@@ -13,7 +13,7 @@ def max_collision(S):
             if S[j] in seen_numbers:
                 T.append(j + 1 - i)
                 seen_numbers.clear()
-                i = (j + 1)
+                i = j + 1
             else:
                 seen_numbers.append(S[j])
     return np.max(T)

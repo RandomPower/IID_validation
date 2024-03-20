@@ -1,5 +1,6 @@
 """ 5.1.3 Lenght of Directional Runs"""
 
+
 def l_directional_runs(S):
     S_prime = []
     for i in range(0, len(S) - 1):
@@ -30,7 +31,7 @@ def l_directional_runs(S):
     return T
 
 
-'''S = [10,9,8,7,6,5,4,25,23,4,5,6]
+"""S = [10,9,8,7,6,5,4,25,23,4,5,6]
 
 T = l_directional_runs(S)
-print(T)'''
+print(T)"""

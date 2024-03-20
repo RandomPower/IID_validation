@@ -9,23 +9,43 @@ from pathos.multiprocessing import ProcessPool as Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from architecture.utils.read import read_file
 from architecture.utils.shuffles import FY_shuffle, shuffle_from_file
-from architecture.utils.useful_functions import execute_function, benchmark_timing, save_failure_test, save_test_values, \
-    get_next_run_number
+from architecture.utils.useful_functions import (
+    execute_function,
+    benchmark_timing,
+    save_failure_test,
+    save_test_values,
+    get_next_run_number,
+)
 from architecture.utils.plot import scatterplot_TxTi, histogram_TxTi
-from architecture.utils.config import file_info, config_info, file, n_symbols, n_sequences, n_symbols_stat, test_list, \
-    distribution_test_index, bool_statistical_analysis, bool_test_NIST, test_list_indexes, bool_pvalue, p, \
-    bool_shuffle_NIST, see_plots, ref_numbers
+from architecture.utils.config import (
+    file_info,
+    config_info,
+    file,
+    n_symbols,
+    n_sequences,
+    n_symbols_stat,
+    test_list,
+    distribution_test_index,
+    bool_statistical_analysis,
+    bool_test_NIST,
+    test_list_indexes,
+    bool_pvalue,
+    p,
+    bool_shuffle_NIST,
+    see_plots,
+    ref_numbers,
+)
 from architecture.statistical_analysis.counters_FYShuffle_Tx import FY_Tx
 from architecture.statistical_analysis.counters_Random_Tx import Random_Tx
 from architecture.statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
 from architecture.statistical_analysis.counters_Random_TjNorm import Random_TjNorm
 from architecture.statistical_analysis.comparison_counters_FyR import comparison_scatterplot
 
-np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={'float': '{:0.6f}'.format})
+np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
 """
 Parallelizzo il numero di sequenze estraendo 10.000 risultati --> chiamando una funzione esterna che chiama i test
-Faccio un executor esterno che prende le 
+Faccio un executor esterno che prende le
 """
 
 
@@ -43,8 +63,10 @@ def execute_test_suite(sequence):
             T.append(result)
     return T
 
+
 # execute_test_suite -->
 # -> [0, 1, 5, 6.7, ...] come con i valori di Tx
+
 
 def FY_test_mode_parallel(seq):
     Ti = []
@@ -52,13 +74,13 @@ def FY_test_mode_parallel(seq):
         futures = []
         for iteration in range(n_sequences):
             s_shuffled = FY_shuffle(seq.copy())
-            '''for k in test_list_indexes:
+            """for k in test_list_indexes:
                 if k in [8, 9]:
                     # Ensure p is passed as a list to be iterable within execute_test
                     future = executor.submit(execute_test, k, s_shuffled)
                 else:
                     future = executor.submit(execute_test, k, s_shuffled)
-                futures.append(future)'''
+                futures.append(future)"""
             future = executor.submit(execute_test_suite, s_shuffled)
             futures.append(future)
 
@@ -121,8 +143,8 @@ def main():
                 if Tx[u] == Ti[t][u]:
                     C1[u] += 1
 
-        print(f'C0 = {C0}')
-        print(f'C1 = {C1}')
+        print(f"C0 = {C0}")
+        print(f"C1 = {C1}")
 
         IID = True
         for b in range(len(Tx)):
@@ -147,8 +169,9 @@ def main():
             hist_dir = "results/plots/histogram_TxTi"
             current_run_date = datetime.now().strftime("%Y-%m-%d")
             dir_sc_run = os.path.join(sc_dir, current_run_date, str(get_next_run_number(sc_dir, current_run_date)))
-            dir_hist_run = os.path.join(hist_dir, current_run_date,
-                                        str(get_next_run_number(hist_dir, current_run_date)))
+            dir_hist_run = os.path.join(
+                hist_dir, current_run_date, str(get_next_run_number(hist_dir, current_run_date))
+            )
 
             # Ensure the directory exists
             os.makedirs(dir_sc_run, exist_ok=True)
@@ -179,7 +202,7 @@ def main():
 
     if bool_statistical_analysis:
         print("----------------------------------------------------------------\n \n")
-        print(f'STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}')
+        print(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
         t_start = time.process_time()
         S = read_file(file=file, n_symbols=n_symbols_stat)
         print("Sequence calculated: S")
@@ -198,5 +221,6 @@ def main():
         comparison_scatterplot()
         print("Statistical analysis completed.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

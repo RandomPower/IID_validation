@@ -3,9 +3,18 @@ import pandas as pd
 import os
 import time
 from datetime import datetime
-from architecture.utils.config import n_symbols, n_sequences, n_symbols_stat, n_iterations_c_stat, test, \
-    n_sequences_stat, test_list_indexes, \
-    test_list, bool_pvalue, bool_shuffle_stat
+from architecture.utils.config import (
+    n_symbols,
+    n_sequences,
+    n_symbols_stat,
+    n_iterations_c_stat,
+    test,
+    n_sequences_stat,
+    test_list_indexes,
+    test_list,
+    bool_pvalue,
+    bool_shuffle_stat,
+)
 from architecture.tests.periodicity import periodicity
 from architecture.tests.excursion_test import excursion_test
 from architecture.tests.runs.n_of_directional_runs import n_directional_runs
@@ -52,17 +61,17 @@ def execute_function(function_name, S, y):
     :return: output of executed test
     """
     return {
-        'excursion_test': lambda: excursion_test(S),
-        'n_directional_runs': lambda: n_directional_runs(S),
-        'l_directional_runs': lambda: l_directional_runs(S),
-        'n_median_runs': lambda: n_median_runs(S),
-        'l_median_runs': lambda: l_median_runs(S),
-        'n_increases_decreases': lambda: n_increases_decreases(S),
-        'avg_collision': lambda: avg_c(S),
-        'max_collision': lambda: max_c(S),
-        'periodicity': lambda: periodicity(S, y),
-        'covariance': lambda: covariace(S, y),
-        'compression': lambda: compression(S)
+        "excursion_test": lambda: excursion_test(S),
+        "n_directional_runs": lambda: n_directional_runs(S),
+        "l_directional_runs": lambda: l_directional_runs(S),
+        "n_median_runs": lambda: n_median_runs(S),
+        "l_median_runs": lambda: l_median_runs(S),
+        "n_increases_decreases": lambda: n_increases_decreases(S),
+        "avg_collision": lambda: avg_c(S),
+        "max_collision": lambda: max_c(S),
+        "periodicity": lambda: periodicity(S, y),
+        "covariance": lambda: covariace(S, y),
+        "compression": lambda: compression(S),
     }[function_name]()
 
 
@@ -76,12 +85,29 @@ def save_counters(c0, c1, elapsed_time, type, f):
     :param type: type of shuffle used
     :param f: path to csv file
     """
-    header = ['n_iterations_c', 'n_symbols', 'n_sequences', 'shuffle', 'test', 'COUNTER_0',
-              'COUNTER_1',
-              'PROCESS_TIME', 'DATE']
+    header = [
+        "n_iterations_c",
+        "n_symbols",
+        "n_sequences",
+        "shuffle",
+        "test",
+        "COUNTER_0",
+        "COUNTER_1",
+        "PROCESS_TIME",
+        "DATE",
+    ]
     elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
-    data = [n_iterations_c_stat, n_symbols_stat, n_sequences_stat, type, test, c0, c1, str(elapsed),
-            str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))]
+    data = [
+        n_iterations_c_stat,
+        n_symbols_stat,
+        n_sequences_stat,
+        type,
+        test,
+        c0,
+        c1,
+        str(elapsed),
+        str(datetime.now().strftime("%d/%m/%Y %H:%M:%S")),
+    ]
 
     # Convert the dictionary to a DataFrame
     df = pd.DataFrame(data, index=header).T
@@ -93,7 +119,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
 
     h = not os.path.exists(f)
     # Esporta il DataFrame in un file CSV
-    df.to_csv(f, mode='a', header=h, index=False)
+    df.to_csv(f, mode="a", header=h, index=False)
 
 
 def save_failure_test(C0, C1, b, test_time):
@@ -105,16 +131,16 @@ def save_failure_test(C0, C1, b, test_time):
     :param b: bool IID (True of False)
     :param test_time: time taken for the execution
     """
-    header = ['n_symbols', 'n_sequences', 'test_list', 'COUNTER_0', 'COUNTER_1', 'IID', 'process_time', 'date']
+    header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
     t = [test_list.get(i) for i in test_list_indexes]
     d = [n_symbols, n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
     dt = pd.DataFrame(d, index=header).T
     h = True
-    if os.path.exists('results/failure_rate.csv'):
+    if os.path.exists("results/failure_rate.csv"):
         h = False
-        dt.to_csv('results/failure_rate.csv', mode='a', header=h, index=False)
+        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
     else:
-        dt.to_csv('results/failure_rate.csv', mode='a', header=h, index=False)
+        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
 
 
 def save_test_values(Tx, Ti):
@@ -125,19 +151,36 @@ def save_test_values(Tx, Ti):
     :param Ti: Ti vector with test values
     """
     if bool_pvalue:
-        header = ['excursion_test', 'n_directional_runs', 'l_directional_runs', 'n_median_runs', 'l_median_runs',
-                  'n_increases_decreases', 'avg_collision', 'max_collision', 'periodicity_p0', 'periodicity_p1',
-                  'periodicity_p2', 'periodicity_p3', 'periodicity_p4', 'covariance_p0', 'covariance_p1',
-                  'covariance_p2', 'covariance_p3', 'covariance_p4', 'compression']
+        header = [
+            "excursion_test",
+            "n_directional_runs",
+            "l_directional_runs",
+            "n_median_runs",
+            "l_median_runs",
+            "n_increases_decreases",
+            "avg_collision",
+            "max_collision",
+            "periodicity_p0",
+            "periodicity_p1",
+            "periodicity_p2",
+            "periodicity_p3",
+            "periodicity_p4",
+            "covariance_p0",
+            "covariance_p1",
+            "covariance_p2",
+            "covariance_p3",
+            "covariance_p4",
+            "compression",
+        ]
     else:
         header = [test_list[k] for k in test_list_indexes]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
     # df.insert("time Ti", tf, True)
-    file_path = 'results/save_test_values.csv'
+    file_path = "results/save_test_values.csv"
     write_header = not os.path.isfile(file_path)
-    write_mode = 'w' if write_header else 'a'
+    write_mode = "w" if write_header else "a"
 
     # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
     df.to_csv(file_path, mode=write_mode, header=write_header, index=False)
@@ -153,10 +196,16 @@ def benchmark_timing(tot_time, p):
         test_ind = "all tests run"
     else:
         test_ind = "tests run: " + str(test_list_indexes)
-    lines = [str(datetime.now()), "n_symbols: " + str(n_symbols), "n_sequences: " + str(n_sequences), test_ind,
-             "total_time: " + str(tot_time) + " s", p]
-    with open('results/benchmark_timing_Ti_NIST_test.txt', 'a') as f:
-        f.write('\n'.join(map(str, lines)) + '\n' '\n')
+    lines = [
+        str(datetime.now()),
+        "n_symbols: " + str(n_symbols),
+        "n_sequences: " + str(n_sequences),
+        test_ind,
+        "total_time: " + str(tot_time) + " s",
+        p,
+    ]
+    with open("results/benchmark_timing_Ti_NIST_test.txt", "a") as f:
+        f.write("\n".join(map(str, lines)) + "\n" "\n")
 
 
 def get_next_run_number(base_dir, current_run_date):

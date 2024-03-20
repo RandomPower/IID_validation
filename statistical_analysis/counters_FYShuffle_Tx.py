@@ -7,12 +7,20 @@ computed on a sequence is bigger than that it, C1 is incremented if they are equ
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
-from architecture.utils.config import n_symbols_stat, n_sequences_stat, n_iterations_c_stat, test, distribution_test_index, p_value_stat
+from architecture.utils.config import (
+    n_symbols_stat,
+    n_sequences_stat,
+    n_iterations_c_stat,
+    test,
+    distribution_test_index,
+    p_value_stat,
+)
 from architecture.utils.useful_functions import execute_function, save_counters
 from architecture.utils.shuffles import FY_shuffle
 from architecture.utils.plot import counters_distribution_Tx
 import time
 from tqdm import tqdm
+
 
 def counters_FYShuffle_Tx(S):
     counters_0 = []
@@ -43,16 +51,18 @@ def counters_FYShuffle_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f'FY_Tx counter_0: {counters_0}')
-    print(f'FY_Tx counter_1: {counters_1}')
+    print(f"FY_Tx counter_0: {counters_0}")
+    print(f"FY_Tx counter_1: {counters_1}")
 
     return counters_0, counters_1
 
 
 def FY_Tx(S):
     print("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
-    f = '/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/FYShuffleTx' \
-        '/fyShuffleTx_' + test + '.csv'
+    f = (
+        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/FYShuffleTx"
+        "/fyShuffleTx_" + test + ".csv"
+    )
     t = time.process_time()
     C0, C1 = counters_FYShuffle_Tx(S)
     elapsed_time = time.process_time() - t
@@ -62,4 +72,3 @@ def FY_Tx(S):
 
     # Plot results
     counters_distribution_Tx(C0, n_sequences_stat, n_iterations_c_stat, "FY_Tx")
-

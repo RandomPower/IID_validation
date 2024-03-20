@@ -1,4 +1,5 @@
 """ 5.1.9 Periodicity Test Statistics"""
+
 import time
 
 from architecture.utils.config import p
@@ -23,4 +24,3 @@ def periodicity_test(S):
                 t += 1
         T.append(t)
     return T
-
