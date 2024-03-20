@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def l_median_runs(S):
     X = np.median(S)
     S_prime = []
@@ -32,5 +33,5 @@ def l_median_runs(S):
     return T
 
 
-'''S = (5, 15, 12_normal, 1, 13, 9, 4)
-print(l_median_runs(S))'''
+"""S = (5, 15, 12_normal, 1, 13, 9, 4)
+print(l_median_runs(S))"""

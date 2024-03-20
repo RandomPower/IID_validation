@@ -1,4 +1,5 @@
 """ 5.1.5 Number of Runs based on median"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
@@ -35,14 +36,16 @@ def statistic_n_median_runs(s_sequences):
 
     fig, ax = plt.subplots()
     bin_edges = np.arange(min(num_M_runs) - 0.5, max(num_M_runs) + 1.5, 1)
-    ax.hist(num_M_runs, bin_edges, color='skyblue', edgecolor='black')
-    textstr = '\n'.join((
-        r'$mean=%.2f$' % (np.mean(num_M_runs),),
-        r'$std=%.2f$' % (np.std(num_M_runs),),))
-    props = dict(boxstyle='round', facecolor='w', alpha=0.5)
-    ax.text(0.15, 0.35, textstr, transform=ax.transAxes, fontsize=14,
-            verticalalignment='top', bbox=props)
-    plt.title('Distribution of the number of runs with respect to the median per sequence', size=14)
+    ax.hist(num_M_runs, bin_edges, color="skyblue", edgecolor="black")
+    textstr = "\n".join(
+        (
+            r"$mean=%.2f$" % (np.mean(num_M_runs),),
+            r"$std=%.2f$" % (np.std(num_M_runs),),
+        )
+    )
+    props = dict(boxstyle="round", facecolor="w", alpha=0.5)
+    ax.text(0.15, 0.35, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
+    plt.title("Distribution of the number of runs with respect to the median per sequence", size=14)
     plt.show()
 
     # compute z-score: with theoretical R_mean and R_var computed for each sequence
@@ -57,11 +60,11 @@ def statistic_n_median_runs(s_sequences):
     UL = 9.5 * np.std(Z)
     bin_size = np.std(Z) / 9
     bins = np.linspace(LL, UL, num=int((UL - LL) / bin_size))
-    bin_values, bin_edges, patches = ax.hist(Z, bins, color='skyblue', edgecolor='black')
+    bin_values, bin_edges, patches = ax.hist(Z, bins, color="skyblue", edgecolor="black")
 
     # gaussian fit
     def gauss(x, amp, mu, sigma):
-        return amp * np.exp(-(x - mu) ** 2 / 2 * (sigma) ** 2)
+        return amp * np.exp(-((x - mu) ** 2) / 2 * (sigma) ** 2)
 
     x = np.linspace(LL, UL, int((UL - LL) / bin_size) - 1)
     y = bin_values
@@ -73,17 +76,14 @@ def statistic_n_median_runs(s_sequences):
     amp_err, mu_err, sigma_err = par_err
 
     x1 = np.linspace(LL, UL, 10000)
-    ax.plot(x1, gauss(x1, *par_opt), color='red', label='fit')
+    ax.plot(x1, gauss(x1, *par_opt), color="red", label="fit")
 
     # plot costumization
-    textstr = '\n'.join((
-        r'$mean=%.2f \pm%.2f$' % (mu, mu_err),
-        r'$std=%.2f \pm%.2f$' % (sigma, sigma_err)))
-    props = dict(boxstyle='round', facecolor='w', alpha=0.5)
-    ax.text(0.15, 0.35, textstr, transform=ax.transAxes, fontsize=14,
-            verticalalignment='top', bbox=props)
+    textstr = "\n".join((r"$mean=%.2f \pm%.2f$" % (mu, mu_err), r"$std=%.2f \pm%.2f$" % (sigma, sigma_err)))
+    props = dict(boxstyle="round", facecolor="w", alpha=0.5)
+    ax.text(0.15, 0.35, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    ax.set_title('Distribution of the z-scores of the number of runs with respect to the median per sequence', size=14)
+    ax.set_title("Distribution of the z-scores of the number of runs with respect to the median per sequence", size=14)
 
     plt.show()
 
@@ -107,5 +107,5 @@ def n_median_runs(S):
     return T
 
 
-'''S = (5, 15, 12_normal, 1, 13, 9, 4, 9, 20, 3, 1, 7, 8, 5, 2)
-print(n_median_runs(S))'''
+"""S = (5, 15, 12_normal, 1, 13, 9, 4, 9, 20, 3, 1, 7, 8, 5, 2)
+print(n_median_runs(S))"""

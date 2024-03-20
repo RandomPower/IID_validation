@@ -1,5 +1,6 @@
 """ 5.1.2 Number of Directional Runs"""
 
+
 def n_directional_runs(S):
     S_prime = []
     for i in range(len(S) - 1):
@@ -18,6 +19,6 @@ def n_directional_runs(S):
     return T
 
 
-'''S = [2, 2, 2, 5, 7, 7, 9, 3, 1, 4, 4]
+"""S = [2, 2, 2, 5, 7, 7, 9, 3, 1, 4, 4]
 T = n_directional_runs(S)
-print(T)'''
+print(T)"""

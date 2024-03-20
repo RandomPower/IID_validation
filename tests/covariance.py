@@ -4,10 +4,11 @@
 # parameters (1,2,8,16,32). the function 'covariance' leaves the choice of the parameter, while 'covariance_test'
 # performs 'covariace' on the aforementioned parameters and returns the statistic(s) T as an array
 
+
 def covariace(S, p):
     T = 0
     for i in range(len(S) - p):
-        T += (S[i] * S[i + p])
+        T += S[i] * S[i + p]
     return T
 
 

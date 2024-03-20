@@ -9,7 +9,7 @@ def read_file(file, n_symbols):
     :param n_symbols: number of symbols to read
     :return: S sequence
     """
-    with open(file, 'r+b') as f:
+    with open(file, "r+b") as f:
         tot_bytes = int(n_symbols / 2)
         if bool_first_seq:
             my_bytes = f.read(tot_bytes)

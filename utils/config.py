@@ -3,8 +3,10 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 """
 
 # GLOBAL VARIABLES
-file = '/Users/olivia1/Desktop/RANDOM POWER/project_entropy_validation/bits_RandomPower/test1' \
-       '/getbits_20230401_195315_RAW_BITS.BIN'
+file = (
+    "/Users/olivia1/Desktop/RANDOM POWER/project_entropy_validation/bits_RandomPower/test1"
+    "/getbits_20230401_195315_RAW_BITS.BIN"
+)
 bool_test_NIST = True
 bool_statistical_analysis = False
 
@@ -38,24 +40,26 @@ test_list_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # Select which tests to 
 step = n_symbols / 2  # step in reading bin file
 
 # Test list
-test_list = {0: 'excursion_test',
-             1: 'n_directional_runs',
-             2: 'l_directional_runs',
-             3: 'n_median_runs',
-             4: 'l_median_runs',
-             5: 'n_increases_decreases',
-             6: 'avg_collision',
-             7: 'max_collision',
-             8: 'periodicity',
-             9: 'covariance',
-             10: 'compression'}
+test_list = {
+    0: "excursion_test",
+    1: "n_directional_runs",
+    2: "l_directional_runs",
+    3: "n_median_runs",
+    4: "l_median_runs",
+    5: "n_increases_decreases",
+    6: "avg_collision",
+    7: "max_collision",
+    8: "periodicity",
+    9: "covariance",
+    10: "compression",
+}
 
 # test chosen for counters distribution
 test = test_list[distribution_test_index]
 
 
 def file_info():
-    f = open(file, 'r+b')
+    f = open(file, "r+b")
     f.seek(0, 2)
     size = f.tell()
     print("FILE INFO")
@@ -74,7 +78,6 @@ def file_info():
             print("Error: SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
             exit(-1)
     print("----------------------------------------------------------------\n")
-
 
 
 def config_info():
