@@ -65,8 +65,7 @@ def counters_FY_TjNorm(S):
 def FY_TjNorm(S):
     print("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-        "/FYShuffleTjNorm/fyShuffleTjNorm_" + test + ".csv"
+        "./results/counters_distribution/FYShuffleTjNorm/fyShuffleTjNorm_" + test + ".csv"
     )
     t = time.process_time()
     C0, C1 = counters_FY_TjNorm(S)

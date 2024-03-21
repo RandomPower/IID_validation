@@ -4,8 +4,7 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 
 # GLOBAL VARIABLES
 file = (
-    "/Users/olivia1/Desktop/RANDOM POWER/project_entropy_validation/bits_RandomPower/test1"
-    "/getbits_20230401_195315_RAW_BITS.BIN"
+    "../getbits_20230401_195315_RAW_BITS.BIN"
 )
 bool_test_NIST = True
 bool_statistical_analysis = False

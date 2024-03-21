@@ -36,21 +36,17 @@ def get_data(ref_numbers, Tj_norm):
         if ref in test_list:
             if Tj_norm:
                 fy = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/FYShuffleTjNorm/fyShuffleTjNorm_" + str(test_list[ref]).strip() + ".csv"
+                    "./results/counters_distribution/FYShuffleTjNorm/fyShuffleTjNorm_" + str(test_list[ref]).strip() + ".csv"
                 )
                 rand = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/RandomTjNorm/randomTjNorm_" + str(test_list[ref]).strip() + ".csv"
+                    "./results/counters_distribution/RandomTjNorm/randomTjNorm_" + str(test_list[ref]).strip() + ".csv"
                 )
             else:
                 fy = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/FYShuffleTx/fyShuffleTx_" + str(test_list[ref]).strip() + ".csv"
+                    "./results/counters_distribution/FYShuffleTx/fyShuffleTx_" + str(test_list[ref]).strip() + ".csv"
                 )
                 rand = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/RandomTx/randomTx_" + str(test_list[ref]).strip() + ".csv"
+                    "./results/counters_distribution/RandomTx/randomTx_" + str(test_list[ref]).strip() + ".csv"
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
                 print(f"Error: File(s) for reference number {ref} do not exist.")

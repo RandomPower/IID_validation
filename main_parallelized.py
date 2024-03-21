@@ -3,7 +3,6 @@ import time
 import sys
 import numpy as np
 from datetime import datetime
-import time
 from functools import wraps
 from pathos.multiprocessing import ProcessPool as Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed

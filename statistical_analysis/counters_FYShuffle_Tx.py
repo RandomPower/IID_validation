@@ -60,8 +60,7 @@ def counters_FYShuffle_Tx(S):
 def FY_Tx(S):
     print("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
     f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/FYShuffleTx"
-        "/fyShuffleTx_" + test + ".csv"
+        "./results/counters_distribution/FYShuffleTx/fyShuffleTx_" + test + ".csv"
     )
     t = time.process_time()
     C0, C1 = counters_FYShuffle_Tx(S)

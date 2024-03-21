@@ -62,8 +62,7 @@ def counters_Random_Tx(S):
 def Random_Tx(S):
     print("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
     f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/RandomTx"
-        "/randomTx_" + test + ".csv"
+        "./results/counters_distribution/RandomTx/randomTx_" + test + ".csv"
     )
     t = time.process_time()
     C0, C1 = counters_Random_Tx(S)
