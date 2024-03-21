@@ -20,6 +20,7 @@ from architecture.utils.useful_functions import execute_function, save_counters
 from architecture.utils.shuffles import shuffle_from_file_Norm
 from architecture.utils.plot import counters_distribution_Tj
 import time
+import os
 from tqdm import tqdm
 
 
@@ -56,9 +57,13 @@ def counters_FY_TjNorm(S):
 
 def Random_TjNorm(S):
     print("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
-    f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/RandomTjNorm"
-        "/randomTjNorm_" + test + ".csv"
+    f = os.path.abspath(
+        os.path.join(
+            "results",
+            "counters_distribution",
+            "RandomTjNorm",
+            f"randomTjNorm_{test}.csv",
+        )
     )
     t = time.process_time()
     C0, C1 = counters_FY_TjNorm(S)
