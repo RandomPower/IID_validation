@@ -19,6 +19,7 @@ from architecture.utils.useful_functions import execute_function, save_counters
 from architecture.utils.shuffles import FY_shuffle
 from architecture.utils.plot import counters_distribution_Tj
 import time
+import os
 from tqdm import tqdm
 
 
@@ -64,8 +65,13 @@ def counters_FY_TjNorm(S):
 
 def FY_TjNorm(S):
     print("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
-    f = (
-        "./results/counters_distribution/FYShuffleTjNorm/fyShuffleTjNorm_" + test + ".csv"
+    f = os.path.abspath(
+        os.path.join(
+            "results",
+            "counters_distribution",
+            "FYShuffleTjNorm",
+            f"fyShuffleTjNorm_{test}.csv",
+        )
     )
     t = time.process_time()
     C0, C1 = counters_FY_TjNorm(S)
