@@ -22,7 +22,7 @@ from utils.plot import scatterplot_TxTi, histogram_TxTi
 from utils.config import (
     file_info,
     config_info,
-    file,
+    input_file,
     n_symbols,
     n_sequences,
     n_symbols_stat,
@@ -125,7 +125,7 @@ if bool_test_NIST:
     print("NIST TEST")
     print("Process started")
     t_start = time.process_time()
-    S = read_file(file=file, n_symbols=n_symbols)
+    S = read_file(file=input_file, n_symbols=n_symbols)
     print("Sequence calculated: S")
 
     print("Calculating for each test the reference statistic: Tx")
@@ -228,7 +228,7 @@ if bool_statistical_analysis:
     print("----------------------------------------------------------------")
     print(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
     t_start = time.process_time()
-    S = read_file(file=file, n_symbols=n_symbols_stat)
+    S = read_file(file=input_file, n_symbols=n_symbols_stat)
     print("Sequence calculated: S")
     FY_Tx(S)
     FY_TjNorm(S)
