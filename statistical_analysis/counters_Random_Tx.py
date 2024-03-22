@@ -66,8 +66,8 @@ def Random_Tx(S):
         os.path.join(
             "results",
             "counters_distribution",
-            "RandomTjNorm",
-            f"randomTjNorm_{test}.csv",
+            "RandomTx",
+            f"RandomTx_{test}.csv",
         )
     )
     t = time.process_time()
