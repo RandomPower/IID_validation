@@ -31,7 +31,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
     :param n_sequences: number of sequences
     :return: shuffled sequences
     """
-    with open(file, "rb") as f:
+    with open(input_file, "rb") as f:
         sequences = []
         for z in range(n_seq):
             # Move to the current offset
@@ -75,7 +75,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     :param test: test on which perform the statistical analysis
     :return: shuffled sequences, reference statistics on the shuffled sequences
     """
-    with open(file, "rb") as f:
+    with open(input_file, "rb") as f:
         sequences = []
         Ti = []
 
