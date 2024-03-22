@@ -7,7 +7,7 @@ computed on a sequence is bigger than that it, C1 is incremented if they are equ
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
-from architecture.utils.config import (
+from utils.config import (
     n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
@@ -15,9 +15,9 @@ from architecture.utils.config import (
     distribution_test_index,
     p_value_stat,
 )
-from architecture.utils.useful_functions import execute_function, save_counters
-from architecture.utils.shuffles import shuffle_from_file
-from architecture.utils.plot import counters_distribution_Tx
+from utils.useful_functions import execute_function, save_counters
+from utils.shuffles import shuffle_from_file
+from utils.plot import counters_distribution_Tx
 import time
 from tqdm import tqdm
 import os

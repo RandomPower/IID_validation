@@ -7,17 +7,17 @@ import time
 from functools import wraps
 from pathos.multiprocessing import ProcessPool as Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from architecture.utils.read import read_file
-from architecture.utils.shuffles import FY_shuffle, shuffle_from_file
-from architecture.utils.useful_functions import (
+from utils.read import read_file
+from utils.shuffles import FY_shuffle, shuffle_from_file
+from utils.useful_functions import (
     execute_function,
     benchmark_timing,
     save_failure_test,
     save_test_values,
     get_next_run_number,
 )
-from architecture.utils.plot import scatterplot_TxTi, histogram_TxTi
-from architecture.utils.config import (
+from utils.plot import scatterplot_TxTi, histogram_TxTi
+from utils.config import (
     file_info,
     config_info,
     input_file,
@@ -35,11 +35,11 @@ from architecture.utils.config import (
     see_plots,
     ref_numbers,
 )
-from architecture.statistical_analysis.counters_FYShuffle_Tx import FY_Tx
-from architecture.statistical_analysis.counters_Random_Tx import Random_Tx
-from architecture.statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
-from architecture.statistical_analysis.counters_Random_TjNorm import Random_TjNorm
-from architecture.statistical_analysis.comparison_counters_FyR import comparison_scatterplot
+from statistical_analysis.counters_FYShuffle_Tx import FY_Tx
+from statistical_analysis.counters_Random_Tx import Random_Tx
+from statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
+from statistical_analysis.counters_Random_TjNorm import Random_TjNorm
+from statistical_analysis.comparison_counters_FyR import comparison_scatterplot
 
 np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 

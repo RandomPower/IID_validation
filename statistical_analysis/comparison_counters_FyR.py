@@ -18,8 +18,8 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from architecture.utils.config import n_sequences_stat, test_list, ref_numbers
-from architecture.utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
+from utils.config import n_sequences_stat, test_list, ref_numbers
+from utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
 
 
 def get_data(ref_numbers, Tj_norm):

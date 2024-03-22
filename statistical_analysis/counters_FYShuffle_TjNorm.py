@@ -7,7 +7,7 @@ test are equal the second sequence is ignored. Each pair of sequences is conside
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
-from architecture.utils.config import (
+from utils.config import (
     n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
@@ -15,9 +15,9 @@ from architecture.utils.config import (
     distribution_test_index,
     p_value_stat,
 )
-from architecture.utils.useful_functions import execute_function, save_counters
-from architecture.utils.shuffles import FY_shuffle
-from architecture.utils.plot import counters_distribution_Tj
+from utils.useful_functions import execute_function, save_counters
+from utils.shuffles import FY_shuffle
+from utils.plot import counters_distribution_Tj
 import time
 import os
 from tqdm import tqdm

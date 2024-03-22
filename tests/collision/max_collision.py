@@ -1,7 +1,7 @@
 """ 5.1.8 Maximum Collision Test Statistic"""
 
 import numpy as np
-from architecture.utils.time_monitor_function import timed
+from utils.time_monitor_function import timed
 
 
 def max_collision(S):

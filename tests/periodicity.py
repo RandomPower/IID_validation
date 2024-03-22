@@ -2,8 +2,8 @@
 
 import time
 
-from architecture.utils.config import p
-from architecture.utils.time_monitor_function import timed
+from utils.config import p
+from utils.time_monitor_function import timed
 
 
 # @timed
