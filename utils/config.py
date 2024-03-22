@@ -15,7 +15,7 @@ n_symbols = 1000
 n_sequences = 100000
 bool_shuffle_NIST = True  # --> if True: FY shuffle, if False: use random sampling from file
 bool_first_seq = True  # --> if True: reference sequence read from beginning; if False: reference sequence from the end
-bool_pvalue = False  # --> if True: NIST values, if False: user choose value
+bool_pvalue = False  # --> if True: NIST values, if False: user chooses value
 see_plots = False
 
 if bool_pvalue:
@@ -68,7 +68,7 @@ def file_info():
     print("Number of sequences wanted for counters analysis:", n_sequences_stat)
     max_symbols = size * 2  # total number of symbols in the file
     max_sequences = max_symbols / n_symbols_stat
-    print("Maxmimum sequences that can be generated from the file:", max_sequences)
+    print("Maximum sequences that can be generated from the file:", max_sequences)
     tot_seqs = n_iterations_c_stat * n_sequences_stat
     print("Total sequences necessary =", tot_seqs)
     if not bool_shuffle_stat:
