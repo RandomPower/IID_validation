@@ -5,8 +5,8 @@ import numpy as np
 import datetime
 import pandas as pd
 from datetime import datetime
-from architecture.utils.useful_functions import get_next_run_number
-from architecture.utils.config import test, distribution_test_index, n_sequences_stat, n_symbols, n_sequences
+from utils.useful_functions import get_next_run_number
+from utils.config import test, distribution_test_index, n_sequences_stat, n_symbols, n_sequences
 
 
 ########################################################################

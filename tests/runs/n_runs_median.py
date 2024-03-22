@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
-from architecture.utils.config import n_symbols, n_sequences
+from utils.config import n_symbols, n_sequences
 
 
 def statistic_n_median_runs(s_sequences):

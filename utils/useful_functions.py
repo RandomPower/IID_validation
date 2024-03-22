@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import time
 from datetime import datetime
-from architecture.utils.config import (
+from utils.config import (
     n_symbols,
     n_sequences,
     n_symbols_stat,
@@ -15,17 +15,17 @@ from architecture.utils.config import (
     bool_pvalue,
     bool_shuffle_stat,
 )
-from architecture.tests.periodicity import periodicity
-from architecture.tests.excursion_test import excursion_test
-from architecture.tests.runs.n_of_directional_runs import n_directional_runs
-from architecture.tests.runs.l_directional_runs import l_directional_runs
-from architecture.tests.runs.n_runs_median import n_median_runs
-from architecture.tests.runs.l_runs_median import l_median_runs
-from architecture.tests.runs.n_increases_decreases import n_increases_decreases
-from architecture.tests.collision.avg_collision import avg_c
-from architecture.tests.collision.max_collision import max_c
-from architecture.tests.covariance import covariace
-from architecture.tests.compression import compression
+from tests.periodicity import periodicity
+from tests.excursion_test import excursion_test
+from tests.runs.n_of_directional_runs import n_directional_runs
+from tests.runs.l_directional_runs import l_directional_runs
+from tests.runs.n_runs_median import n_median_runs
+from tests.runs.l_runs_median import l_median_runs
+from tests.runs.n_increases_decreases import n_increases_decreases
+from tests.collision.avg_collision import avg_c
+from tests.collision.max_collision import max_c
+from tests.covariance import covariace
+from tests.compression import compression
 
 
 def s_prime(S):

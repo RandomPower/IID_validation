@@ -3,7 +3,7 @@ average collision
 """
 
 import numpy as np
-from architecture.utils.time_monitor_function import timed
+from utils.time_monitor_function import timed
 
 
 def avg_collision(S):

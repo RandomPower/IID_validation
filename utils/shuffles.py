@@ -1,6 +1,6 @@
 import random
-from architecture.utils.config import file, step, distribution_test_index, test, bool_pvalue, p_value_stat
-from architecture.utils.useful_functions import execute_function
+from utils.config import input_file, step, distribution_test_index, test, bool_pvalue, p_value_stat
+from utils.useful_functions import execute_function
 
 
 # %matplotlib inline
