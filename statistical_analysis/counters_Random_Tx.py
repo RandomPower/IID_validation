@@ -20,6 +20,7 @@ from architecture.utils.shuffles import shuffle_from_file
 from architecture.utils.plot import counters_distribution_Tx
 import time
 from tqdm import tqdm
+import logging
 
 
 def counters_Random_Tx(S):
@@ -53,14 +54,14 @@ def counters_Random_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"Random_Tx counter_0: {counters_0}")
-    print(f"Random_Tx counter_1: {counters_1}")
+    logging.debug(f"Random_Tx counter_0: {counters_0}")
+    logging.debug(f"Random_Tx counter_1: {counters_1}")
 
     return counters_0, counters_1
 
 
 def Random_Tx(S):
-    print("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
+    logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
     f = (
         "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/RandomTx"
         "/randomTx_" + test + ".csv"

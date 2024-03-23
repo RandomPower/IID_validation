@@ -21,6 +21,7 @@ from architecture.utils.shuffles import shuffle_from_file_Norm
 from architecture.utils.plot import counters_distribution_Tj
 import time
 from tqdm import tqdm
+import logging
 
 
 def counters_random_TjNorm():
@@ -43,14 +44,14 @@ def counters_random_TjNorm():
         counters_1.append(C1)
         index += n_sequences_stat * n_symbols_stat / 2
 
-    print(f"Random_TjNorm counter_0: {counters_0}")
-    print(f"Random_TjNorm counter_1: {counters_1}")
+    logging.debug(f"Random_TjNorm counter_0: {counters_0}")
+    logging.debug(f"Random_TjNorm counter_1: {counters_1}")
 
     return counters_0, counters_1
 
 
-def Random_TjNorm(S):
-    print("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
+def Random_TjNorm():
+    logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = (
         "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/RandomTjNorm"
         "/randomTjNorm_" + test + ".csv"
