@@ -2,13 +2,13 @@
 FISHER YATES SHUFFLE WITH NORMALIZED Tj
 
 Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the results of the
-test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one.
+C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the
+results of the test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from
+the following one.
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
 from architecture.utils.config import (
-    n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,

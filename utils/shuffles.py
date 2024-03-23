@@ -1,9 +1,6 @@
 import random
-from architecture.utils.config import file, step, distribution_test_index, test, bool_pvalue, p_value_stat
+from architecture.utils.config import file, step, distribution_test_index, p_value_stat
 from architecture.utils.useful_functions import execute_function
-
-
-# %matplotlib inline
 
 
 def FY_shuffle(sequence):
@@ -20,15 +17,13 @@ def FY_shuffle(sequence):
     return sequence
 
 
-# shuffle direttamente da file per ottenere sequenze senza usare FY
 def shuffle_from_file(ind, n_symb, n_seq):
     """
     This function read sequences from file
 
-    :param n_symb:
     :param ind: index in the file
-    :param n_symbols: number of symols per sequence
-    :param n_sequences: number of sequences
+    :param n_symb: number of symols per sequence
+    :param n_seq: number of sequences
     :return: shuffled sequences
     """
     with open(file, "rb") as f:
@@ -54,6 +49,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
             ind += step
 
             # TO DO: exception
+
         return sequences
 
 
@@ -61,17 +57,17 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     """
     Shuffle from file normalized
 
-    This function is a modification of shuffle_from_file used for normalized Tj counters_oli. It takes the same input
+    This function is a modification of shuffle_from_file, to be used for normalized Tj counters. It takes the same input
     index as shuffle_from_file, but if the sequence it reads has the same result T on a given test as the previous
     sequence (T(j-1)), it discards it and passes to the next sequence. This is because for Tj normalized we want the
-    counters_oli distribution to be a binomial one with probability 1/2, so we want to ignore the cases = and only have
+    counters distribution to be a binomial one with probability 1/2, so we want to ignore the cases = and only have
     the options > or <. To do so this function also needs to compute the T (aka test(seq)): it therefore gives them
-    back as well, so that there is no need to compute them again (this however changes the main as well, I don't know
-    if it's howerall convenient). The otput are two: the list of sequences and the list of the Ti on those sequences.
+    back as well, so that there is no need to compute them again. The output are two: the list of sequences and the list
+     of the Ti on those sequences.
 
     :param index: index in the file
-    :param n_symbols: number of symbols in the sequence
-    :param n_sequences: number of sequences
+    :param n_symb: number of symbols in the sequence
+    :param n_seq: number of sequences
     :param test: test on which perform the statistical analysis
     :return: shuffled sequences, reference statistics on the shuffled sequences
     """
@@ -101,10 +97,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
 
         z = 1
         while z < n_seq:
-            # Move to the current offset
             f.seek(int(index))
-
-            # Read the sequence_size bytes
             sequence_size = int(n_symb / 2)
             sequence = f.read(sequence_size)
 

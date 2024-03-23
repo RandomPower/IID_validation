@@ -2,13 +2,12 @@
 FISHER YATES SHUFFLE FOR REFERENCE VALUES
 
 Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result of the test T
-computed on a sequence is bigger than that it, C1 is incremented if they are equal.
+The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result of the
+test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
 from architecture.utils.config import (
-    n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,

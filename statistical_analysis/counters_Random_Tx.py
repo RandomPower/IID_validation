@@ -2,8 +2,8 @@
 RANDOM SAMPLING FROM FILE FOR REFERENCE VALUES
 
 Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
-The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result of the test T
-computed on a sequence is bigger than that it, C1 is incremented if they are equal.
+The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result of the
+test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
@@ -29,7 +29,7 @@ def counters_Random_Tx(S):
         Tx = execute_function(test, S, p_value_stat)
     else:
         Tx = execute_function(test, S, None)
-    counters_0 = []  # shape = (n_iterations_c x 1)
+    counters_0 = []
     counters_1 = []
     index = n_symbols_stat / 2
 

@@ -29,7 +29,7 @@ else:
 # STATISTICAL ANALYSIS VARIABLES
 n_sequences_stat = 200
 n_symbols_stat = 1000
-n_iterations_c_stat = 500  # counter distruibution iterations
+n_iterations_c_stat = 500
 distribution_test_index = 6  # Select which test index for counter distribution
 
 bool_shuffle_stat = True  # --> if True: FY shuffle, if False: use random sampling from file

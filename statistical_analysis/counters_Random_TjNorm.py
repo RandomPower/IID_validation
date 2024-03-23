@@ -13,10 +13,8 @@ from architecture.utils.config import (
     n_sequences_stat,
     n_iterations_c_stat,
     test,
-    distribution_test_index,
-    p_value_stat,
 )
-from architecture.utils.useful_functions import execute_function, save_counters
+from architecture.utils.useful_functions import save_counters
 from architecture.utils.shuffles import shuffle_from_file_Norm
 from architecture.utils.plot import counters_distribution_Tj
 import time
