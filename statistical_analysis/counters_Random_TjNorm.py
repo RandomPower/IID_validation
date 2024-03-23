@@ -23,12 +23,7 @@ import time
 from tqdm import tqdm
 
 
-def counters_FY_TjNorm(S):
-    if distribution_test_index == 8 or distribution_test_index == 9:
-        Tx = execute_function(test, S, p_value_stat)
-    else:
-        Tx = execute_function(test, S, None)
-
+def counters_random_TjNorm():
     counters_0 = []
     counters_1 = []
     index = 0
@@ -61,7 +56,7 @@ def Random_TjNorm(S):
         "/randomTjNorm_" + test + ".csv"
     )
     t = time.process_time()
-    C0, C1 = counters_FY_TjNorm(S)
+    C0, C1 = counters_random_TjNorm()
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
