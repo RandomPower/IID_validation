@@ -20,6 +20,7 @@ from architecture.utils.shuffles import FY_shuffle
 from architecture.utils.plot import counters_distribution_Tx
 import time
 from tqdm import tqdm
+import logging
 
 
 def counters_FYShuffle_Tx(S):
@@ -51,14 +52,14 @@ def counters_FYShuffle_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"FY_Tx counter_0: {counters_0}")
-    print(f"FY_Tx counter_1: {counters_1}")
+    logging.debug(f"FY_Tx counter_0: {counters_0}")
+    logging.debug(f"FY_Tx counter_1: {counters_1}")
 
     return counters_0, counters_1
 
 
 def FY_Tx(S):
-    print("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
+    logging.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
     f = (
         "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/FYShuffleTx"
         "/fyShuffleTx_" + test + ".csv"

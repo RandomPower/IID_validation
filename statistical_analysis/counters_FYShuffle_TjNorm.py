@@ -20,6 +20,7 @@ from architecture.utils.shuffles import FY_shuffle
 from architecture.utils.plot import counters_distribution_Tj
 import time
 from tqdm import tqdm
+import logging
 
 
 def counters_FY_TjNorm(S):
@@ -56,14 +57,14 @@ def counters_FY_TjNorm(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"FY_TjNorm counter_0: {counters_0}")
-    print(f"FY_TjNorm counter_1: {counters_1}")
+    logging.debug(f"FY_TjNorm counter_0: {counters_0}")
+    logging.debug(f"FY_TjNorm counter_1: {counters_1}")
 
     return counters_0, counters_1
 
 
 def FY_TjNorm(S):
-    print("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
+    logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     f = (
         "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
         "/FYShuffleTjNorm/fyShuffleTjNorm_" + test + ".csv"

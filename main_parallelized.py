@@ -7,6 +7,7 @@ import time
 from functools import wraps
 from pathos.multiprocessing import ProcessPool as Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import logging
 from architecture.utils.read import read_file
 from architecture.utils.shuffles import FY_shuffle, shuffle_from_file
 from architecture.utils.useful_functions import (
@@ -100,13 +101,13 @@ def main():
     file_info()
     config_info()
     if bool_test_NIST:
-        print("NIST TEST")
-        print("Process started")
+        logging.debug("NIST TEST")
+        logging.debug("Process started")
         t_start = time.process_time()
         S = read_file(file=file, n_symbols=n_symbols)
-        print("Sequence calculated: S")
+        logging.debug("Sequence calculated: S")
 
-        print("Calculating for each test the reference statistic: Tx")
+        logging.debug("Calculating for each test the reference statistic: Tx")
         Tx = []
         for k in test_list_indexes:
             if k == 8 or k == 9:
@@ -117,20 +118,14 @@ def main():
                     Tx.append(execute_function(test_list[k], S, p))
             else:
                 Tx.append(execute_function(test_list[k], S, None))
-        print("Reference statistics calculated!")
-        print("Calculating each test statistic for each shuffled sequence: Ti")
+        logging.debug("Reference statistics calculated!")
+        logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
         t0 = time.process_time()
         Ti = FY_test_mode_parallel(S)
         ti = time.process_time() - t0
         # tf = time.strftime("%H:%M:%S.{}".format(str(ti % 1)[2:])[:11_parallelized], time.gmtime(ti))
         benchmark_timing(ti, "parallelizing")
-        # ti = time.process_time() - t0
-        # tf = time.strftime("%H:%M:%S.{}".format(str(ti % 1)[2:])[:11_parallelized], time.gmtime(ti))
-        print("Shuffled sequences Ti statistics calculated")
-        # print(f'Tx = {len(Tx)}')
-        # print(f'Ti = {len(Ti)}')
-        # save_test_values(Tx, Ti)
-        # shape(Ti) = n_tests x n_iterations
+        logging.debug("Shuffled sequences Ti statistics calculated")
         C0 = [0 for k in range(len(Tx))]
         C1 = [0 for k in range(len(Tx))]
 
@@ -143,8 +138,8 @@ def main():
                 if Tx[u] == Ti[t][u]:
                     C1[u] += 1
 
-        print(f"C0 = {C0}")
-        print(f"C1 = {C1}")
+        logging.debug(f"C0 = {C0}")
+        logging.debug(f"C1 = {C1}")
 
         IID = True
         for b in range(len(Tx)):
@@ -153,17 +148,13 @@ def main():
                 IID = False
                 break
         if IID:
-            print("IID assumption: assume the noise")
+            logging.info("IID assumption validated")
         else:
-            print("IID assumption rejected")
+            logging.info("IID assumption rejected")
         tu = time.process_time() - t_start
-        print("Total process time = ", tu)
-        # Creates csv file to collect failures
-        # save_failure_test(C0, C1, IID, tu)
-
-        """
-            Plots
-        """
+        logging.debug("Total process time = ", tu)
+        
+        # plots
         if see_plots:
             sc_dir = "results/plots/scatterplot_TxTi"
             hist_dir = "results/plots/histogram_TxTi"
@@ -201,11 +192,11 @@ def main():
                     scatterplot_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_sc_run)
 
     if bool_statistical_analysis:
-        print("----------------------------------------------------------------\n \n")
-        print(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
+        logging.debug("----------------------------------------------------------------\n \n")
+        logging.debug(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
         t_start = time.process_time()
         S = read_file(file=file, n_symbols=n_symbols_stat)
-        print("Sequence calculated: S")
+        logging.debug("Sequence calculated: S")
         with ProcessPoolExecutor() as executor:
             tasks = [
                 executor.submit(FY_Tx, S),
@@ -219,7 +210,7 @@ def main():
 
         # Comparison
         comparison_scatterplot()
-        print("Statistical analysis completed.")
+        logging.debug("Statistical analysis completed.")
 
 
 if __name__ == "__main__":

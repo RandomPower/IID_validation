@@ -16,9 +16,8 @@ The function computes the mean and std for each list making up C0r and C0fy and 
 import os
 import sys
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from architecture.utils.config import n_sequences_stat, test_list, ref_numbers
+import logging
+from architecture.utils.config import test_list, ref_numbers
 from architecture.utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
 
 
@@ -53,7 +52,7 @@ def get_data(ref_numbers, Tj_norm):
                     "/RandomTx/randomTx_" + str(test_list[ref]).strip() + ".csv"
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
-                print(f"Error: File(s) for reference number {ref} do not exist.")
+                logging.error(f"Error: File(s) for reference number {ref} do not exist.")
                 sys.exit(1)
 
             try:
@@ -66,7 +65,7 @@ def get_data(ref_numbers, Tj_norm):
                 C0_fy.append(eval(last_entry1))
                 C0_random.append(eval(last_entry2))
             except Exception as e:
-                print(f"Error reading or processing files for {test_list[ref]}: {e}")
+                logging.error(f"Error reading or processing files for {test_list[ref]}: {e}")
                 sys.exit(1)
     return C0_fy, C0_random, [test_list[i] for i in ref_numbers]
 
