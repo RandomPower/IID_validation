@@ -5,7 +5,6 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 import logging
 import os
 
-
 # GLOBAL VARIABLES
 input_file = os.path.abspath(os.path.join("getbits_20230401_195315_RAW_BITS.BIN"))
 bool_test_NIST = True

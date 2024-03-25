@@ -1,9 +1,11 @@
+import logging
 import os
 import sys
+
 import pandas as pd
-import logging
-from utils.config import test_list, ref_numbers
-from utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
+
+import utils.config
+import utils.plot
 
 
 def get_data(ref_numbers, Tj_norm):
@@ -17,14 +19,14 @@ def get_data(ref_numbers, Tj_norm):
     C0_fy = []
     C0_random = []
     for ref in ref_numbers:
-        if ref in test_list:
+        if ref in utils.config.test_list:
             if Tj_norm:
                 fy = os.path.abspath(
                     os.path.join(
                         "results",
                         "counters_distribution",
                         "FYShuffleTjNorm",
-                        f"fyShuffleTjNorm_{str(test_list[ref]).strip()}.csv",
+                        f"fyShuffleTjNorm_{str(utils.config.test_list[ref]).strip()}.csv",
                     )
                 )
                 rand = os.path.abspath(
@@ -32,7 +34,7 @@ def get_data(ref_numbers, Tj_norm):
                         "results",
                         "counters_distribution",
                         "RandomTjNorm",
-                        f"randomTjNorm_{str(test_list[ref]).strip()}.csv",
+                        f"randomTjNorm_{str(utils.config.test_list[ref]).strip()}.csv",
                     )
                 )
             else:
@@ -41,7 +43,7 @@ def get_data(ref_numbers, Tj_norm):
                         "results",
                         "counters_distribution",
                         "FYShuffleTx",
-                        f"fyShuffleTx_{str(test_list[ref]).strip()}.csv",
+                        f"fyShuffleTx_{str(utils.config.test_list[ref]).strip()}.csv",
                     )
                 )
                 rand = os.path.abspath(
@@ -49,7 +51,7 @@ def get_data(ref_numbers, Tj_norm):
                         "results",
                         "counters_distribution",
                         "RandomTx",
-                        f"randomTx_{str(test_list[ref]).strip()}.csv",
+                        f"randomTx_{str(utils.config.test_list[ref]).strip()}.csv",
                     )
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
@@ -66,9 +68,9 @@ def get_data(ref_numbers, Tj_norm):
                 C0_fy.append(eval(last_entry1))
                 C0_random.append(eval(last_entry2))
             except Exception as e:
-                logging.error("Reading or processing files for %s: %s not successful", test_list[ref], e)
+                logging.error("Reading or processing files for %s: %s not successful", utils.config.test_list[ref], e)
                 sys.exit(1)
-    return C0_fy, C0_random, [test_list[i] for i in ref_numbers]
+    return C0_fy, C0_random, [utils.config.test_list[i] for i in ref_numbers]
 
 
 def comparison_scatterplot():
@@ -76,8 +78,8 @@ def comparison_scatterplot():
     This function produces the comparison scatterplot between FY_shuffle counters and Random sampling from
     the file. The counters values are read from previously produced csv files.
     """
-    Cfy, Crand, l1 = get_data(ref_numbers, False)
-    Cfy_tjNorm, Crand_TjNorm, l2 = get_data(ref_numbers, True)
+    Cfy, Crand, l1 = get_data(utils.config.ref_numbers, False)
+    Cfy_tjNorm, Crand_TjNorm, l2 = get_data(utils.config.ref_numbers, True)
 
-    scatterplot_RvsFY(l1, Crand, Cfy)
-    scatterplot_RvsFY_TjNorm(l2, Crand_TjNorm, Cfy_tjNorm)
+    utils.plot.scatterplot_RvsFY(l1, Crand, Cfy)
+    utils.plot.scatterplot_RvsFY_TjNorm(l2, Crand_TjNorm, Cfy_tjNorm)

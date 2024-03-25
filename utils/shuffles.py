@@ -1,6 +1,7 @@
 import random
-from utils.config import input_file, step, distribution_test_index, p_value_stat
-from utils.useful_functions import execute_function
+
+import utils.config
+import utils.useful_functions
 
 
 def FY_shuffle(sequence):
@@ -26,7 +27,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
     :param n_seq: number of sequences
     :return: shuffled sequences
     """
-    with open(input_file, "rb") as f:
+    with open(utils.config.input_file, "rb") as f:
         sequences = []
         for z in range(n_seq):
             # Move to the current offset
@@ -46,7 +47,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
             sequences.append(S)
 
             # Increment the offset by step-byte
-            ind += step
+            ind += utils.config.step
 
             # TO DO: exception
 
@@ -71,7 +72,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     :param test: test on which perform the statistical analysis
     :return: shuffled sequences, reference statistics on the shuffled sequences
     """
-    with open(input_file, "rb") as f:
+    with open(utils.config.input_file, "rb") as f:
         sequences = []
         Ti = []
 
@@ -85,13 +86,13 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             S.append(symbol1)
             symbol2 = i & 0b00001111
             S.append(symbol2)
-        index += step
+        index += utils.config.step
 
-        if distribution_test_index == 8 or distribution_test_index == 9:
-            t = execute_function(test, S, p_value_stat)
+        if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+            t = utils.useful_functions.execute_function(test, S, utils.config.p_value_stat)
             Ti.append(t)
         else:
-            t = execute_function(test, S, None)
+            t = utils.useful_functions.execute_function(test, S, None)
             Ti.append(t)
         sequences.append(S)
 
@@ -108,12 +109,12 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
                 symbol2 = i & 0b00001111
                 S.append(symbol2)
 
-            index += step
+            index += utils.config.step
 
-            if distribution_test_index == 8 or distribution_test_index == 9:
-                t = execute_function(test, S, p_value_stat)
+            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+                t = utils.useful_functions.execute_function(test, S, utils.config.p_value_stat)
             else:
-                t = execute_function(test, S, None)
+                t = utils.useful_functions.execute_function(test, S, None)
 
             if t == Ti[z - 1]:
                 continue

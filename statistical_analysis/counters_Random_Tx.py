@@ -7,50 +7,47 @@ test T computed on a sequence is bigger than that it, C1 is incremented if they 
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
-from utils.config import (
-    n_symbols_stat,
-    n_sequences_stat,
-    n_iterations_c_stat,
-    test,
-    distribution_test_index,
-    p_value_stat,
-)
-from utils.useful_functions import execute_function, save_counters
-from utils.shuffles import shuffle_from_file
-from utils.plot import counters_distribution_Tx
-import time
-from tqdm import tqdm
 import logging
 import os
+import time
+
+from tqdm import tqdm
+
+import utils.config
+import utils.plot
+import utils.shuffles
+import utils.useful_functions
 
 
 def counters_Random_Tx(S):
 
-    if distribution_test_index == 8 or distribution_test_index == 9:
-        Tx = execute_function(test, S, p_value_stat)
+    if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+        Tx = utils.useful_functions.execute_function(utils.config.test, S, utils.config.p_value_stat)
     else:
-        Tx = execute_function(test, S, None)
+        Tx = utils.useful_functions.execute_function(utils.config.test, S, None)
     counters_0 = []
     counters_1 = []
-    index = n_symbols_stat / 2
+    index = utils.config.n_symbols_stat / 2
 
-    for i in tqdm(range(n_iterations_c_stat)):
+    for i in tqdm(range(utils.config.n_iterations_c_stat)):
         C0 = 0
         C1 = 0
-        S_shuffled = shuffle_from_file(index, n_symbols_stat, n_sequences_stat)
+        S_shuffled = utils.shuffles.shuffle_from_file(
+            index, utils.config.n_symbols_stat, utils.config.n_sequences_stat
+        )
         Ti = []
         for k in S_shuffled:
-            if distribution_test_index == 8 or distribution_test_index == 9:
-                Ti.append(execute_function(test, k, p_value_stat))
+            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+                Ti.append(utils.useful_functions.execute_function(utils.config.test, k, utils.config.p_value_stat))
             else:
-                Ti.append(execute_function(test, k, None))
+                Ti.append(utils.useful_functions.execute_function(utils.config.test, k, None))
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
                 C0 += 1
             if Tx == Ti[z]:
                 C1 += 1
-        index += n_sequences_stat * (n_symbols_stat / 2)
+        index += utils.config.n_sequences_stat * (utils.config.n_symbols_stat / 2)
 
         counters_0.append(C0)
         counters_1.append(C1)
@@ -68,7 +65,7 @@ def Random_Tx(S):
             "results",
             "counters_distribution",
             "RandomTx",
-            f"RandomTx_{test}.csv",
+            f"RandomTx_{utils.config.test}.csv",
         )
     )
     t = time.process_time()
@@ -76,7 +73,9 @@ def Random_Tx(S):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
-    counters_distribution_Tx(C0, n_sequences_stat, n_iterations_c_stat, "Random_Tx")
+    utils.plot.counters_distribution_Tx(
+        C0, utils.config.n_sequences_stat, utils.config.n_iterations_c_stat, "Random_Tx"
+    )

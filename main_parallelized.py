@@ -1,40 +1,22 @@
-import os
-import time
-import sys
-import numpy as np
-from datetime import datetime
-from concurrent.futures import ProcessPoolExecutor, as_completed
+import concurrent.futures
+import datetime
 import logging
-from utils.read import read_file
-from utils.shuffles import FY_shuffle
-from utils.useful_functions import (
-    execute_function,
-    benchmark_timing,
-    get_next_run_number,
-)
-from utils.plot import scatterplot_TxTi, histogram_TxTi
-from utils.config import (
-    file_info,
-    config_info,
-    input_file,
-    n_symbols,
-    n_sequences,
-    n_symbols_stat,
-    test_list,
-    distribution_test_index,
-    bool_statistical_analysis,
-    bool_test_NIST,
-    test_list_indexes,
-    bool_pvalue,
-    p,
-    see_plots,
-)
-from statistical_analysis.counters_FYShuffle_Tx import FY_Tx
-from statistical_analysis.counters_Random_Tx import Random_Tx
-from statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
-from statistical_analysis.counters_Random_TjNorm import Random_TjNorm
-from statistical_analysis.comparison_counters_FyR import comparison_scatterplot
+import os
+import sys
+import time
 
+import numpy as np
+
+import statistical_analysis.comparison_counters_FyR
+import statistical_analysis.counters_FYShuffle_TjNorm
+import statistical_analysis.counters_FYShuffle_Tx
+import statistical_analysis.counters_Random_TjNorm
+import statistical_analysis.counters_Random_Tx
+import utils.config
+import utils.plot
+import utils.read
+import utils.shuffles
+import utils.useful_functions
 
 logging.basicConfig(
     filename="IID_validation.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
@@ -45,31 +27,33 @@ np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter
 
 def execute_test_suite(sequence):
     T = []
-    for test_index in test_list_indexes:
-        if test_index in [8, 9] and bool_pvalue:
+    for test_index in utils.config.test_list_indexes:
+        if test_index in [8, 9] and utils.config.bool_pvalue:
             # If bool_pvalue is True, p_values is expected to be a list. Iterate over it.
-            for p_value in p:
-                result = execute_function(test_list[test_index], sequence, p_value)
+            for p_value in utils.config.p:
+                result = utils.useful_functions.execute_function(utils.config.test_list[test_index], sequence, p_value)
                 T.append(result)
         else:
             # For other cases or if bool_pvalue is False, execute the function with p_values directly.
-            result = execute_function(test_list[test_index], sequence, p)
+            result = utils.useful_functions.execute_function(
+                utils.config.test_list[test_index], sequence, utils.config.p
+            )
             T.append(result)
     return T
 
 
 def FY_test_mode_parallel(seq):
     Ti = []
-    with ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(n_sequences):
-            s_shuffled = FY_shuffle(seq.copy())
+        for iteration in range(utils.config.n_sequences):
+            s_shuffled = utils.shuffles.FY_shuffle(seq.copy())
             future = executor.submit(execute_test_suite, s_shuffled)
             futures.append(future)
 
         completed = 0
         total_futures = len(futures)
-        for future in as_completed(futures):
+        for future in concurrent.futures.as_completed(futures):
             Ti.append(future.result())
             completed += 1
             percentage_complete = (completed / total_futures) * 100
@@ -79,38 +63,41 @@ def FY_test_mode_parallel(seq):
 
 
 def main():
-    file_info()
-    config_info()
-    if bool_test_NIST:
+    utils.config.file_info()
+    utils.config.config_info()
+    if utils.config.bool_test_NIST:
         logging.debug("NIST TEST")
         logging.debug("Process started")
         t_start = time.process_time()
-        S = read_file(file=input_file, n_symbols=n_symbols)
+        S = utils.read.read_file(file=utils.config.input_file, n_symbols=utils.config.n_symbols)
         logging.debug("Sequence calculated: S")
 
         logging.debug("Calculating for each test the reference statistic: Tx")
         Tx = []
-        for k in test_list_indexes:
+        for k in utils.config.test_list_indexes:
             if k == 8 or k == 9:
-                if bool_pvalue:
-                    T = [execute_function(test_list[k], S, i) for i in p]
+                if utils.config.bool_pvalue:
+                    T = [
+                        utils.useful_functions.execute_function(utils.config.test_list[k], S, i)
+                        for i in utils.config.p
+                    ]
                     Tx += (e for e in T)
                 else:
-                    Tx.append(execute_function(test_list[k], S, p))
+                    Tx.append(utils.useful_functions.execute_function(utils.config.test_list[k], S, utils.config.p))
             else:
-                Tx.append(execute_function(test_list[k], S, None))
+                Tx.append(utils.useful_functions.execute_function(utils.config.test_list[k], S, None))
         logging.debug("Reference statistics calculated!")
         logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
         t0 = time.process_time()
         Ti = FY_test_mode_parallel(S)
         ti = time.process_time() - t0
-        benchmark_timing(ti, "parallelizing")
+        utils.useful_functions.benchmark_timing(ti, "parallelizing")
         logging.debug("Shuffled sequences Ti statistics calculated")
         C0 = [0 for k in range(len(Tx))]
         C1 = [0 for k in range(len(Tx))]
 
         for u in range(len(Tx)):
-            for t in range(n_sequences):
+            for t in range(utils.config.n_sequences):
                 if Tx[u] > Ti[t][u]:
                     C0[u] += 1
                 if Tx[u] == Ti[t][u]:
@@ -129,15 +116,17 @@ def main():
         else:
             logging.info("IID assumption rejected")
         tu = time.process_time() - t_start
-        logging.debug("Total process time = ", tu)
+        logging.debug("Total process time = %s", tu)
         # plots
-        if see_plots:
+        if utils.config.see_plots:
             sc_dir = "results/plots/scatterplot_TxTi"
             hist_dir = "results/plots/histogram_TxTi"
-            current_run_date = datetime.now().strftime("%Y-%m-%d")
-            dir_sc_run = os.path.join(sc_dir, current_run_date, str(get_next_run_number(sc_dir, current_run_date)))
+            current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
+            dir_sc_run = os.path.join(
+                sc_dir, current_run_date, str(utils.useful_functions.get_next_run_number(sc_dir, current_run_date))
+            )
             dir_hist_run = os.path.join(
-                hist_dir, current_run_date, str(get_next_run_number(hist_dir, current_run_date))
+                hist_dir, current_run_date, str(utils.useful_functions.get_next_run_number(hist_dir, current_run_date))
             )
 
             # Ensure the directory exists
@@ -146,45 +135,45 @@ def main():
 
             Ti_transposed = np.transpose(Ti)
             for t in range(len(Tx)):
-                if bool_pvalue:
+                if utils.config.bool_pvalue:
                     # Handle the special case for test 8 ('periodicity')
                     if 8 <= t <= 12:
                         p_index = t - 8  # Adjust index to map to the correct p value
-                        test_name = f"{test_list[8]} (p={p[p_index]})"
+                        test_name = f"{utils.config.test_list[8]} (p={utils.config.p[p_index]})"
                     # Handle the special case for test 9 ('covariance')
                     elif 13 <= t <= 17:
                         p_index = t - 13  # Adjust index to map to the correct p value
-                        test_name = f"{test_list[9]} (p={p[p_index]})"
+                        test_name = f"{utils.config.test_list[9]} (p={utils.config.p[p_index]})"
                     # For the values that should correspond to test 10 ('compression')
                     elif t == 18:
-                        test_name = test_list[10]  # Direct mapping for 'compression'
+                        test_name = utils.config.test_list[10]  # Direct mapping for 'compression'
                     else:
                         # Direct mapping for other tests
-                        test_name = test_list[t]
-                    histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
-                    scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
+                        test_name = utils.config.test_list[t]
+                    utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
+                    utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
                 else:
-                    histogram_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_hist_run)
-                    scatterplot_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_sc_run)
+                    utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], utils.config.test_list[t], dir_hist_run)
+                    utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], utils.config.test_list[t], dir_sc_run)
 
-    if bool_statistical_analysis:
+    if utils.config.bool_statistical_analysis:
         logging.debug("----------------------------------------------------------------\n \n")
-        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
+        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", utils.config.test_list[utils.config.distribution_test_index])
         t_start = time.process_time()
-        S = read_file(file=input_file, n_symbols=n_symbols_stat)
+        S = utils.read.read_file(file=utils.config.input_file, n_symbols=utils.config.n_symbols_stat)
         logging.debug("Sequence calculated: S")
-        with ProcessPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
             tasks = [
-                executor.submit(FY_Tx, S),
-                executor.submit(FY_TjNorm, S),
-                executor.submit(Random_Tx, S),
-                executor.submit(Random_TjNorm, S),
+                executor.submit(statistical_analysis.counters_FYShuffle_Tx.FY_Tx, S),
+                executor.submit(statistical_analysis.counters_FYShuffle_TjNorm.FY_TjNorm, S),
+                executor.submit(statistical_analysis.counters_Random_Tx.Random_Tx, S),
+                executor.submit(statistical_analysis.counters_Random_TjNorm.Random_TjNorm, S),
             ]
             # Wait for all tasks to complete
             for task in tasks:
                 task.result()
 
-        comparison_scatterplot()
+        statistical_analysis.comparison_counters_FyR.comparison_scatterplot()
         logging.debug("Statistical analysis completed.")
 
 
