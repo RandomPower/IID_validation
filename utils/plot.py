@@ -240,7 +240,7 @@ def counters_distribution_Tj(c, n_seq, n_iter, t):
     # Adjust bin_center for error bars
     bin_center = (new_edges[:-1] + new_edges[1:]) / 2
 
-    bin_err = [np.sqrt(val) for val in bin_val]
+    bin_err = [np.sqrt(n * (1 - (n / n_iter))) for n in bin_val]
     ax.errorbar(bin_center[:len(bin_val)], bin_val, yerr=bin_err[:len(bin_val)], fmt='o', color='blue', capsize=3,
                 label='Data')
 
