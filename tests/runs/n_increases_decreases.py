@@ -20,7 +20,3 @@ def n_increases_decreases(S):
         else:
             count_plus += 1
     return max(count_minus, count_plus)
-
-
-"""S = [2, 2, 2, 5, 7, 7, 9, 3, 1, 4, 4]
-print(n_increases_decreases(S))"""

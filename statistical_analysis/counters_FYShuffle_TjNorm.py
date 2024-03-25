@@ -2,13 +2,13 @@
 FISHER YATES SHUFFLE WITH NORMALIZED Tj
 
 Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the results of the
-test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one.
+C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the
+results of the test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from
+the following one.
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
 from utils.config import (
-    n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,
@@ -21,6 +21,7 @@ from utils.plot import counters_distribution_Tj
 import time
 import os
 from tqdm import tqdm
+import logging
 
 
 def counters_FY_TjNorm(S):
@@ -57,14 +58,14 @@ def counters_FY_TjNorm(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"FY_TjNorm counter_0: {counters_0}")
-    print(f"FY_TjNorm counter_1: {counters_1}")
+    logging.debug("FY_TjNorm counter_0: %s", counters_0)
+    logging.debug("FY_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
 
 def FY_TjNorm(S):
-    print("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
+    logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     f = os.path.abspath(
         os.path.join(
             "results",

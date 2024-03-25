@@ -3,17 +3,13 @@ import time
 import sys
 import numpy as np
 from datetime import datetime
-import time
-from functools import wraps
-from pathos.multiprocessing import ProcessPool as Pool
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import logging
 from utils.read import read_file
-from utils.shuffles import FY_shuffle, shuffle_from_file
+from utils.shuffles import FY_shuffle
 from utils.useful_functions import (
     execute_function,
     benchmark_timing,
-    save_failure_test,
-    save_test_values,
     get_next_run_number,
 )
 from utils.plot import scatterplot_TxTi, histogram_TxTi
@@ -31,9 +27,7 @@ from utils.config import (
     test_list_indexes,
     bool_pvalue,
     p,
-    bool_shuffle_NIST,
     see_plots,
-    ref_numbers,
 )
 from statistical_analysis.counters_FYShuffle_Tx import FY_Tx
 from statistical_analysis.counters_Random_Tx import Random_Tx
@@ -41,12 +35,12 @@ from statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
 from statistical_analysis.counters_Random_TjNorm import Random_TjNorm
 from statistical_analysis.comparison_counters_FyR import comparison_scatterplot
 
-np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
-"""
-Parallelizzo il numero di sequenze estraendo 10.000 risultati --> chiamando una funzione esterna che chiama i test
-Faccio un executor esterno che prende le
-"""
+logging.basicConfig(
+    filename="IID_validation.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)
+
+np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
 
 def execute_test_suite(sequence):
@@ -64,23 +58,12 @@ def execute_test_suite(sequence):
     return T
 
 
-# execute_test_suite -->
-# -> [0, 1, 5, 6.7, ...] come con i valori di Tx
-
-
 def FY_test_mode_parallel(seq):
     Ti = []
     with ProcessPoolExecutor() as executor:
         futures = []
         for iteration in range(n_sequences):
             s_shuffled = FY_shuffle(seq.copy())
-            """for k in test_list_indexes:
-                if k in [8, 9]:
-                    # Ensure p is passed as a list to be iterable within execute_test
-                    future = executor.submit(execute_test, k, s_shuffled)
-                else:
-                    future = executor.submit(execute_test, k, s_shuffled)
-                futures.append(future)"""
             future = executor.submit(execute_test_suite, s_shuffled)
             futures.append(future)
 
@@ -95,18 +78,17 @@ def FY_test_mode_parallel(seq):
     return Ti
 
 
-##########  MAIN TEST  ###########
 def main():
     file_info()
     config_info()
     if bool_test_NIST:
-        print("NIST TEST")
-        print("Process started")
+        logging.debug("NIST TEST")
+        logging.debug("Process started")
         t_start = time.process_time()
         S = read_file(file=input_file, n_symbols=n_symbols)
-        print("Sequence calculated: S")
+        logging.debug("Sequence calculated: S")
 
-        print("Calculating for each test the reference statistic: Tx")
+        logging.debug("Calculating for each test the reference statistic: Tx")
         Tx = []
         for k in test_list_indexes:
             if k == 8 or k == 9:
@@ -117,53 +99,38 @@ def main():
                     Tx.append(execute_function(test_list[k], S, p))
             else:
                 Tx.append(execute_function(test_list[k], S, None))
-        print("Reference statistics calculated!")
-        print("Calculating each test statistic for each shuffled sequence: Ti")
+        logging.debug("Reference statistics calculated!")
+        logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
         t0 = time.process_time()
         Ti = FY_test_mode_parallel(S)
         ti = time.process_time() - t0
-        # tf = time.strftime("%H:%M:%S.{}".format(str(ti % 1)[2:])[:11_parallelized], time.gmtime(ti))
         benchmark_timing(ti, "parallelizing")
-        # ti = time.process_time() - t0
-        # tf = time.strftime("%H:%M:%S.{}".format(str(ti % 1)[2:])[:11_parallelized], time.gmtime(ti))
-        print("Shuffled sequences Ti statistics calculated")
-        # print(f'Tx = {len(Tx)}')
-        # print(f'Ti = {len(Ti)}')
-        # save_test_values(Tx, Ti)
-        # shape(Ti) = n_tests x n_iterations
+        logging.debug("Shuffled sequences Ti statistics calculated")
         C0 = [0 for k in range(len(Tx))]
         C1 = [0 for k in range(len(Tx))]
 
         for u in range(len(Tx)):
-            a = Tx[u]
             for t in range(n_sequences):
-                b = Ti[t][u]
                 if Tx[u] > Ti[t][u]:
                     C0[u] += 1
                 if Tx[u] == Ti[t][u]:
                     C1[u] += 1
 
-        print(f"C0 = {C0}")
-        print(f"C1 = {C1}")
+        logging.debug("C0 = %s", C0)
+        logging.debug("C1 = %s", C1)
 
         IID = True
         for b in range(len(Tx)):
-            # if any(C0[b] + C1[b] <= 5 or C0[b] >= 9995 b in range(len(Tx))):
             if (C0[b] + C1[b] <= 5) or (C0[b] >= 9995):
                 IID = False
                 break
         if IID:
-            print("IID assumption: assume the noise")
+            logging.info("IID assumption validated")
         else:
-            print("IID assumption rejected")
+            logging.info("IID assumption rejected")
         tu = time.process_time() - t_start
-        print("Total process time = ", tu)
-        # Creates csv file to collect failures
-        # save_failure_test(C0, C1, IID, tu)
-
-        """
-            Plots
-        """
+        logging.debug("Total process time = ", tu)
+        # plots
         if see_plots:
             sc_dir = "results/plots/scatterplot_TxTi"
             hist_dir = "results/plots/histogram_TxTi"
@@ -187,7 +154,7 @@ def main():
                     # Handle the special case for test 9 ('covariance')
                     elif 13 <= t <= 17:
                         p_index = t - 13  # Adjust index to map to the correct p value
-                        test_name = f"{test_list[9]} (p={p[p_index]})"  # Append the corresponding p value
+                        test_name = f"{test_list[9]} (p={p[p_index]})"
                     # For the values that should correspond to test 10 ('compression')
                     elif t == 18:
                         test_name = test_list[10]  # Direct mapping for 'compression'
@@ -201,11 +168,11 @@ def main():
                     scatterplot_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_sc_run)
 
     if bool_statistical_analysis:
-        print("----------------------------------------------------------------\n \n")
-        print(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
+        logging.debug("----------------------------------------------------------------\n \n")
+        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
         t_start = time.process_time()
         S = read_file(file=input_file, n_symbols=n_symbols_stat)
-        print("Sequence calculated: S")
+        logging.debug("Sequence calculated: S")
         with ProcessPoolExecutor() as executor:
             tasks = [
                 executor.submit(FY_Tx, S),
@@ -217,9 +184,8 @@ def main():
             for task in tasks:
                 task.result()
 
-        # Comparison
         comparison_scatterplot()
-        print("Statistical analysis completed.")
+        logging.debug("Statistical analysis completed.")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,8 @@
 CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 """
 
-import os
+import logging
+
 
 # GLOBAL VARIABLES
 input_file = os.path.abspath(os.path.join("getbits_20230401_195315_RAW_BITS.BIN"))
@@ -14,7 +15,7 @@ n_symbols = 1000
 n_sequences = 100000
 bool_shuffle_NIST = True  # --> if True: FY shuffle, if False: use random sampling from file
 bool_first_seq = True  # --> if True: reference sequence read from beginning; if False: reference sequence from the end
-bool_pvalue = False  # --> if True: NIST values, if False: user choose value
+bool_pvalue = False  # --> if True: NIST values, if False: user chooses value
 see_plots = False
 
 if bool_pvalue:
@@ -26,7 +27,7 @@ else:
 # STATISTICAL ANALYSIS VARIABLES
 n_sequences_stat = 200
 n_symbols_stat = 1000
-n_iterations_c_stat = 500  # counter distruibution iterations
+n_iterations_c_stat = 500
 distribution_test_index = 6  # Select which test index for counter distribution
 
 bool_shuffle_stat = True  # --> if True: FY shuffle, if False: use random sampling from file
@@ -61,45 +62,45 @@ def file_info():
     f = open(input_file, "r+b")
     f.seek(0, 2)
     size = f.tell()
-    print("FILE INFO")
-    print("Size of file is:", size, "bytes")
-    print("Number of symbols per sequence for counters analysis:", n_symbols_stat)
-    print("Number of sequences wanted for counters analysis:", n_sequences_stat)
+    logging.debug("FILE INFO")
+    logging.debug("Size of file is: %s bytes", size)
+    logging.debug("Number of symbols per sequence for counters analysis: %s", n_symbols_stat)
+    logging.debug("Number of sequences wanted for counters analysis: %s", n_sequences_stat)
     max_symbols = size * 2  # total number of symbols in the file
     max_sequences = max_symbols / n_symbols_stat
-    print("Maxmimum sequences that can be generated from the file:", max_sequences)
+    logging.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
     tot_seqs = n_iterations_c_stat * n_sequences_stat
-    print("Total sequences necessary =", tot_seqs)
+    logging.debug("Total sequences necessary = %s", tot_seqs)
     if not bool_shuffle_stat:
         if tot_seqs <= max_sequences:
-            print("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
+            logging.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
         else:
-            print("Error: SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
+            logging.error("SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
             exit(-1)
-    print("----------------------------------------------------------------\n")
+    logging.debug("----------------------------------------------------------------\n")
 
 
 def config_info():
-    print("CONFIG INFO - NIST")
-    print("Number of symbols per sequence =", n_symbols)
-    print("Number of shuffled sequences =", n_sequences)
+    logging.debug("CONFIG INFO - NIST")
+    logging.debug("Number of symbols per sequence = %s", n_symbols)
+    logging.debug("Number of shuffled sequences = %s", n_sequences)
     ts = [test_list.get(i) for i in test_list_indexes]
-    print("Tests for entropy validation selected:", ts)
+    logging.debug("Tests for entropy validation selected: %s", ts)
     if bool_first_seq:
-        print("Reference sequence read from the beginning of the file")
+        logging.debug("Reference sequence read from the beginning of the file")
     else:
-        print("Reference sequence read from the end of the file")
+        logging.debug("Reference sequence read from the end of the file")
     if bool_pvalue:
-        print("p parameter used: NIST")
+        logging.debug("p parameter used: NIST")
     else:
-        print("p parameter used: user value \n")
+        logging.debug("p parameter used: user value \n")
 
-    print("\nCONFIG INFO - STATISTICAL ANALYSIS")
-    print("Number of symbols per sequence =", n_symbols_stat)
-    print("Number of shuffled sequences =", n_sequences_stat)
-    print("Number of iterations for counter:", n_iterations_c_stat)
-    print("Test selected for counter distribution analysis:", test)
+    logging.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
+    logging.debug("Number of symbols per sequence = %s", n_symbols_stat)
+    logging.debug("Number of shuffled sequences = %s", n_sequences_stat)
+    logging.debug("Number of iterations for counter: %s", n_iterations_c_stat)
+    logging.debug("Test selected for counter distribution analysis: %s", test)
     comp = [test_list.get(i) for i in ref_numbers]
-    print("Tests selected test for shuffle/random comparison:", comp)
-    print("p parameter used: user value:", p_value_stat)
-    print("----------------------------------------------------------------\n \nMAIN")
+    logging.debug("Tests selected test for shuffle/random comparison: %s", comp)
+    logging.debug("p parameter used: user value: %s", p_value_stat)
+    logging.debug("----------------------------------------------------------------\n \nMAIN")
