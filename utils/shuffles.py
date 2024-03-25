@@ -1,5 +1,5 @@
 import random
-from utils.config import file, step, distribution_test_index, p_value_stat
+from utils.config import input_file, step, distribution_test_index, p_value_stat
 from utils.useful_functions import execute_function
 
 
