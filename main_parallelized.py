@@ -129,7 +129,7 @@ def main():
         else:
             logging.info("IID assumption rejected")
         tu = time.process_time() - t_start
-        logging.debug("Total process time = ", tu)
+        logging.debug("Total process time = %s", tu)
         # plots
         if see_plots:
             sc_dir = "results/plots/scatterplot_TxTi"
