@@ -74,6 +74,18 @@ def FY_test_mode_p(seq):
 if bool_test_NIST:
 
     def FY_test_mode(seq):
+        """Calculate test values on a given sequence shuffled with Fisher-Yates algorithm
+
+        Parameters
+        ----------
+        seq : list of int
+              sequence of sample values
+
+        Returns
+        -------
+        list of float
+            list of test outputs
+        """
         Ti = []
         for iteration in tqdm(range(n_sequences)):
             # print(f'\niteration: {iteration}')
@@ -104,6 +116,13 @@ if bool_test_NIST:
         return Ti
 
     def file_mode():
+        """Calculate test values on random sequences read from file
+
+        Returns
+        -------
+        list of float
+            list of test outputs
+        """
         ind = 0
         S_shuffled = shuffle_from_file(ind, n_symbols, n_sequences)
         Ti = []

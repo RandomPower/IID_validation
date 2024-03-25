@@ -1,14 +1,5 @@
-"""
-FISHER YATES SHUFFLE WITH NORMALIZED Tj
-
-Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the
-results of the test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from
-the following one.
-Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
-"""
-
 import logging
+
 import os
 import time
 
@@ -21,6 +12,21 @@ import utils.useful_functions
 
 
 def counters_FY_TjNorm(S):
+    """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
+    C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the results of the
+    test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one.
+
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    list of int, list of int
+        counter 0 and counter 1 lists of values
+    """
     counters_0 = []
     counters_1 = []
     for k in tqdm(range(utils.config.n_iterations_c_stat)):
@@ -61,6 +67,14 @@ def counters_FY_TjNorm(S):
 
 
 def FY_TjNorm(S):
+    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one, 
+    save the values in a file and plot the distribution
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    """
     logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     f = os.path.abspath(
         os.path.join(

@@ -9,11 +9,19 @@ import utils.plot
 
 
 def get_data(ref_numbers, Tj_norm):
-    """
-    This function reads the file corresponding to the reference test numbers and returns the counters values
-    :param ref_numbers: tests to compare
-    :param Tj_norm: boolean
-    :return: the counter values within the files
+    """Reads the files corresponding to the reference test numbers and returns the counters values
+
+    Parameters
+    ----------
+    ref_numbers : list of int
+        tests to compare
+    Tj_norm : boolean
+        Tj norm / Tx
+
+    Returns
+    -------
+    list of lists of int, list of lists of int and list of str
+        counters values and list of test names 
     """
     # Construct the filenames based on reference numbers
     C0_fy = []
@@ -74,9 +82,8 @@ def get_data(ref_numbers, Tj_norm):
 
 
 def comparison_scatterplot():
-    """
-    This function produces the comparison scatterplot between FY_shuffle counters and Random sampling from
-    the file. The counters values are read from previously produced csv files.
+    """Plots the comparison scatterplot between FY_shuffle counters and reading from file. 
+    The counters values are read from csv files.
     """
     Cfy, Crand, l1 = get_data(utils.config.ref_numbers, False)
     Cfy_tjNorm, Crand_TjNorm, l2 = get_data(utils.config.ref_numbers, True)

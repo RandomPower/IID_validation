@@ -11,8 +11,8 @@ bool_test_NIST = True
 bool_statistical_analysis = False
 
 # NIST TEST VARIABLES
-n_symbols = 1000
-n_sequences = 100000
+n_symbols = 100
+n_sequences = 100
 bool_shuffle_NIST = True  # --> if True: FY shuffle, if False: use random sampling from file
 bool_first_seq = True  # --> if True: reference sequence read from beginning; if False: reference sequence from the end
 bool_pvalue = False  # --> if True: NIST values, if False: user chooses value
