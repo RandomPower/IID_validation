@@ -21,6 +21,18 @@ def max_collision(S):
 
 # @timed
 def max_c(S):
+    """Counts the number of successive sample values until a duplicate is found
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+       length of the longest unique subsequence before encountering a duplicate value
+    """
     seen = set()
     C = []
     last_split = 0

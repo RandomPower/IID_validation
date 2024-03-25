@@ -3,11 +3,20 @@ import os
 
 
 def read_file(file, n_symbols):
-    """
-    Function that reads from binary file the sequence of n_symbols
-    :param file: path to file
-    :param n_symbols: number of symbols to read
-    :return: S sequence
+    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by 
+    applying a masking process
+
+    Parameters
+    ----------
+    file : str
+        path to file
+    n_symbols : int
+        number of symbols
+
+    Returns
+    -------
+    list of int
+        sequence of symbols
     """
     with open(file, "r+b") as f:
         tot_bytes = int(n_symbols / 2)

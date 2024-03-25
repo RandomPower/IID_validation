@@ -15,14 +15,19 @@ from utils.config import test, distribution_test_index, n_sequences_stat, n_symb
 
 
 def histogram_TxTi(Tx, Ti, t, plot_dir_h):
-    """
-    This function takes as input the number Tx and the list of values in Ti array. It plots the values in an histogram
-    (with binning made such that bins are centered on an integer) with the red vertical line as the reference value Tx.
+    """Plots tests values in an histogram (with binning made such that bins are centered on an integer) 
+    with the red vertical line as the reference value Tx.
 
-    :param Tx: Reference value
-    :param Ti: Values from shuffled sequence
-    :param t: test conducted
-    :param plot_dir_h: directory where to save the plot
+    Parameters
+    ----------
+    Tx : list of float 
+        Tx test values calculated on one sequence
+    Ti : list of float
+        Ti test values calculated on the shuffled sequences
+    t : str
+        test executed
+    plot_dir_h : str
+        directory where to save the plot
     """
     fig, ax = plt.subplots()
 
@@ -57,14 +62,19 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
 
 
 def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
-    """
-    This function produces a scatter plot with one dot for each observation of every shuffled sequence and a red line
-    for the reference Tx value
+    """Plots tests values in a scatter plot with one dot for each observation of every shuffled sequence 
+    and a red line for the reference Tx value
 
-    :param Tx: Reference value
-    :param Ti: Values from shuffled sequence
-    :param t: test conducted
-    :param plot_dir_s: directory where to save the plot
+    Parameters
+    ----------
+    Tx : list of float 
+        Tx test values calculated on one sequence
+    Ti : list of float
+        Ti test values calculated on the shuffled sequences
+    t : str
+        test executed
+    plot_dir_s : str
+        directory where to save the plot
     """
     x = [k for k in range(n_sequences)]
 
@@ -97,16 +107,21 @@ def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
 
 # Scatterplot random vs FY
 def scatterplot_RvsFY(test, C0r, C0fy):
-    """
-    This function plots the graph that compares the distribution of counters C0 obtained considering random
-    sequences (read from file) with those obtained through FY shuffling.
+    """Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with 
+    the one obtained through FY shuffling.
     For each test, the mean value of C0 is represented as a dot with error bars and one standard deviation long.
-    As expected, the two sets of results (random and shuffled) overlap, hinting towards the IID hypotesis.
+    The two sets of results (random and shuffled) should overlap, hinting towards the IID hypotesis.
     The function computes the mean and std for each list making up C0r and C0fy and uses the results for the plot.
 
-    :param test: test conducted
-    :param C0r: C0r: a list containing the values of counters C0 using sequences read from file
-    :param C0fy: a list containing the results of counters C0 using FY shuffled sequence
+
+    Parameters
+    ----------
+    test : str
+        test executed
+    C0r : list of lists of int
+        list containing the values of counters C0 using sequences read from file
+    C0fy : list of lists of int
+        list containing the results of counters C0 using FY shuffled sequence
     """
     data_1 = [np.mean(i) for i in C0r]
     err_1 = [np.std(i) for i in C0r]
@@ -129,11 +144,18 @@ def scatterplot_RvsFY(test, C0r, C0fy):
 
 def scatterplot_RvsFY_TjNorm(test, C0r, C0fy):
     """
-    The following is a modified version for TjNorm which adds a reference dashed orizontal line in n_sequences/4
+    Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with 
+    the one obtained through FY shuffling.
+    Modified version for TjNorm: adds a reference dashed orizontal line in n_sequences/4
 
-    :param test: test conducted
-    :param C0r: C0r: a list containing the values of counters C0 using sequences read from file
-    :param C0fy: a list containing the results of counters C0 using FY shuffled sequence
+    Parameters
+    ----------
+    test : str
+        test executed
+    C0r : list of lists of int
+        list containing the values of counters C0 using sequences read from file
+    C0fy : list of lists of int
+        list containing the results of counters C0 using FY shuffled sequence
     """
     data_1 = [np.mean(i) for i in C0r]
     err_1 = [np.std(i) for i in C0r]
@@ -170,11 +192,41 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy):
 
 
 def binomial_function(n, v, p):
+    """Calculates the binomial distribution for a given  
+
+    Parameters
+    ----------
+    n : int
+        number of trials
+    v : int
+        number of successes in trial
+    p : float
+        probability of a single success
+
+    Returns
+    -------
+    float
+        binomial distribution value
+    """
     f = (math.factorial(n) / (math.factorial(v) * math.factorial(n - v))) * (p**v) * (1 - p) ** (n - v)
     return f
 
 
 def counters_distribution(c, n_seq, n_iter, t):
+    """Plots a histogram of distribution of the counter C0 for a given test with the measured mean 
+    and standard deviation
+
+    Parameters
+    ----------
+    c : list of int
+        counter values
+    n_seq : int
+        number of sequences
+    n_iter : int
+        number of iterations
+    t : str
+        test executed
+    """
     # calculate the parameters of the distribution
     p = sum(c) / ((n_seq * n_iter))
     mean_teor = n_seq * p
@@ -231,14 +283,20 @@ def counters_distribution(c, n_seq, n_iter, t):
 
 
 def counters_distribution_Tx(c, n_seq, n_iter, t):
-    """
-    Counter distribution function used for Tx reference values
-    :param c: list of the values of the counter;
-    :param n_seq: number of sequences
-    :param n_iter: number of iterations
-    :param t: test conducted
-    """
+    """Plots a histogram of distribution of the counter C0 for a given test with the measured mean 
+    and standard deviation
 
+    Parameters
+    ----------
+    c : list of int
+        counter values
+    n_seq : int
+        number of sequences
+    n_iter : int
+        number of iterations
+    t : str
+        test executed
+    """
     # Calculate the parameters of the distribution
     p = sum(c) / (n_seq * n_iter)  # Calculate the success probability
     mean_teor = n_seq * p  # Theoretical mean
@@ -296,14 +354,18 @@ def counters_distribution_Tx(c, n_seq, n_iter, t):
 
 
 def counters_distribution_Tj(c, n_seq, n_iter, t):
-    """
-    Counter distribution function used for TjNorm where the sequences that would increase C1 are discarded
-    (in this way the only options are for Ti values to be either > or <, which is helpful when
-    evaluating the distribution of C0).
-    :param c: list of the values of the counter;
-    :param n_seq: number of sequences
-    :param n_iter: number of iterations
-    :param t: test conducted
+    """Plots a histogram of distribution of the counter C0 for a given test adjuested for Tj normalized
+
+    Parameters
+    ----------
+    c : list of int
+        counter values
+    n_seq : int
+        number of sequences
+    n_iter : int
+        number of iterations
+    t : str
+        test executed
     """
     # calculate the parameters of the distribution
     p = 0.5
@@ -371,6 +433,20 @@ def counters_distribution_Tj(c, n_seq, n_iter, t):
 
 
 def counters_distribution_file_plot(f, n_symbols, n_sequences, n_iterations_c):
+    """Plots a histogram of distribution of the counter C0 read from file with the measured mean 
+    and standard deviation
+
+    Parameters
+    ----------
+    f : str
+        path to file
+    n_symbols : int
+        number of symbols
+    n_sequences : int
+        number of sequences
+    n_iterations_c : int
+        number of iterations
+    """
     df = pd.read_csv(f)
     d = df["COUNTER_0"][0]
     list_elements = d[1:-1].split(",")

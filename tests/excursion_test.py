@@ -4,6 +4,19 @@ import numpy as np
 
 
 def excursion_test(S):
+    """Measures how far the running sum of sample values deviates from its
+       average value at each point in the sequence
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    float
+        maximum deviation from the average
+    """
     X = np.mean(S)
     D = [None] * len(S)
     somma = 0

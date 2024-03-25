@@ -1,13 +1,3 @@
-"""
-RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED
-
-Compute the counters C0 and C1 for a given test on a series of random sequences read from file. C0 is incremented if
-the result of the test T on a sequence is bigger than that on the following sequence; if the results of the test are
-equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one. Each
-counter is evaluated on a series of n_sequences_stat sequences; n_iterations_c_stat values of the counters are
-calculated.
-"""
-
 from utils.config import (
     n_symbols_stat,
     n_sequences_stat,
@@ -25,6 +15,21 @@ from tqdm import tqdm
 
 
 def counters_FY_TjNorm(S):
+    """Compute the counters C0 and C1 for a given test on a series of random sequences read from file. 
+    C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; 
+    if the results of the test are equal the second sequence is ignored. 
+    Each pair of sequences is considered as disjointed from the following one. 
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    list of int, list of int
+        counter 0 and counter 1 lists of values
+    """
     if distribution_test_index == 8 or distribution_test_index == 9:
         Tx = execute_function(test, S, p_value_stat)
     else:
@@ -56,6 +61,14 @@ def counters_FY_TjNorm(S):
 
 
 def Random_TjNorm(S):
+    """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file, 
+    save the values in a file and plot the distribution
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    """
     print("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = os.path.abspath(
         os.path.join(

@@ -2,6 +2,18 @@
 
 
 def n_directional_runs(S):
+    """Measures the number of runs constructed using the relations between consecutive samples
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+        number of runs
+    """
     S_prime = []
     for i in range(len(S) - 1):
         if S[i] > S[i + 1]:

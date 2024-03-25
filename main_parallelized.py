@@ -50,6 +50,18 @@ Faccio un executor esterno che prende le
 
 
 def execute_test_suite(sequence):
+    """Executes NIST test suite on a given sequence
+
+    Parameters
+    ----------
+    sequence : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    float
+        executed test output
+    """
     T = []
     for test_index in test_list_indexes:
         if test_index in [8, 9] and bool_pvalue:
@@ -69,6 +81,18 @@ def execute_test_suite(sequence):
 
 
 def FY_test_mode_parallel(seq):
+    """Executes NIST test suite on shuffled sequence in parallel along n_sequences iterations
+
+    Parameters
+    ----------
+    sequence : ist of int
+        sequence of sample values
+
+    Returns
+    -------
+    list of float
+        list of test outputs
+    """
     Ti = []
     with ProcessPoolExecutor() as executor:
         futures = []
