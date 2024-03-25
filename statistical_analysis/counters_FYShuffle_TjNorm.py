@@ -8,17 +8,18 @@ the following one.
 Each counter is evaluated on a series of n_sequences sequences; n_iterations_c values of the counters are calculated.
 """
 
-from architecture.utils.config import (
+from utils.config import (
     n_sequences_stat,
     n_iterations_c_stat,
     test,
     distribution_test_index,
     p_value_stat,
 )
-from architecture.utils.useful_functions import execute_function, save_counters
-from architecture.utils.shuffles import FY_shuffle
-from architecture.utils.plot import counters_distribution_Tj
+from utils.useful_functions import execute_function, save_counters
+from utils.shuffles import FY_shuffle
+from utils.plot import counters_distribution_Tj
 import time
+import os
 from tqdm import tqdm
 import logging
 
@@ -65,9 +66,13 @@ def counters_FY_TjNorm(S):
 
 def FY_TjNorm(S):
     logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
-    f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-        "/FYShuffleTjNorm/fyShuffleTjNorm_" + test + ".csv"
+    f = os.path.abspath(
+        os.path.join(
+            "results",
+            "counters_distribution",
+            "FYShuffleTjNorm",
+            f"fyShuffleTjNorm_{test}.csv",
+        )
     )
     t = time.process_time()
     C0, C1 = counters_FY_TjNorm(S)

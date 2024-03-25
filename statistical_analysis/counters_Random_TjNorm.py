@@ -8,16 +8,17 @@ counter is evaluated on a series of n_sequences_stat sequences; n_iterations_c_s
 calculated.
 """
 
-from architecture.utils.config import (
+from utils.config import (
     n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,
 )
-from architecture.utils.useful_functions import save_counters
-from architecture.utils.shuffles import shuffle_from_file_Norm
-from architecture.utils.plot import counters_distribution_Tj
+from utils.useful_functions import save_counters
+from utils.shuffles import shuffle_from_file_Norm
+from utils.plot import counters_distribution_Tj
 import time
+import os
 from tqdm import tqdm
 import logging
 
@@ -48,11 +49,15 @@ def counters_random_TjNorm():
     return counters_0, counters_1
 
 
-def Random_TjNorm():
+def Random_TjNorm(S):
     logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
-    f = (
-        "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution/RandomTjNorm"
-        "/randomTjNorm_" + test + ".csv"
+    f = os.path.abspath(
+        os.path.join(
+            "results",
+            "counters_distribution",
+            "RandomTjNorm",
+            f"randomTjNorm_{test}.csv",
+        )
     )
     t = time.process_time()
     C0, C1 = counters_random_TjNorm()

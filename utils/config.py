@@ -4,11 +4,9 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 
 import logging
 
+
 # GLOBAL VARIABLES
-file = (
-    "/Users/olivia1/Desktop/RANDOM POWER/project_entropy_validation/bits_RandomPower/test1"
-    "/getbits_20230401_195315_RAW_BITS.BIN"
-)
+input_file = os.path.abspath(os.path.join("getbits_20230401_195315_RAW_BITS.BIN"))
 bool_test_NIST = True
 bool_statistical_analysis = False
 
@@ -61,7 +59,7 @@ test = test_list[distribution_test_index]
 
 
 def file_info():
-    f = open(file, "r+b")
+    f = open(input_file, "r+b")
     f.seek(0, 2)
     size = f.tell()
     logging.debug("FILE INFO")

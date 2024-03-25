@@ -5,18 +5,18 @@ import numpy as np
 from datetime import datetime
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import logging
-from architecture.utils.read import read_file
-from architecture.utils.shuffles import FY_shuffle
-from architecture.utils.useful_functions import (
+from utils.read import read_file
+from utils.shuffles import FY_shuffle
+from utils.useful_functions import (
     execute_function,
     benchmark_timing,
     get_next_run_number,
 )
-from architecture.utils.plot import scatterplot_TxTi, histogram_TxTi
-from architecture.utils.config import (
+from utils.plot import scatterplot_TxTi, histogram_TxTi
+from utils.config import (
     file_info,
     config_info,
-    file,
+    input_file,
     n_symbols,
     n_sequences,
     n_symbols_stat,
@@ -29,11 +29,11 @@ from architecture.utils.config import (
     p,
     see_plots,
 )
-from architecture.statistical_analysis.counters_FYShuffle_Tx import FY_Tx
-from architecture.statistical_analysis.counters_Random_Tx import Random_Tx
-from architecture.statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
-from architecture.statistical_analysis.counters_Random_TjNorm import Random_TjNorm
-from architecture.statistical_analysis.comparison_counters_FyR import comparison_scatterplot
+from statistical_analysis.counters_FYShuffle_Tx import FY_Tx
+from statistical_analysis.counters_Random_Tx import Random_Tx
+from statistical_analysis.counters_FYShuffle_TjNorm import FY_TjNorm
+from statistical_analysis.counters_Random_TjNorm import Random_TjNorm
+from statistical_analysis.comparison_counters_FyR import comparison_scatterplot
 
 
 logging.basicConfig(
@@ -85,7 +85,7 @@ def main():
         logging.debug("NIST TEST")
         logging.debug("Process started")
         t_start = time.process_time()
-        S = read_file(file=file, n_symbols=n_symbols)
+        S = read_file(file=input_file, n_symbols=n_symbols)
         logging.debug("Sequence calculated: S")
 
         logging.debug("Calculating for each test the reference statistic: Tx")
@@ -171,7 +171,7 @@ def main():
         logging.debug("----------------------------------------------------------------\n \n")
         logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
         t_start = time.process_time()
-        S = read_file(file=file, n_symbols=n_symbols_stat)
+        S = read_file(file=input_file, n_symbols=n_symbols_stat)
         logging.debug("Sequence calculated: S")
         with ProcessPoolExecutor() as executor:
             tasks = [

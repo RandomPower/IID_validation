@@ -1,4 +1,4 @@
-from architecture.utils.config import bool_first_seq
+from utils.config import bool_first_seq
 import os
 
 

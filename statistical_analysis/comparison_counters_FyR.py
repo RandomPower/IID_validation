@@ -2,8 +2,8 @@ import os
 import sys
 import pandas as pd
 import logging
-from architecture.utils.config import test_list, ref_numbers
-from architecture.utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
+from utils.config import test_list, ref_numbers
+from utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
 
 
 def get_data(ref_numbers, Tj_norm):
@@ -19,22 +19,38 @@ def get_data(ref_numbers, Tj_norm):
     for ref in ref_numbers:
         if ref in test_list:
             if Tj_norm:
-                fy = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/FYShuffleTjNorm/fyShuffleTjNorm_" + str(test_list[ref]).strip() + ".csv"
+                fy = os.path.abspath(
+                    os.path.join(
+                        "results",
+                        "counters_distribution",
+                        "FYShuffleTjNorm",
+                        f"fyShuffleTjNorm_{str(test_list[ref]).strip()}.csv",
+                    )
                 )
-                rand = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/RandomTjNorm/randomTjNorm_" + str(test_list[ref]).strip() + ".csv"
+                rand = os.path.abspath(
+                    os.path.join(
+                        "results",
+                        "counters_distribution",
+                        "RandomTjNorm",
+                        f"randomTjNorm_{str(test_list[ref]).strip()}.csv",
+                    )
                 )
             else:
-                fy = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/FYShuffleTx/fyShuffleTx_" + str(test_list[ref]).strip() + ".csv"
+                fy = os.path.abspath(
+                    os.path.join(
+                        "results",
+                        "counters_distribution",
+                        "FYShuffleTx",
+                        f"fyShuffleTx_{str(test_list[ref]).strip()}.csv",
+                    )
                 )
-                rand = (
-                    "/Users/olivia1/Desktop/random_power_entropy_val_new/architecture/results/counters_distribution"
-                    "/RandomTx/randomTx_" + str(test_list[ref]).strip() + ".csv"
+                rand = os.path.abspath(
+                    os.path.join(
+                        "results",
+                        "counters_distribution",
+                        "RandomTx",
+                        f"randomTx_{str(test_list[ref]).strip()}.csv",
+                    )
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
                 logging.error("File(s) for reference number %s do not exist.", ref)
