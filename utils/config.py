@@ -77,7 +77,7 @@ def file_info():
         if tot_seqs <= max_sequences:
             logging.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
         else:
-            logging.error("Error: SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
+            logging.error("SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
             exit(-1)
     logging.debug("----------------------------------------------------------------\n")
 
