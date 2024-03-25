@@ -31,6 +31,5 @@ def read_file(file, n_symbols):
         S.append(symbol1)
         symbol2 = i & 0b00001111
         S.append(symbol2)
-    # print(f'sequence length = {len(S)}')
-    # print(f'sequence values = {S}')
+
     return S

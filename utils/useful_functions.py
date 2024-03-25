@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import os
 import time
@@ -11,9 +10,6 @@ from utils.config import (
     test,
     n_sequences_stat,
     test_list_indexes,
-    test_list,
-    bool_pvalue,
-    bool_shuffle_stat,
 )
 from tests.periodicity import periodicity
 from tests.excursion_test import excursion_test
@@ -24,7 +20,7 @@ from tests.runs.l_runs_median import l_median_runs
 from tests.runs.n_increases_decreases import n_increases_decreases
 from tests.collision.avg_collision import avg_c
 from tests.collision.max_collision import max_c
-from tests.covariance import covariace
+from tests.covariance import covariance
 from tests.compression import compression
 
 
@@ -105,7 +101,7 @@ def execute_function(function_name, S, y):
         "avg_collision": lambda: avg_c(S),
         "max_collision": lambda: max_c(S),
         "periodicity": lambda: periodicity(S, y),
-        "covariance": lambda: covariace(S, y),
+        "covariance": lambda: covariance(S, y),
         "compression": lambda: compression(S),
     }[function_name]()
 
@@ -142,7 +138,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
         n_iterations_c_stat,
         n_symbols_stat,
         n_sequences_stat,
-        type,
+        shuffle_type,
         test,
         c0,
         c1,
@@ -150,16 +146,14 @@ def save_counters(c0, c1, elapsed_time, type, f):
         str(datetime.now().strftime("%d/%m/%Y %H:%M:%S")),
     ]
 
-    # Convert the dictionary to a DataFrame
+    # Convert the dictionary to a DataFrame and export it to a csv file
     df = pd.DataFrame(data, index=header).T
 
-    # Crea la directory se non esiste
     directory = os.path.dirname(f)
     if not os.path.exists(directory):
         os.makedirs(directory)
-
     h = not os.path.exists(f)
-    # Esporta il DataFrame in un file CSV
+    
     df.to_csv(f, mode="a", header=h, index=False)
 
 

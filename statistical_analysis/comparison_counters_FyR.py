@@ -1,24 +1,8 @@
-"""
-This function plots the graph that compares the distribution of counters C0 obtained considering random sequences (aka read from file)
-with those obtained through FY shuffling. For each test, the mean value of C0 is rapresented as a dot with errorbars one standard deviation long.
-As expected, the two sets of results (random and shuffled) overlap, hinting towards the IID hypotesis.
-The function 'scatterplot_RvsFY' takes as input:
-    1) test: a dictionary with elements x:'name_of_test' (e.g. 0:'5.1.2:n_directional runs'). It is done as a dictionary only because I remembered
-    that you used something alike to cycle among the tests, so I hope it could be convenient when putting everything together. If this is not the
-    case, feel free to change the nature of 'test'. In such a case, the only modification of 'scatterplot_RvsFY' would in lines 24, 25, where test.values()
-    is used as the x-values for the plot.
-    2) C0r: a list containing the results of the counters C0 for each test using sequences read from file, i.e. C0r = [[counters C0 for test 5.1.2],[counters C0 for test 5.1.3],[counters C0 for test 5.1.4]...]
-    3) C0fy: a list containing the results of the counters C0 for each test using sequences shuffled with FY, i.e. C0fy = [[counters C0 for test 5.1.2],[counters C0 for test 5.1.3],[counters C0 for test 5.1.4]...]
-
-The function computes the mean and std for each list making up C0r and C0fy and uses the results for the plot.
-"""
-
 import os
 import sys
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from utils.config import n_sequences_stat, test_list, ref_numbers
+import logging
+from utils.config import test_list, ref_numbers
 from utils.plot import scatterplot_RvsFY, scatterplot_RvsFY_TjNorm
 
 
@@ -77,7 +61,7 @@ def get_data(ref_numbers, Tj_norm):
                     )
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
-                print(f"Error: File(s) for reference number {ref} do not exist.")
+                logging.error("File(s) for reference number %s do not exist.", ref)
                 sys.exit(1)
 
             try:
@@ -90,7 +74,7 @@ def get_data(ref_numbers, Tj_norm):
                 C0_fy.append(eval(last_entry1))
                 C0_random.append(eval(last_entry2))
             except Exception as e:
-                print(f"Error reading or processing files for {test_list[ref]}: {e}")
+                logging.error("Reading or processing files for %s: %s not successful", test_list[ref], e)
                 sys.exit(1)
     return C0_fy, C0_random, [test_list[i] for i in ref_numbers]
 

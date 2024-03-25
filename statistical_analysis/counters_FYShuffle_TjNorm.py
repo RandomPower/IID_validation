@@ -1,5 +1,4 @@
 from utils.config import (
-    n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,
@@ -12,6 +11,7 @@ from utils.plot import counters_distribution_Tj
 import time
 import os
 from tqdm import tqdm
+import logging
 
 
 def counters_FY_TjNorm(S):
@@ -63,8 +63,8 @@ def counters_FY_TjNorm(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"FY_TjNorm counter_0: {counters_0}")
-    print(f"FY_TjNorm counter_1: {counters_1}")
+    logging.debug("FY_TjNorm counter_0: %s", counters_0)
+    logging.debug("FY_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -78,7 +78,7 @@ def FY_TjNorm(S):
     S : list of int
         sequence of sample values
     """
-    print("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
+    logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     f = os.path.abspath(
         os.path.join(
             "results",

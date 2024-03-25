@@ -11,6 +11,7 @@ from utils.shuffles import shuffle_from_file
 from utils.plot import counters_distribution_Tx
 import time
 from tqdm import tqdm
+import logging
 import os
 
 
@@ -34,7 +35,7 @@ def counters_Random_Tx(S):
         Tx = execute_function(test, S, p_value_stat)
     else:
         Tx = execute_function(test, S, None)
-    counters_0 = []  # shape = (n_iterations_c x 1)
+    counters_0 = []
     counters_1 = []
     index = n_symbols_stat / 2
 
@@ -59,8 +60,8 @@ def counters_Random_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"Random_Tx counter_0: {counters_0}")
-    print(f"Random_Tx counter_1: {counters_1}")
+    logging.debug("Random_Tx counter_0: %s", counters_0)
+    logging.debug("Random_Tx counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -74,7 +75,7 @@ def Random_Tx(S):
     S : list of int
         sequence of sample values
     """
-    print("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
+    logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
     f = os.path.abspath(
         os.path.join(
             "results",

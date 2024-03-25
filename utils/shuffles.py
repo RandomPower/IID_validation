@@ -1,9 +1,6 @@
 import random
-from utils.config import input_file, step, distribution_test_index, test, bool_pvalue, p_value_stat
+from utils.config import input_file, step, distribution_test_index, p_value_stat
 from utils.useful_functions import execute_function
-
-
-# %matplotlib inline
 
 
 def FY_shuffle(sequence):
@@ -27,7 +24,6 @@ def FY_shuffle(sequence):
     return sequence
 
 
-# shuffle direttamente da file per ottenere sequenze senza usare FY
 def shuffle_from_file(ind, n_symb, n_seq):
     """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by 
     applying a masking process.
@@ -69,6 +65,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
             ind += step
 
             # TO DO: exception
+
         return sequences
 
 
@@ -76,12 +73,12 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     """Version of shuffle_from_file function for normalized Tj. 
     The sequence it reads has the same result T on a given test as the previous
     sequence (T(j-1)), it discards it and passes to the next sequence. This is because for Tj normalized we want the
-    counters_oli distribution to be a binomial one with probability 1/2, so we want to ignore the cases = and only have
+    counters distribution to be a binomial one with probability 1/2, so we want to ignore the cases = and only have
     the options > or <. To do so this function also needs to compute the T (aka test(seq)): it therefore gives them
-    back as well, so that there is no need to compute them again (this however changes the main as well, I don't know
-    if it's howerall convenient). The otput are two: the list of sequences and the list of the Ti on those sequences.
+    back as well, so that there is no need to compute them again. The output are two: the list of sequences and the list
+     of the Ti on those sequences.
 
-    TO DO: WRITE THE SUMMARY BETTER
+    TODO: WRITE THE SUMMARY BETTER
 
     Parameters
     ----------
@@ -125,10 +122,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
 
         z = 1
         while z < n_seq:
-            # Move to the current offset
             f.seek(int(index))
-
-            # Read the sequence_size bytes
             sequence_size = int(n_symb / 2)
             sequence = f.read(sequence_size)
 

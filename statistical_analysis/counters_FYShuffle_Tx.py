@@ -1,5 +1,4 @@
 from utils.config import (
-    n_symbols_stat,
     n_sequences_stat,
     n_iterations_c_stat,
     test,
@@ -12,6 +11,7 @@ from utils.plot import counters_distribution_Tx
 import time
 import os
 from tqdm import tqdm
+import logging
 
 
 def counters_FYShuffle_Tx(S):
@@ -57,8 +57,8 @@ def counters_FYShuffle_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    print(f"FY_Tx counter_0: {counters_0}")
-    print(f"FY_Tx counter_1: {counters_1}")
+    logging.debug("FY_Tx counter_0: %s", counters_0)
+    logging.debug("FY_Tx counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -72,7 +72,7 @@ def FY_Tx(S):
     S : list of int
         sequence of sample values
     """
-    print("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
+    logging.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
     f = os.path.abspath(
         os.path.join(
             "results",
