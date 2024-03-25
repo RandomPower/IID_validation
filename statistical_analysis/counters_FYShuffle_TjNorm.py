@@ -57,8 +57,8 @@ def counters_FY_TjNorm(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    logging.debug(f"FY_TjNorm counter_0: {counters_0}")
-    logging.debug(f"FY_TjNorm counter_1: {counters_1}")
+    logging.debug("FY_TjNorm counter_0: %s", counters_0)
+    logging.debug("FY_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 

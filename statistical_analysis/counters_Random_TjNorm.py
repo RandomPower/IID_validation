@@ -42,8 +42,8 @@ def counters_random_TjNorm():
         counters_1.append(C1)
         index += n_sequences_stat * n_symbols_stat / 2
 
-    logging.debug(f"Random_TjNorm counter_0: {counters_0}")
-    logging.debug(f"Random_TjNorm counter_1: {counters_1}")
+    logging.debug("Random_TjNorm counter_0: %s", counters_0)
+    logging.debug("Random_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 

@@ -51,8 +51,8 @@ def counters_FYShuffle_Tx(S):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    logging.debug(f"FY_Tx counter_0: {counters_0}")
-    logging.debug(f"FY_Tx counter_1: {counters_1}")
+    logging.debug("FY_Tx counter_0: %s", counters_0)
+    logging.debug("FY_Tx counter_1: %s", counters_1)
 
     return counters_0, counters_1
 

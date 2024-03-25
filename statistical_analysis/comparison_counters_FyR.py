@@ -37,7 +37,7 @@ def get_data(ref_numbers, Tj_norm):
                     "/RandomTx/randomTx_" + str(test_list[ref]).strip() + ".csv"
                 )
             if not os.path.exists(fy) or not os.path.exists(rand):
-                logging.error(f"Error: File(s) for reference number {ref} do not exist.")
+                logging.error("Error: File(s) for reference number %s do not exist.", ref)
                 sys.exit(1)
 
             try:
@@ -50,7 +50,7 @@ def get_data(ref_numbers, Tj_norm):
                 C0_fy.append(eval(last_entry1))
                 C0_random.append(eval(last_entry2))
             except Exception as e:
-                logging.error(f"Error reading or processing files for {test_list[ref]}: {e}")
+                logging.error("Error reading or processing files for %s: %s", test_list[ref], e)
                 sys.exit(1)
     return C0_fy, C0_random, [test_list[i] for i in ref_numbers]
 

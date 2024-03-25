@@ -116,8 +116,8 @@ def main():
                 if Tx[u] == Ti[t][u]:
                     C1[u] += 1
 
-        logging.debug(f"C0 = {C0}")
-        logging.debug(f"C1 = {C1}")
+        logging.debug("C0 = %s", C0)
+        logging.debug("C1 = %s", C1)
 
         IID = True
         for b in range(len(Tx)):
@@ -169,7 +169,7 @@ def main():
 
     if bool_statistical_analysis:
         logging.debug("----------------------------------------------------------------\n \n")
-        logging.debug(f"STATISTICAL ANALYSIS FOR TEST {test_list[distribution_test_index]}")
+        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
         t_start = time.process_time()
         S = read_file(file=file, n_symbols=n_symbols_stat)
         logging.debug("Sequence calculated: S")
