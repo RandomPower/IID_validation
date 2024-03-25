@@ -111,7 +111,6 @@ def main():
 
         for u in range(len(Tx)):
             for t in range(n_sequences):
-                b = Ti[t][u]
                 if Tx[u] > Ti[t][u]:
                     C0[u] += 1
                 if Tx[u] == Ti[t][u]:
