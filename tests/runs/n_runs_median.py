@@ -4,6 +4,18 @@ import numpy as np
 
 
 def n_median_runs(S):
+    """Measures the number of runs that are constructed with respect to the median of the sequence
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+        number of runs
+    """
     X = np.median(S)
     S_prime = []
     for i in range(len(S)):

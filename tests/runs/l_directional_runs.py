@@ -2,6 +2,19 @@
 
 
 def l_directional_runs(S):
+    """Measures the length of the longest run constructed using the relations between
+    consecutive samples
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+        length of the longest run of consecutive samples that are either strictly increasing or strictly decreasing
+    """
     S_prime = []
     for i in range(0, len(S) - 1):
         if S[i] > S[i + 1]:

@@ -24,14 +24,72 @@ from tests.covariance import covariance
 from tests.compression import compression
 
 
-def execute_function(function_name, S, y):
-    """
-    Function used to call the methods to execute the tests
+def s_prime(S):
+    """Generates a transformed sequence based on the comparison of consecutive elements in the input sequence.
+    For each pair of consecutive elements, if the first element is greater than the second, a -1 
+    is appended to the new sequence; otherwise, a +1 is appended
 
-    :param function_name: function name to be executed
-    :param S: sequence
-    :param y: p value
-    :return: output of executed test
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    list of int
+        new sequence of -1s and +1s
+    """
+    S_prime = []
+    L = len(S)
+    for i in range(L - 1):
+        if S[i] > S[i + 1]:
+            S_prime.append(-1)
+        else:
+            S_prime.append(1)
+    return S_prime
+
+
+def s_prime_median(S):
+    """Generates a transformed sequence where each original value is replaced with -1 if it is 
+    less than the median of the original sequence, or 1 if it is greater than or equal to the median
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    list of int
+        new sequence of -1s and +1s
+    """
+    M = np.median(S)
+    S_prime = []
+    L = len(S)
+    for i in range(L):
+        if S[i] < M:
+            S_prime.append(-1)
+        else:
+            S_prime.append(1)
+    return S_prime
+
+
+def execute_function(function_name, S, y):
+    """Calls functions to execute based on the function name provided
+
+    Parameters
+    ----------
+    function_name : str
+        function name to be executed
+    S : list of int
+        sequence of sample values
+    y : int
+        lag parameter p
+
+    Returns
+    -------
+    int or float
+        output of the executed test function
     """
     return {
         "excursion_test": lambda: excursion_test(S),
@@ -48,15 +106,21 @@ def execute_function(function_name, S, y):
     }[function_name]()
 
 
-def save_counters(c0, c1, elapsed_time, shuffle_type, f):
-    """
-    This function saves the counters values produced in the statistical analysis
+def save_counters(c0, c1, elapsed_time, type, f):
+    """Saves counters values obtained in the statistical analysis
 
-    :param c0: counter C0 values
-    :param c1: counter C1 values
-    :param elapsed_time: time used to execute the test
-    :param shuffle_type: type of shuffle used
-    :param f: path to csv file
+    Parameters
+    ----------
+    c0 : list of int
+        counter C0
+    c1 : list of int
+        counter C1
+    elapsed_time : float
+        time to execute a test
+    type : str
+        type of shuffle selected
+    f : str
+        path to csv file
     """
     header = [
         "n_iterations_c",
@@ -89,16 +153,91 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     if not os.path.exists(directory):
         os.makedirs(directory)
     h = not os.path.exists(f)
-
+    
     df.to_csv(f, mode="a", header=h, index=False)
 
 
-def benchmark_timing(tot_time, p):
-    """
-    This function saves in a txt file the time taken to execute the tests on the shuffled sequences
+def save_failure_test(C0, C1, b, test_time):
+    """Saves IID failure and the counters values generated in the NIST test part
 
-    :param tot_time: computed total time
-    :param p: string, either "parallelizing" or "non-parallelizing"
+    Parameters
+    ----------
+    C0 : list of int
+        counter C0
+    C1 : list of int
+        counter C1
+    b : bool
+        IID assumption
+    test_time : float
+        total process time
+    """
+    header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
+    t = [test_list.get(i) for i in test_list_indexes]
+    d = [n_symbols, n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
+    dt = pd.DataFrame(d, index=header).T
+    h = True
+    if os.path.exists("results/failure_rate.csv"):
+        h = False
+        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+    else:
+        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+
+
+def save_test_values(Tx, Ti):
+    """Saves Tx test values and Ti test values in a csv file
+
+    Parameters
+    ----------
+    Tx : list of float 
+        Tx test values calculated on one sequence
+    Ti : list of float
+        Ti test values calculated on the shuffled sequences
+    """
+    if bool_pvalue:
+        header = [
+            "excursion_test",
+            "n_directional_runs",
+            "l_directional_runs",
+            "n_median_runs",
+            "l_median_runs",
+            "n_increases_decreases",
+            "avg_collision",
+            "max_collision",
+            "periodicity_p0",
+            "periodicity_p1",
+            "periodicity_p2",
+            "periodicity_p3",
+            "periodicity_p4",
+            "covariance_p0",
+            "covariance_p1",
+            "covariance_p2",
+            "covariance_p3",
+            "covariance_p4",
+            "compression",
+        ]
+    else:
+        header = [test_list[k] for k in test_list_indexes]
+    df2 = pd.DataFrame(np.array(Ti), columns=header)
+    a = pd.DataFrame([Tx], columns=header)
+    df = pd.concat([a, df2]).reset_index(drop=True)
+    # df.insert("time Ti", tf, True)
+    file_path = "results/save_test_values.csv"
+    write_header = not os.path.isfile(file_path)
+    write_mode = "w" if write_header else "a"
+
+    # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
+    df.to_csv(file_path, mode=write_mode, header=write_header, index=False)
+
+
+def benchmark_timing(tot_time, p):
+    """Saves time taken to execute the tests on the shuffled sequences in a txt file 
+
+    Parameters
+    ----------
+    tot_time : float
+        total process time
+    p : string
+        parallelized / non parallelized mode
     """
     if len(test_list_indexes) == 11:
         test_ind = "all tests run"
@@ -117,12 +256,20 @@ def benchmark_timing(tot_time, p):
 
 
 def get_next_run_number(base_dir, current_run_date):
-    """
-    Function used to detect whether a folder is already present in the project
+    """Calculates the iteration number to create numbered of sequenced folders
 
-    :param base_dir: base path to the directory
-    :param current_run_date: date at which the script is run
-    :return: the next iteration number for the folder
+
+    Parameters
+    ----------
+    base_dir : str
+        base path to the directory
+    current_run_date : str
+        date at which the script is run
+
+    Returns
+    -------
+    int
+        next iteration number for the folder
     """
     # Check existing directories for the current date
     date_dir = os.path.join(base_dir, current_run_date)

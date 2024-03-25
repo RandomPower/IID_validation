@@ -4,6 +4,18 @@ import numpy as np
 
 
 def l_median_runs(S):
+    """Measures the length of the longest run constructed with respect to the median of the sequence
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+        length of the longest run
+    """
     X = np.median(S)
     S_prime = []
     for i in range(len(S)):
