@@ -2,6 +2,18 @@
 
 
 def n_increases_decreases(S):
+    """Measures the maximum number of increases or decreases between consecutive sample values
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    Returns
+    -------
+    int
+        greater number between the total counts of increases and decreases among consecutive sample values
+    """
     S_prime = []
     for i in range(0, len(S) - 1):
         if S[i] > S[i + 1]:
@@ -20,7 +32,3 @@ def n_increases_decreases(S):
         else:
             count_plus += 1
     return max(count_minus, count_plus)
-
-
-"""S = [2, 2, 2, 5, 7, 7, 9, 3, 1, 4, 4]
-print(n_increases_decreases(S))"""
