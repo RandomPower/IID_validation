@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 import tests.collision.avg_collision
@@ -147,7 +148,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
     if not os.path.exists(directory):
         os.makedirs(directory)
     h = not os.path.exists(f)
-    
+
     df.to_csv(f, mode="a", header=h, index=False)
 
 
@@ -166,8 +167,8 @@ def save_failure_test(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [test_list.get(i) for i in test_list_indexes]
-    d = [n_symbols, n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
+    t = [utils.config.test_list.get(i) for i in utils.config.test_list_indexes]
+    d = [utils.config.n_symbols, utils.config.n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
     dt = pd.DataFrame(d, index=header).T
     h = True
     if os.path.exists("results/failure_rate.csv"):
@@ -187,7 +188,7 @@ def save_test_values(Tx, Ti):
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if bool_pvalue:
+    if utils.config.bool_pvalue:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -210,7 +211,7 @@ def save_test_values(Tx, Ti):
             "compression",
         ]
     else:
-        header = [test_list[k] for k in test_list_indexes]
+        header = [utils.config.test_list[k] for k in utils.config.test_list_indexes]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
