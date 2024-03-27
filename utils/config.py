@@ -34,7 +34,7 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-config_data: dict = parse_config_file("./conf.toml")
+config_data: dict = parse_config_file("conf.toml")
 
 # GLOBAL VARIABLES
 input_file = os.path.abspath(os.path.join("getbits_20230401_195315_RAW_BITS.BIN"))
