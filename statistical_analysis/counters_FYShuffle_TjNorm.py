@@ -1,5 +1,4 @@
 import logging
-
 import os
 import time
 
@@ -67,7 +66,7 @@ def counters_FY_TjNorm(S):
 
 
 def FY_TjNorm(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one, 
+    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one,
     save the values in a file and plot the distribution
 
     Parameters
