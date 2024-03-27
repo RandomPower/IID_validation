@@ -101,7 +101,7 @@ def execute_function(function_name, S, y):
     }[function_name]()
 
 
-def save_counters(c0, c1, elapsed_time, type, f):
+def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     """Saves counters values obtained in the statistical analysis
 
     Parameters
@@ -112,7 +112,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
         counter C1
     elapsed_time : float
         time to execute a test
-    type : str
+    shuffle_type : str
         type of shuffle selected
     f : str
         path to csv file
