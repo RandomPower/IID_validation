@@ -17,20 +17,16 @@ def parse_config_file(file_path: str) -> dict:
         dict: a dictionary containing all the configuration values,
             or an empty dictionary if the configuration file cannot
             be parsed.
-
-    Raises:
-        IOError: If the file specified by 'file_path' cannot be opened or read.
-        Exception: If any other unexpected error occurs during parsing.
     """
     try:
         with open(file_path, "rb") as f:
             config_data: dict = tomllib.load(f)
         return config_data
     except IOError as e:
-        print(f"Error opening or reading config file: {e}")
+        logging.error(f"Unable to open or read config file: {e}")
         return {}
     except Exception as e:
-        print(f"Error parsing config file: {e}")
+        logging.error(f"Unable to parse config file: {e}")
         return {}
 
 
