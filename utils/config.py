@@ -27,10 +27,10 @@ def parse_config_file(file_path: str) -> dict:
             config_data: dict = tomllib.load(f)
         return config_data
     except IOError as e:
-        print(f'Error opening or reading config file: {e}')
+        print(f"Error opening or reading config file: {e}")
         return {}
     except Exception as e:
-        print(f'Error parsing config file: {e}')
+        print(f"Error parsing config file: {e}")
         return {}
 
 
@@ -44,9 +44,7 @@ bool_statistical_analysis = False
 # NIST TEST VARIABLES
 n_symbols = 100
 n_sequences = 100
-bool_shuffle_NIST = (
-    True  # --> if True: FY shuffle, if False: use random sampling from file
-)
+bool_shuffle_NIST = True  # --> if True: FY shuffle, if False: use random sampling from file
 bool_first_seq = True  # --> if True: reference sequence read from beginning; if False: reference sequence from the end
 bool_pvalue = False  # --> if True: NIST values, if False: user chooses value
 see_plots = False
@@ -63,9 +61,7 @@ n_symbols_stat = 1000
 n_iterations_c_stat = 500
 distribution_test_index = 6  # Select which test index for counter distribution
 
-bool_shuffle_stat = (
-    True  # --> if True: FY shuffle, if False: use random sampling from file
-)
+bool_shuffle_stat = True  # --> if True: FY shuffle, if False: use random sampling from file
 
 p_value_stat = 2  # User sets preferred value
 ref_numbers = [1, 3, 4]  # Select which test indexes for shuffle/random comparison
@@ -111,17 +107,11 @@ def file_info():
     size = f.tell()
     logging.debug("FILE INFO")
     logging.debug("Size of file is: %s bytes", size)
-    logging.debug(
-        "Number of symbols per sequence for counters analysis: %s", n_symbols_stat
-    )
-    logging.debug(
-        "Number of sequences wanted for counters analysis: %s", n_sequences_stat
-    )
+    logging.debug("Number of symbols per sequence for counters analysis: %s", n_symbols_stat)
+    logging.debug("Number of sequences wanted for counters analysis: %s", n_sequences_stat)
     max_symbols = size * 2  # total number of symbols in the file
     max_sequences = max_symbols / n_symbols_stat
-    logging.debug(
-        "Maximum sequences that can be generated from the file: %s", max_sequences
-    )
+    logging.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
     tot_seqs = n_iterations_c_stat * n_sequences_stat
     logging.debug("Total sequences necessary = %s", tot_seqs)
     if not bool_shuffle_stat:
@@ -156,6 +146,4 @@ def config_info():
     comp = [test_list.get(i) for i in ref_numbers]
     logging.debug("Tests selected test for shuffle/random comparison: %s", comp)
     logging.debug("p parameter used: user value: %s", p_value_stat)
-    logging.debug(
-        "----------------------------------------------------------------\n \nMAIN"
-    )
+    logging.debug("----------------------------------------------------------------\n \nMAIN")
