@@ -2,7 +2,6 @@
 CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 """
 
-from ctypes import Union
 import logging
 import os
 import tomllib
