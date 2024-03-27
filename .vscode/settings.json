@@ -3,6 +3,7 @@
     "isort.check": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
+    "isort.args":["--profile", "black"],
     "flake8.args": [
         "--max-line-length=120"
     ],
