@@ -8,7 +8,7 @@ import tomllib
 
 
 def parse_config_file(file_path: str) -> dict:
-    """Parse the conf.toml file into a Python dictionary
+    """Parse the specified file into a Python dictionary
 
     Args:
         file_path (str): the path of the configuration file.
