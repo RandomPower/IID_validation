@@ -35,8 +35,8 @@ def execute_test_suite(sequence):
 
     Returns
     -------
-    float
-        executed test output
+    list of float
+        list of tests results
     """
     T = []
     for test_index in utils.config.test_list_indexes:
