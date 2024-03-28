@@ -156,6 +156,50 @@ def FY_test_mode_parallel(seq):
     return Ti
 
 
+def iid_plots(Tx, Ti):
+    """Plot histogram and scatterplot of Ti values with respect to the Tx test value
+
+    Parameters
+    ----------
+    Tx : list of int
+        reference test values
+    Ti : list of int
+        test values calculated on shuffled sequences
+    """
+    sc_dir = "results/plots/scatterplot_TxTi"
+    hist_dir = "results/plots/histogram_TxTi"
+    current_run_date = datetime.now().strftime("%Y-%m-%d")
+    dir_sc_run = os.path.join(sc_dir, current_run_date, str(get_next_run_number(sc_dir, current_run_date)))
+    dir_hist_run = os.path.join(hist_dir, current_run_date, str(get_next_run_number(hist_dir, current_run_date)))
+
+    # Ensure the directory exists
+    os.makedirs(dir_sc_run, exist_ok=True)
+    os.makedirs(dir_hist_run, exist_ok=True)
+
+    Ti_transposed = np.transpose(Ti)
+    for t in range(len(Tx)):
+        if bool_pvalue:
+            # Handle the special case for test 8 ('periodicity')
+            if 8 <= t <= 12:
+                p_index = t - 8  # Adjust index to map to the correct p value
+                test_name = f"{test_list[8]} (p={p[p_index]})"
+            # Handle the special case for test 9 ('covariance')
+            elif 13 <= t <= 17:
+                p_index = t - 13  # Adjust index to map to the correct p value
+                test_name = f"{test_list[9]} (p={p[p_index]})"
+            # For the values that should correspond to test 10 ('compression')
+            elif t == 18:
+                test_name = test_list[10]  # Direct mapping for 'compression'
+            else:
+                # Direct mapping for other tests
+                test_name = test_list[t]
+            histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
+            scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
+        else:
+            histogram_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_hist_run)
+            scatterplot_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_sc_run)
+
+
 def iid_test_function():
     logging.debug("NIST TEST")
     logging.debug("Process started")
@@ -188,39 +232,8 @@ def iid_test_function():
 
     # plots
     if see_plots:
-        sc_dir = "results/plots/scatterplot_TxTi"
-        hist_dir = "results/plots/histogram_TxTi"
-        current_run_date = datetime.now().strftime("%Y-%m-%d")
-        dir_sc_run = os.path.join(sc_dir, current_run_date, str(get_next_run_number(sc_dir, current_run_date)))
-        dir_hist_run = os.path.join(hist_dir, current_run_date, str(get_next_run_number(hist_dir, current_run_date)))
-
-        # Ensure the directory exists
-        os.makedirs(dir_sc_run, exist_ok=True)
-        os.makedirs(dir_hist_run, exist_ok=True)
-
-        Ti_transposed = np.transpose(Ti)
-        for t in range(len(Tx)):
-            if bool_pvalue:
-                # Handle the special case for test 8 ('periodicity')
-                if 8 <= t <= 12:
-                    p_index = t - 8  # Adjust index to map to the correct p value
-                    test_name = f"{test_list[8]} (p={p[p_index]})"
-                # Handle the special case for test 9 ('covariance')
-                elif 13 <= t <= 17:
-                    p_index = t - 13  # Adjust index to map to the correct p value
-                    test_name = f"{test_list[9]} (p={p[p_index]})"
-                # For the values that should correspond to test 10 ('compression')
-                elif t == 18:
-                    test_name = test_list[10]  # Direct mapping for 'compression'
-                else:
-                    # Direct mapping for other tests
-                    test_name = test_list[t]
-                histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
-                scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
-            else:
-                histogram_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_hist_run)
-                scatterplot_TxTi(Tx[t], Ti_transposed[t], test_list[t], dir_sc_run)
-
+        iid_plots(Tx, Ti)
+        
 
 def main():
     file_info()
