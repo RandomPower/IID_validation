@@ -1,17 +1,13 @@
-from utils.config import (
-    n_sequences_stat,
-    n_iterations_c_stat,
-    test,
-    distribution_test_index,
-    p_value_stat,
-)
-from utils.useful_functions import execute_function, save_counters
-from utils.shuffles import FY_shuffle
-from utils.plot import counters_distribution_Tx
-import time
-import os
-from tqdm import tqdm
 import logging
+import os
+import time
+
+from tqdm import tqdm
+
+import utils.config
+import utils.plot
+import utils.shuffles
+import utils.useful_functions
 
 
 def counters_FYShuffle_Tx(S):
@@ -32,22 +28,24 @@ def counters_FYShuffle_Tx(S):
     counters_0 = []
     counters_1 = []
     # Calculate reference statistics
-    if distribution_test_index == 8 or distribution_test_index == 9:
-        Tx = execute_function(test, S, p_value_stat)
+    if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+        Tx = utils.useful_functions.execute_function(utils.config.test, S, utils.config.p_value_stat)
     else:
-        Tx = execute_function(test, S, None)
+        Tx = utils.useful_functions.execute_function(utils.config.test, S, None)
 
     # S_shuffled will move by a P_pointer for every n_sequences
-    for i in tqdm(range(n_iterations_c_stat)):
+    for i in tqdm(range(utils.config.n_iterations_c_stat)):
         C0 = 0
         C1 = 0
         Ti = []
-        for k in range(n_sequences_stat):
-            s_shuffled = FY_shuffle(S.copy())
-            if distribution_test_index == 8 or distribution_test_index == 9:
-                Ti.append(execute_function(test, s_shuffled, p_value_stat))
+        for k in range(utils.config.n_sequences_stat):
+            s_shuffled = utils.shuffles.FY_shuffle(S.copy())
+            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+                Ti.append(
+                    utils.useful_functions.execute_function(utils.config.test, s_shuffled, utils.config.p_value_stat)
+                )
             else:
-                Ti.append(execute_function(test, s_shuffled, None))
+                Ti.append(utils.useful_functions.execute_function(utils.config.test, s_shuffled, None))
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
@@ -78,7 +76,7 @@ def FY_Tx(S):
             "results",
             "counters_distribution",
             "FYShuffleTx",
-            f"fyShuffleTx_{test}.csv",
+            f"fyShuffleTx_{utils.config.test}.csv",
         )
     )
     t = time.process_time()
@@ -86,7 +84,7 @@ def FY_Tx(S):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
-    counters_distribution_Tx(C0, n_sequences_stat, n_iterations_c_stat, "FY_Tx")
+    utils.plot.counters_distribution_Tx(C0, utils.config.n_sequences_stat, utils.config.n_iterations_c_stat, "FY_Tx")

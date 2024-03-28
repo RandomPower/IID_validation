@@ -1,17 +1,13 @@
-from utils.config import (
-    n_sequences_stat,
-    n_iterations_c_stat,
-    test,
-    distribution_test_index,
-    p_value_stat,
-)
-from utils.useful_functions import execute_function, save_counters
-from utils.shuffles import FY_shuffle
-from utils.plot import counters_distribution_Tj
-import time
-import os
-from tqdm import tqdm
 import logging
+import os
+import time
+
+from tqdm import tqdm
+
+import utils.config
+import utils.plot
+import utils.shuffles
+import utils.useful_functions
 
 
 def counters_FY_TjNorm(S):
@@ -32,22 +28,22 @@ def counters_FY_TjNorm(S):
     """
     counters_0 = []
     counters_1 = []
-    for k in tqdm(range(n_iterations_c_stat)):
+    for k in tqdm(range(utils.config.n_iterations_c_stat)):
         Ti = []
-        seq = FY_shuffle(S.copy())
+        seq = utils.shuffles.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
-        if distribution_test_index == 8 or distribution_test_index == 9:
-            Ti.append(execute_function(test, seq, p_value_stat))
+        if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+            Ti.append(utils.useful_functions.execute_function(utils.config.test, seq, utils.config.p_value_stat))
         else:
-            Ti.append(execute_function(test, seq, None))
+            Ti.append(utils.useful_functions.execute_function(utils.config.test, seq, None))
         j = 1
-        while j < n_sequences_stat:
-            seq = FY_shuffle(S.copy())
-            if distribution_test_index == 8 or distribution_test_index == 9:
-                t = execute_function(test, seq, p_value_stat)
+        while j < utils.config.n_sequences_stat:
+            seq = utils.shuffles.FY_shuffle(S.copy())
+            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
+                t = utils.useful_functions.execute_function(utils.config.test, seq, utils.config.p_value_stat)
             else:
-                t = execute_function(test, seq, None)
+                t = utils.useful_functions.execute_function(utils.config.test, seq, None)
             if t == Ti[j - 1]:
                 continue
             else:
@@ -70,7 +66,7 @@ def counters_FY_TjNorm(S):
 
 
 def FY_TjNorm(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one, 
+    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one,
     save the values in a file and plot the distribution
 
     Parameters
@@ -84,7 +80,7 @@ def FY_TjNorm(S):
             "results",
             "counters_distribution",
             "FYShuffleTjNorm",
-            f"fyShuffleTjNorm_{test}.csv",
+            f"fyShuffleTjNorm_{utils.config.test}.csv",
         )
     )
     t = time.process_time()
@@ -92,7 +88,9 @@ def FY_TjNorm(S):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
-    counters_distribution_Tj(C0, n_sequences_stat, n_iterations_c_stat, "FY_TjNorm")
+    utils.plot.counters_distribution_Tj(
+        C0, utils.config.n_sequences_stat, utils.config.n_iterations_c_stat, "FY_TjNorm"
+    )

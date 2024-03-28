@@ -1,27 +1,22 @@
-import pandas as pd
 import os
 import time
 from datetime import datetime
-from utils.config import (
-    n_symbols,
-    n_sequences,
-    n_symbols_stat,
-    n_iterations_c_stat,
-    test,
-    n_sequences_stat,
-    test_list_indexes,
-)
-from tests.periodicity import periodicity
-from tests.excursion_test import excursion_test
-from tests.runs.n_of_directional_runs import n_directional_runs
-from tests.runs.l_directional_runs import l_directional_runs
-from tests.runs.n_runs_median import n_median_runs
-from tests.runs.l_runs_median import l_median_runs
-from tests.runs.n_increases_decreases import n_increases_decreases
-from tests.collision.avg_collision import avg_c
-from tests.collision.max_collision import max_c
-from tests.covariance import covariance
-from tests.compression import compression
+
+import numpy as np
+import pandas as pd
+
+import tests.collision.avg_collision
+import tests.collision.max_collision
+import tests.compression
+import tests.covariance
+import tests.excursion_test
+import tests.periodicity
+import tests.runs.l_directional_runs
+import tests.runs.l_runs_median
+import tests.runs.n_increases_decreases
+import tests.runs.n_of_directional_runs
+import tests.runs.n_runs_median
+import utils.config
 
 
 def s_prime(S):
@@ -92,21 +87,21 @@ def execute_function(function_name, S, y):
         output of the executed test function
     """
     return {
-        "excursion_test": lambda: excursion_test(S),
-        "n_directional_runs": lambda: n_directional_runs(S),
-        "l_directional_runs": lambda: l_directional_runs(S),
-        "n_median_runs": lambda: n_median_runs(S),
-        "l_median_runs": lambda: l_median_runs(S),
-        "n_increases_decreases": lambda: n_increases_decreases(S),
-        "avg_collision": lambda: avg_c(S),
-        "max_collision": lambda: max_c(S),
-        "periodicity": lambda: periodicity(S, y),
-        "covariance": lambda: covariance(S, y),
-        "compression": lambda: compression(S),
+        "excursion_test": lambda: tests.excursion_test.excursion_test(S),
+        "n_directional_runs": lambda: tests.runs.n_of_directional_runs.n_directional_runs(S),
+        "l_directional_runs": lambda: tests.runs.l_directional_runs.l_directional_runs(S),
+        "n_median_runs": lambda: tests.runs.n_runs_median.n_median_runs(S),
+        "l_median_runs": lambda: tests.runs.l_runs_median.l_median_runs(S),
+        "n_increases_decreases": lambda: tests.runs.n_increases_decreases.n_increases_decreases(S),
+        "avg_collision": lambda: tests.collision.avg_collision.avg_c(S),
+        "max_collision": lambda: tests.collision.max_collision.max_c(S),
+        "periodicity": lambda: tests.periodicity.periodicity(S, y),
+        "covariance": lambda: tests.covariance.covariance(S, y),
+        "compression": lambda: tests.compression.compression(S),
     }[function_name]()
 
 
-def save_counters(c0, c1, elapsed_time, type, f):
+def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     """Saves counters values obtained in the statistical analysis
 
     Parameters
@@ -117,7 +112,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
         counter C1
     elapsed_time : float
         time to execute a test
-    type : str
+    shuffle_type : str
         type of shuffle selected
     f : str
         path to csv file
@@ -135,11 +130,11 @@ def save_counters(c0, c1, elapsed_time, type, f):
     ]
     elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
     data = [
-        n_iterations_c_stat,
-        n_symbols_stat,
-        n_sequences_stat,
+        utils.config.n_iterations_c_stat,
+        utils.config.n_symbols_stat,
+        utils.config.n_sequences_stat,
         shuffle_type,
-        test,
+        utils.config.test,
         c0,
         c1,
         str(elapsed),
@@ -153,7 +148,7 @@ def save_counters(c0, c1, elapsed_time, type, f):
     if not os.path.exists(directory):
         os.makedirs(directory)
     h = not os.path.exists(f)
-    
+
     df.to_csv(f, mode="a", header=h, index=False)
 
 
@@ -172,8 +167,8 @@ def save_failure_test(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [test_list.get(i) for i in test_list_indexes]
-    d = [n_symbols, n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
+    t = [utils.config.test_list.get(i) for i in utils.config.test_list_indexes]
+    d = [utils.config.n_symbols, utils.config.n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
     dt = pd.DataFrame(d, index=header).T
     h = True
     if os.path.exists("results/failure_rate.csv"):
@@ -193,7 +188,7 @@ def save_test_values(Tx, Ti):
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if bool_pvalue:
+    if utils.config.bool_pvalue:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -216,7 +211,7 @@ def save_test_values(Tx, Ti):
             "compression",
         ]
     else:
-        header = [test_list[k] for k in test_list_indexes]
+        header = [utils.config.test_list[k] for k in utils.config.test_list_indexes]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
@@ -239,14 +234,14 @@ def benchmark_timing(tot_time, p):
     p : string
         parallelized / non parallelized mode
     """
-    if len(test_list_indexes) == 11:
+    if len(utils.config.test_list_indexes) == 11:
         test_ind = "all tests run"
     else:
-        test_ind = "tests run: " + str(test_list_indexes)
+        test_ind = "tests run: " + str(utils.config.test_list_indexes)
     lines = [
         str(datetime.now()),
-        "n_symbols: " + str(n_symbols),
-        "n_sequences: " + str(n_sequences),
+        "n_symbols: " + str(utils.config.n_symbols),
+        "n_sequences: " + str(utils.config.n_sequences),
         test_ind,
         "total_time: " + str(tot_time) + " s",
         p,
