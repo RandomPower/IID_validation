@@ -233,7 +233,29 @@ def iid_test_function():
     # plots
     if see_plots:
         iid_plots(Tx, Ti)
-        
+
+
+def statistical_analysis_function():
+    logging.debug("----------------------------------------------------------------\n \n")
+    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
+    t_start = time.process_time()
+
+    S = read_file(file=input_file, n_symbols=n_symbols_stat)
+    logging.debug("Sequence calculated: S")
+
+    with ProcessPoolExecutor() as executor:
+        tasks = [
+            executor.submit(FY_Tx, S),
+            executor.submit(FY_TjNorm, S),
+            executor.submit(Random_Tx, S),
+            executor.submit(Random_TjNorm, S),
+        ]
+        # Wait for all tasks to complete
+        for task in tasks:
+            task.result()
+        comparison_scatterplot()
+        logging.debug("Statistical analysis completed.")
+
 
 def main():
     file_info()
@@ -242,24 +264,7 @@ def main():
         iid_test_function()
 
     if bool_statistical_analysis:
-        logging.debug("----------------------------------------------------------------\n \n")
-        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", test_list[distribution_test_index])
-        t_start = time.process_time()
-        S = read_file(file=input_file, n_symbols=n_symbols_stat)
-        logging.debug("Sequence calculated: S")
-        with ProcessPoolExecutor() as executor:
-            tasks = [
-                executor.submit(FY_Tx, S),
-                executor.submit(FY_TjNorm, S),
-                executor.submit(Random_Tx, S),
-                executor.submit(Random_TjNorm, S),
-            ]
-            # Wait for all tasks to complete
-            for task in tasks:
-                task.result()
-
-        comparison_scatterplot()
-        logging.debug("Statistical analysis completed.")
+        statistical_analysis_function()
 
 
 if __name__ == "__main__":
