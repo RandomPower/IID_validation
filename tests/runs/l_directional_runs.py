@@ -1,5 +1,7 @@
 """ 5.1.3 Lenght of Directional Runs"""
 
+import utils.useful_functions
+
 
 def l_directional_runs(S):
     """Measures the length of the longest run constructed using the relations between
@@ -15,14 +17,7 @@ def l_directional_runs(S):
     int
         length of the longest run of consecutive samples that are either strictly increasing or strictly decreasing
     """
-    S_prime = []
-    for i in range(0, len(S) - 1):
-        if S[i] > S[i + 1]:
-            S_prime.append(-1)
-        else:
-            S_prime.append(1)
-    if len(S_prime) == 0:
-        return 0
+    S_prime = utils.useful_functions.s_prime(S)
 
     T = 0
     current_count = 1

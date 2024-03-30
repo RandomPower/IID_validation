@@ -1,6 +1,6 @@
 """ 5.1.5 Number of Runs based on median"""
 
-import numpy as np
+import utils.useful_functions
 
 
 def n_median_runs(S):
@@ -16,15 +16,7 @@ def n_median_runs(S):
     int
         number of runs
     """
-    X = np.median(S)
-    S_prime = []
-    for i in range(len(S)):
-        if S[i] < X:
-            S_prime.append(-1)
-        else:
-            S_prime.append(1)
-    if len(S_prime) == 0:
-        return 0
+    S_prime = utils.useful_functions.s_prime_median(S)
 
     T = 1
     for i in range(1, len(S_prime)):

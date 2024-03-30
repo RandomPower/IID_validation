@@ -1,5 +1,7 @@
 """ 5.1.4 Number of Increases and Decreases"""
 
+import utils.useful_functions
+
 
 def n_increases_decreases(S):
     """Measures the maximum number of increases or decreases between consecutive sample values
@@ -14,14 +16,7 @@ def n_increases_decreases(S):
     int
         greater number between the total counts of increases and decreases among consecutive sample values
     """
-    S_prime = []
-    for i in range(0, len(S) - 1):
-        if S[i] > S[i + 1]:
-            S_prime.append(-1)
-        else:
-            S_prime.append(1)
-    if len(S_prime) == 0:
-        return 0
+    S_prime = utils.useful_functions.s_prime(S)
 
     count_plus = 0
     count_minus = 0

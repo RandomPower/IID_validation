@@ -1,5 +1,7 @@
 """ 5.1.2 Number of Directional Runs"""
 
+import utils.useful_functions
+
 
 def n_directional_runs(S):
     """Measures the number of runs constructed using the relations between consecutive samples
@@ -14,14 +16,7 @@ def n_directional_runs(S):
     int
         number of runs
     """
-    S_prime = []
-    for i in range(len(S) - 1):
-        if S[i] > S[i + 1]:
-            S_prime.append(-1)
-        else:
-            S_prime.append(1)
-    if len(S_prime) == 0:
-        return 0
+    S_prime = utils.useful_functions.s_prime(S)
 
     T = 1
     for k in range(1, len(S_prime)):
