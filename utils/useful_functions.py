@@ -21,8 +21,8 @@ import utils.config
 
 def s_prime(S):
     """Generates a transformed sequence based on the comparison of consecutive elements in the input sequence.
-    For each pair of consecutive elements, if the first element is greater than the second, a -1 
-    is appended to the new sequence; otherwise, a +1 is appended
+    For each pair of consecutive elements, if the first element is greater than the second, a -1
+    is appended to the new sequence; otherwise, a +1 is appended.
 
     Parameters
     ----------
@@ -34,18 +34,23 @@ def s_prime(S):
     list of int
         new sequence of -1s and +1s
     """
+    if len(S) == 0:
+        raise Exception("Input sequence has lenght 0")
+    if len(S) == 1:
+        raise Exception("Input sequence has lenght 1")
+
     S_prime = []
-    L = len(S)
-    for i in range(L - 1):
+    for i in range(len(S) - 1):
         if S[i] > S[i + 1]:
             S_prime.append(-1)
         else:
             S_prime.append(1)
+
     return S_prime
 
 
 def s_prime_median(S):
-    """Generates a transformed sequence where each original value is replaced with -1 if it is 
+    """Generates a transformed sequence where each original value is replaced with -1 if it is
     less than the median of the original sequence, or 1 if it is greater than or equal to the median
 
     Parameters
@@ -58,10 +63,12 @@ def s_prime_median(S):
     list of int
         new sequence of -1s and +1s
     """
+    if len(S) == 0:
+        raise Exception("Input sequence has lenght 0")
+
     M = np.median(S)
     S_prime = []
-    L = len(S)
-    for i in range(L):
+    for i in range(len(S)):
         if S[i] < M:
             S_prime.append(-1)
         else:

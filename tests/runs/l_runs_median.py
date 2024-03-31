@@ -1,6 +1,6 @@
 """ 5.1.6 Length of Runs based on median"""
 
-import numpy as np
+import utils.useful_functions
 
 
 def l_median_runs(S):
@@ -16,15 +16,7 @@ def l_median_runs(S):
     int
         length of the longest run
     """
-    X = np.median(S)
-    S_prime = []
-    for i in range(len(S)):
-        if S[i] < X:
-            S_prime.append(-1)
-        else:
-            S_prime.append(1)
-    if len(S_prime) == 0:
-        return 0
+    S_prime = utils.useful_functions.s_prime_median(S)
 
     T = 0
     current_count = 1
