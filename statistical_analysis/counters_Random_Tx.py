@@ -11,8 +11,8 @@ import utils.useful_functions
 
 
 def counters_Random_Tx(S):
-    """Compute the counters C0 and C1 for a given test on a series of random sequences read from file. 
-    The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result 
+    """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
+    The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
 
     Parameters
@@ -26,33 +26,71 @@ def counters_Random_Tx(S):
         counter 0 and counter 1 lists of values
     """
 
-    if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-        Tx = utils.useful_functions.execute_function(utils.config.test, S, utils.config.p_value_stat)
+    if (
+        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
+        or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+    ):
+        Tx = utils.useful_functions.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+            ],
+            S,
+            utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+        )
     else:
-        Tx = utils.useful_functions.execute_function(utils.config.test, S, None)
+        Tx = utils.useful_functions.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+            ],
+            S,
+            None,
+        )
     counters_0 = []
     counters_1 = []
-    index = utils.config.n_symbols_stat / 2
+    index = utils.config.config_data["statistical_analysis_variables"]["n_symbols_stat"] / 2
 
-    for i in tqdm(range(utils.config.n_iterations_c_stat)):
+    for i in tqdm(range(utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"])):
         C0 = 0
         C1 = 0
         S_shuffled = utils.shuffles.shuffle_from_file(
-            index, utils.config.n_symbols_stat, utils.config.n_sequences_stat
+            index,
+            utils.config.config_data["statistical_analysis_variables"]["n_symbols_stat"],
+            utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"],
         )
         Ti = []
         for k in S_shuffled:
-            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-                Ti.append(utils.useful_functions.execute_function(utils.config.test, k, utils.config.p_value_stat))
+            if (
+                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
+                or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+            ):
+                Ti.append(
+                    utils.useful_functions.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                        ],
+                        k,
+                        utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+                    )
+                )
             else:
-                Ti.append(utils.useful_functions.execute_function(utils.config.test, k, None))
+                Ti.append(
+                    utils.useful_functions.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                        ],
+                        k,
+                        None,
+                    )
+                )
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
                 C0 += 1
             if Tx == Ti[z]:
                 C1 += 1
-        index += utils.config.n_sequences_stat * (utils.config.n_symbols_stat / 2)
+        index += utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"] * (
+            utils.config.config_data["statistical_analysis_variables"]["n_symbols_stat"] / 2
+        )
 
         counters_0.append(C0)
         counters_1.append(C1)
@@ -64,7 +102,7 @@ def counters_Random_Tx(S):
 
 
 def Random_Tx(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file, 
+    """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
     Parameters

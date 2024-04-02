@@ -21,7 +21,7 @@ import utils.config
 
 def s_prime(S):
     """Generates a transformed sequence based on the comparison of consecutive elements in the input sequence.
-    For each pair of consecutive elements, if the first element is greater than the second, a -1 
+    For each pair of consecutive elements, if the first element is greater than the second, a -1
     is appended to the new sequence; otherwise, a +1 is appended
 
     Parameters
@@ -45,7 +45,7 @@ def s_prime(S):
 
 
 def s_prime_median(S):
-    """Generates a transformed sequence where each original value is replaced with -1 if it is 
+    """Generates a transformed sequence where each original value is replaced with -1 if it is
     less than the median of the original sequence, or 1 if it is greater than or equal to the median
 
     Parameters
@@ -130,11 +130,13 @@ def save_counters(c0, c1, elapsed_time, type, f):
     ]
     elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
     data = [
-        utils.config.n_iterations_c_stat,
-        utils.config.n_symbols_stat,
-        utils.config.n_sequences_stat,
+        utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"],
+        utils.config.config_data["statistical_analysis_variables"]["n_symbols_stat"],
+        utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"],
         shuffle_type,
-        utils.config.test,
+        utils.config.config_data["test_list"][
+            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+        ],
         c0,
         c1,
         str(elapsed),
@@ -167,8 +169,20 @@ def save_failure_test(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [utils.config.test_list.get(i) for i in utils.config.test_list_indexes]
-    d = [utils.config.n_symbols, utils.config.n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
+    t = [
+        utils.config.config_data["test_list"][i]
+        for i in utils.config.config_data["global_variables"]["test_list_indexes"]
+    ]
+    d = [
+        utils.config.config_data["nist_test_variables"]["n_symbols"],
+        utils.config.config_data["nist_test_variables"]["n_sequences"],
+        t,
+        C0,
+        C1,
+        b,
+        test_time,
+        str(datetime.now()),
+    ]
     dt = pd.DataFrame(d, index=header).T
     h = True
     if os.path.exists("results/failure_rate.csv"):
@@ -183,12 +197,12 @@ def save_test_values(Tx, Ti):
 
     Parameters
     ----------
-    Tx : list of float 
+    Tx : list of float
         Tx test values calculated on one sequence
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if utils.config.bool_pvalue:
+    if utils.config.config_data["nist_test_variables"]["bool_pvalue"]:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -211,7 +225,10 @@ def save_test_values(Tx, Ti):
             "compression",
         ]
     else:
-        header = [utils.config.test_list[k] for k in utils.config.test_list_indexes]
+        header = [
+            utils.config.config_data["test_list"][k]
+            for k in utils.config.config_data["global_variables"]["test_list_indexes"]
+        ]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
@@ -225,7 +242,7 @@ def save_test_values(Tx, Ti):
 
 
 def benchmark_timing(tot_time, p):
-    """Saves time taken to execute the tests on the shuffled sequences in a txt file 
+    """Saves time taken to execute the tests on the shuffled sequences in a txt file
 
     Parameters
     ----------
@@ -234,14 +251,14 @@ def benchmark_timing(tot_time, p):
     p : string
         parallelized / non parallelized mode
     """
-    if len(utils.config.test_list_indexes) == 11:
+    if len(utils.config.config_data["global_variables"]["test_list_indexes"]) == 11:
         test_ind = "all tests run"
     else:
-        test_ind = "tests run: " + str(utils.config.test_list_indexes)
+        test_ind = "tests run: " + str(utils.config.config_data["global_variables"]["test_list_indexes"])
     lines = [
         str(datetime.now()),
-        "n_symbols: " + str(utils.config.n_symbols),
-        "n_sequences: " + str(utils.config.n_sequences),
+        "n_symbols: " + str(utils.config.config_data["nist_test_variables"]["n_symbols"]),
+        "n_sequences: " + str(utils.config.config_data["nist_test_variables"]["n_sequences"]),
         test_ind,
         "total_time: " + str(tot_time) + " s",
         p,

@@ -4,7 +4,7 @@ import utils.config
 
 
 def read_file(file, n_symbols):
-    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by 
+    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process
 
     Parameters
@@ -21,7 +21,7 @@ def read_file(file, n_symbols):
     """
     with open(file, "r+b") as f:
         tot_bytes = int(n_symbols / 2)
-        if utils.config.bool_first_seq:
+        if utils.config.config_data["nist_test_variables"]["bool_first_seq"]:
             my_bytes = f.read(tot_bytes)
         else:
             f.seek(-tot_bytes, os.SEEK_END)

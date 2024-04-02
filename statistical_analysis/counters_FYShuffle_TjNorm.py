@@ -28,22 +28,56 @@ def counters_FY_TjNorm(S):
     """
     counters_0 = []
     counters_1 = []
-    for k in tqdm(range(utils.config.n_iterations_c_stat)):
+    for k in tqdm(range(utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"])):
         Ti = []
         seq = utils.shuffles.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
-        if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-            Ti.append(utils.useful_functions.execute_function(utils.config.test, seq, utils.config.p_value_stat))
+        if (
+            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
+            or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+        ):
+            Ti.append(
+                utils.useful_functions.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                    ],
+                    seq,
+                    utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+                )
+            )
         else:
-            Ti.append(utils.useful_functions.execute_function(utils.config.test, seq, None))
+            Ti.append(
+                utils.useful_functions.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                    ],
+                    seq,
+                    None,
+                )
+            )
         j = 1
-        while j < utils.config.n_sequences_stat:
+        while j < utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"]:
             seq = utils.shuffles.FY_shuffle(S.copy())
-            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-                t = utils.useful_functions.execute_function(utils.config.test, seq, utils.config.p_value_stat)
+            if (
+                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
+                or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+            ):
+                t = utils.useful_functions.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                    ],
+                    seq,
+                    utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+                )
             else:
-                t = utils.useful_functions.execute_function(utils.config.test, seq, None)
+                t = utils.useful_functions.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                    ],
+                    seq,
+                    None,
+                )
             if t == Ti[j - 1]:
                 continue
             else:
@@ -80,7 +114,7 @@ def FY_TjNorm(S):
             "results",
             "counters_distribution",
             "FYShuffleTjNorm",
-            f"fyShuffleTjNorm_{utils.config.test}.csv",
+            f"fyShuffleTjNorm_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis_variables']['distribution_test_index']]}.csv",
         )
     )
     t = time.process_time()
@@ -92,5 +126,8 @@ def FY_TjNorm(S):
 
     # Plot results
     utils.plot.counters_distribution_Tj(
-        C0, utils.config.n_sequences_stat, utils.config.n_iterations_c_stat, "FY_TjNorm"
+        C0,
+        utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"],
+        utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"],
+        "FY_TjNorm",
     )
