@@ -1,6 +1,6 @@
 [global_variables]
-# Only the file name, not the entire path
-# That is delegated to Python
+# The input file
+# If you don't specify a full path, it will be interpreted as relative to the executable program directory
 input_file = "getbits_20230401_195315_RAW_BITS.BIN"
 bool_test_NIST = true
 bool_statistical_analysis = false
