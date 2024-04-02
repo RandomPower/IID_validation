@@ -41,7 +41,7 @@ p_value_stat = 2
 ref_numbers = [1, 3, 4]  
 
 [test_list]
-0 = "ex"
+0 = "excursion_test"
 1 = "n_directional_runs"
 2 = "l_directional_runs"
 3 = "n_median_runs"
