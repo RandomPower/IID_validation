@@ -73,19 +73,7 @@ ref_numbers = [1, 3, 4]
 
 # GLOBAL VARIABLES
 # Select which tests to test IID assumption
-test_list_indexes = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-]
+test_list_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 # step in reading bin file
 step = n_symbols / 2
 
