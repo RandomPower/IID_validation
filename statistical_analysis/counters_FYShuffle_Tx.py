@@ -29,50 +29,50 @@ def counters_FYShuffle_Tx(S):
     counters_1 = []
     # Calculate reference statistics
     if (
-        utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
-        or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+        utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 8
+        or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 9
     ):
         Tx = utils.useful_functions.execute_function(
             utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
             ],
             S,
-            utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+            utils.config.config_data["statistical_analysis"]["p_value_stat"],
         )
     else:
         Tx = utils.useful_functions.execute_function(
             utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
             ],
             S,
             None,
         )
 
     # S_shuffled will move by a P_pointer for every n_sequences
-    for i in tqdm(range(utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"])):
+    for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
         C0 = 0
         C1 = 0
         Ti = []
-        for k in range(utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"]):
+        for k in range(utils.config.config_data["statistical_analysis"]["n_sequences_stat"]):
             s_shuffled = utils.shuffles.FY_shuffle(S.copy())
             if (
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
-                or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 8
+                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 9
             ):
                 Ti.append(
                     utils.useful_functions.execute_function(
                         utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
                         ],
                         s_shuffled,
-                        utils.config.config_data["statistical_analysis_variables"]["p_value_stat"],
+                        utils.config.config_data["statistical_analysis"]["p_value_stat"],
                     )
                 )
             else:
                 Ti.append(
                     utils.useful_functions.execute_function(
                         utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
                         ],
                         s_shuffled,
                         None,
@@ -108,7 +108,7 @@ def FY_Tx(S):
             "results",
             "counters_distribution",
             "FYShuffleTx",
-            f"fyShuffleTx_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis_variables']['distribution_test_index']]}.csv",
+            f"fyShuffleTx_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}.csv",
         )
     )
     t = time.process_time()
@@ -121,7 +121,7 @@ def FY_Tx(S):
     # Plot results
     utils.plot.counters_distribution_Tx(
         C0,
-        utils.config.config_data["statistical_analysis_variables"]["n_sequences_stat"],
-        utils.config.config_data["statistical_analysis_variables"]["n_iterations_c_stat"],
+        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
+        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
         "FY_Tx",
     )

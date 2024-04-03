@@ -89,9 +89,9 @@ def comparison_scatterplot():
     """Plots the comparison scatterplot between FY_shuffle counters and reading from file.
     The counters values are read from csv files.
     """
-    Cfy, Crand, l1 = get_data(utils.config.config_data["statistical_analysis_variables"]["ref_numbers"], False)
+    Cfy, Crand, l1 = get_data(utils.config.config_data["statistical_analysis"]["ref_numbers"], False)
     Cfy_tjNorm, Crand_TjNorm, l2 = get_data(
-        utils.config.config_data["statistical_analysis_variables"]["ref_numbers"], True
+        utils.config.config_data["statistical_analysis"]["ref_numbers"], True
     )
 
     utils.plot.scatterplot_RvsFY(l1, Crand, Cfy)

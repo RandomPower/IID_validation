@@ -43,7 +43,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
     list of int
         sequences of lists of symbols
     """
-    with open(utils.config.config_data["global_variables"]["input_file"], "rb") as f:
+    with open(utils.config.config_data["global"]["input_file"], "rb") as f:
         sequences = []
         for z in range(n_seq):
             # Move to the current offset
@@ -64,7 +64,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
 
             # Increment the offset by step-byte
             ind += utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
             ]
 
             # TO DO: exception
@@ -99,7 +99,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     tuple of (list of lists of int, list of int)
         sequences of lists of symbols, Ti test values calculated on the shuffled sequences
     """
-    with open(utils.config.config_data["global_variables"]["input_file"], "rb") as f:
+    with open(utils.config.config_data["global"]["input_file"], "rb") as f:
         sequences = []
         Ti = []
 
@@ -114,15 +114,15 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             symbol2 = i & 0b00001111
             S.append(symbol2)
         index += utils.config.config_data["test_list"][
-            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
         ]
 
         if (
-            utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
-            or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+            utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 8
+            or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 9
         ):
             t = utils.useful_functions.execute_function(
-                test, S, utils.config.config_data["statistical_analysis_variables"]["p_value_stat"]
+                test, S, utils.config.config_data["statistical_analysis"]["p_value_stat"]
             )
             Ti.append(t)
         else:
@@ -144,15 +144,15 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
                 S.append(symbol2)
 
             index += utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"]
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
             ]
 
             if (
-                utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 8
-                or utils.config.config_data["statistical_analysis_variables"]["distribution_test_index"] == 9
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 8
+                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == 9
             ):
                 t = utils.useful_functions.execute_function(
-                    test, S, utils.config.config_data["statistical_analysis_variables"]["p_value_stat"]
+                    test, S, utils.config.config_data["statistical_analysis"]["p_value_stat"]
                 )
             else:
                 t = utils.useful_functions.execute_function(test, S, None)

@@ -39,10 +39,10 @@ def execute_test_suite(sequence):
         executed test output
     """
     T = []
-    for test_index in utils.config.config_data['global_variables']['test_list_indexes']:
-        if int(test_index) in [8, 9] and utils.config.config_data['nist_test_variables']['bool_pvalue']:
+    for test_index in utils.config.config_data['global']['test_list_indexes']:
+        if int(test_index) in [8, 9] and utils.config.config_data['nist_test']['bool_pvalue']:
             # If bool_pvalue is True, p_values is expected to be a list. Iterate over it.
-            for p_value in utils.config.config_data['nist_test_variables']['p']:
+            for p_value in utils.config.config_data['nist_test']['p']:
                 result = utils.useful_functions.execute_function(utils.config.config_data['test_list'][test_index], sequence, p_value)
                 T.append(result)
         else:
@@ -70,7 +70,7 @@ def FY_test_mode_parallel(seq):
     Ti = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(utils.config.config_data['nist_test_variables']['n_sequences']):
+        for iteration in range(utils.config.config_data['nist_test']['n_sequences']):
             s_shuffled = utils.shuffles.FY_shuffle(seq.copy())
             future = executor.submit(execute_test_suite, s_shuffled)
             futures.append(future)
@@ -89,21 +89,21 @@ def FY_test_mode_parallel(seq):
 def main():
     utils.config.file_info()
     utils.config.config_info()
-    if utils.config.config_data['global_variables']['bool_test_NIST']:
+    if utils.config.config_data['global']['bool_test_NIST']:
         logging.debug("NIST TEST")
         logging.debug("Process started")
         t_start = time.process_time()
-        S = utils.read.read_file(file=utils.config.config_data['global_variables']['input_file'], n_symbols=utils.config.config_data['nist_test_variables']['n_symbols'])
+        S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['nist_test']['n_symbols'])
         logging.debug("Sequence calculated: S")
 
         logging.debug("Calculating for each test the reference statistic: Tx")
         Tx = []
-        for k in utils.config.config_data['global_variables']['test_list_indexes']:
+        for k in utils.config.config_data['global']['test_list_indexes']:
             if k == '8' or k == '9':
-                if utils.config.config_data['nist_test_variables']['bool_pvalue']:
+                if utils.config.config_data['nist_test']['bool_pvalue']:
                     T = [
                         utils.useful_functions.execute_function(utils.config.config_data['test_list'][k], S, i)
-                        for i in utils.config.config_data['nist_test_variables']['p']
+                        for i in utils.config.config_data['nist_test']['p']
                     ]
                     Tx += (e for e in T)
                 else:
@@ -121,7 +121,7 @@ def main():
         C1 = [0 for k in range(len(Tx))]
 
         for u in range(len(Tx)):
-            for t in range(utils.config.config_data['nist_test_variables']['n_sequences']):
+            for t in range(utils.config.config_data['nist_test']['n_sequences']):
                 if Tx[u] > Ti[t][u]:
                     C0[u] += 1
                 if Tx[u] == Ti[t][u]:
@@ -142,7 +142,7 @@ def main():
         tu = time.process_time() - t_start
         logging.debug("Total process time = %s", tu)
         # plots
-        if utils.config.config_data['nist_test_variables']['see_plots']:
+        if utils.config.config_data['nist_test']['see_plots']:
             sc_dir = "results/plots/scatterplot_TxTi"
             hist_dir = "results/plots/histogram_TxTi"
             current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -159,15 +159,15 @@ def main():
 
             Ti_transposed = np.transpose(Ti)
             for t in range(len(Tx)):
-                if utils.config.config_data['nist_test_variables']['bool_pvalue']:
+                if utils.config.config_data['nist_test']['bool_pvalue']:
                     # Handle the special case for test 8 ('periodicity')
                     if 8 <= t <= 12:
                         p_index = t - 8  # Adjust index to map to the correct p value
-                        test_name = f"{utils.config.config_data['test_list']['8']} (p={utils.config.config_data['nist_test_variables']['p'][p_index]})"
+                        test_name = f"{utils.config.config_data['test_list']['8']} (p={utils.config.config_data['nist_test']['p'][p_index]})"
                     # Handle the special case for test 9 ('covariance')
                     elif 13 <= t <= 17:
                         p_index = t - 13  # Adjust index to map to the correct p value
-                        test_name = f"{utils.config.config_data['test_list']['9']} (p={utils.config.config_data['nist_test_variables']['p'][p_index]})"
+                        test_name = f"{utils.config.config_data['test_list']['9']} (p={utils.config.config_data['nist_test']['p'][p_index]})"
                     # For the values that should correspond to test 10 ('compression')
                     elif t == 18:
                         test_name = utils.config.config_data['test_list']['10']  # Direct mapping for 'compression'
@@ -180,11 +180,11 @@ def main():
                     utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_hist_run)
                     utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_sc_run)
 
-    if utils.config.config_data['global_variables']['bool_statistical_analysis']:
+    if utils.config.config_data['global']['bool_statistical_analysis']:
         logging.debug("----------------------------------------------------------------\n \n")
-        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis_variables']['distribution_test_index']])
+        logging.debug("STATISTICAL ANALYSIS FOR TEST %s", utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']])
         t_start = time.process_time()
-        S = utils.read.read_file(file=utils.config.config_data['global_variables']['input_file'], n_symbols=utils.config.config_data['statistical_analysis_variables']['n_symbols_stat'])
+        S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['statistical_analysis']['n_symbols_stat'])
         logging.debug("Sequence calculated: S")
         with concurrent.futures.ProcessPoolExecutor() as executor:
             tasks = [
