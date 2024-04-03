@@ -1,5 +1,6 @@
 {
     "autoDocstring.docstringFormat": "numpy",
+    "isort.check": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
     "flake8.args": [
