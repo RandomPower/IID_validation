@@ -21,7 +21,7 @@ def read_file(file, n_symbols):
     """
     with open(file, "r+b") as f:
         tot_bytes = int(n_symbols / 2)
-        if utils.config.bool_first_seq:
+        if utils.config.config_data['nist_test']['bool_first_seq']:
             my_bytes = f.read(tot_bytes)
         else:
             f.seek(-tot_bytes, os.SEEK_END)

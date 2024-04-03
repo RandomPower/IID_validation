@@ -137,11 +137,11 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     ]
     elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
     data = [
-        utils.config.n_iterations_c_stat,
-        utils.config.n_symbols_stat,
-        utils.config.n_sequences_stat,
+        utils.config.config_data['statistical_analysis']['n_iterations_c_stat'],
+        utils.config.config_data['statistical_analysis']['n_symbols_stat'],
+        utils.config.config_data['statistical_analysis']['n_sequences_stat'],
         shuffle_type,
-        utils.config.test,
+        utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']],
         c0,
         c1,
         str(elapsed),
@@ -174,8 +174,8 @@ def save_failure_test(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [utils.config.test_list.get(i) for i in utils.config.test_list_indexes]
-    d = [utils.config.n_symbols, utils.config.n_sequences, t, C0, C1, b, test_time, str(datetime.now())]
+    t = [utils.config.config_data['test_list'].get(i) for i in utils.config.config_data['global']['test_list_indexes']]
+    d = [utils.config.config_data['nist_test']['n_symbols'], utils.config.config_data['nist_test']['n_sequences'], t, C0, C1, b, test_time, str(datetime.now())]
     dt = pd.DataFrame(d, index=header).T
     h = True
     if os.path.exists("results/failure_rate.csv"):
@@ -195,7 +195,7 @@ def save_test_values(Tx, Ti):
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if utils.config.bool_pvalue:
+    if utils.config.config_data['nist_test']['bool_pvalue']:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -218,7 +218,7 @@ def save_test_values(Tx, Ti):
             "compression",
         ]
     else:
-        header = [utils.config.test_list[k] for k in utils.config.test_list_indexes]
+        header = [utils.config.config_data['test_list'][k] for k in utils.config.config_data['global']['test_list_indexes']]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
@@ -241,14 +241,14 @@ def benchmark_timing(tot_time, p):
     p : string
         parallelized / non parallelized mode
     """
-    if len(utils.config.test_list_indexes) == 11:
+    if len(utils.config.config_data['global']['test_list_indexes']) == 11:
         test_ind = "all tests run"
     else:
-        test_ind = "tests run: " + str(utils.config.test_list_indexes)
+        test_ind = "tests run: " + str(utils.config.config_data['global']['test_list_indexes'])
     lines = [
         str(datetime.now()),
-        "n_symbols: " + str(utils.config.n_symbols),
-        "n_sequences: " + str(utils.config.n_sequences),
+        "n_symbols: " + str(utils.config.config_data['nist_test']['n_symbols']),
+        "n_sequences: " + str(utils.config.config_data['nist_test']['n_sequences']),
         test_ind,
         "total_time: " + str(tot_time) + " s",
         p,
