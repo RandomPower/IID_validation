@@ -23,10 +23,10 @@ def parse_config_file(file_path: str) -> dict:
             config_data: dict = tomllib.load(f)
         return config_data
     except IOError as e:
-        logging.error(f"Unable to open or read config file: {e}")
+        logging.error("Unable to open or read config file: %s", e)
         return {}
     except Exception as e:
-        logging.error(f"Unable to parse config file: {e}")
+        logging.error("Unable to parse config file: %s", e)
         return {}
 
 
