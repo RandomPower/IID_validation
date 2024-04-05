@@ -43,7 +43,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
     list of int
         sequences of lists of symbols
     """
-    with open(utils.config.input_file, "rb") as f:
+    with open(utils.config.config_data['global']['input_file'], "rb") as f:
         sequences = []
         for z in range(n_seq):
             # Move to the current offset
@@ -97,7 +97,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
     tuple of (list of lists of int, list of int)
         sequences of lists of symbols, Ti test values calculated on the shuffled sequences
     """
-    with open(utils.config.input_file, "rb") as f:
+    with open(utils.config.config_data['global']['input_file'], "rb") as f:
         sequences = []
         Ti = []
 
@@ -113,8 +113,8 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             S.append(symbol2)
         index += utils.config.step
 
-        if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-            t = utils.useful_functions.execute_function(test, S, utils.config.p_value_stat)
+        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+            t = utils.useful_functions.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             Ti.append(t)
         else:
             t = utils.useful_functions.execute_function(test, S, None)
@@ -136,8 +136,8 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
 
             index += utils.config.step
 
-            if utils.config.distribution_test_index == 8 or utils.config.distribution_test_index == 9:
-                t = utils.useful_functions.execute_function(test, S, utils.config.p_value_stat)
+            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+                t = utils.useful_functions.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
                 t = utils.useful_functions.execute_function(test, S, None)
 

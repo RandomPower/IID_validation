@@ -1,0 +1,54 @@
+[global]
+# The input file
+# If you don't specify a full path, it will be interpreted as relative to the executable program directory
+input_file = "getbits_20230401_195315_RAW_BITS.BIN"
+bool_test_NIST = true
+bool_statistical_analysis = false
+# Select which tests to test IID assumption
+test_list_indexes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+# step in reading bin file
+# calculated as n_symbols/2
+# step = 500
+
+[nist_test]
+n_symbols = 1000
+n_sequences = 100000
+# if True: FY shuffle
+# if False: use random sampling from file
+bool_shuffle_NIST = true
+# if True: reference sequence read from beginning
+# if False: reference sequence from the end
+bool_first_seq = true
+# if True: the NIST values are set
+# if False: the user chooses value
+bool_pvalue = false
+see_plots = false
+# NIST values
+p = [1, 2, 8, 16, 32]
+
+[statistical_analysis]
+n_sequences_stat = 200
+n_symbols_stat = 1000
+n_iterations_c_stat = 500
+# Select which test index for counter distribution
+distribution_test_index = '6'
+# if True: FY shuffle,
+# if False: use random sampling from file
+bool_shuffle_stat = true
+# User sets preferred value
+p_value_stat = 2
+# Select which test indexes for shuffle/random comparison
+ref_numbers = ['1', '3', '4']
+
+[test_list]
+0 = "excursion_test"
+1 = "n_directional_runs"
+2 = "l_directional_runs"
+3 = "n_median_runs"
+4 = "l_median_runs"
+5 = "n_increases_decreases"
+6 = "avg_collision"
+7 = "max_collision"
+8 = "periodicity"
+9 = "covariance"
+10 = "compression"
