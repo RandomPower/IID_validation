@@ -170,22 +170,22 @@ def iid_plots(Tx, Ti):
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{utils.config.config_data['test_list'][8]} (p={utils.config.p[p_index]})"
+                test_name = f"{utils.config.config_data['test_list']['8']} (p={utils.config.p[p_index]})"
             # Handle the special case for test 9 ('covariance')
             elif 13 <= t <= 17:
                 p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{utils.config.config_data['test_list'][9]} (p={utils.config.p[p_index]})"
+                test_name = f"{utils.config.config_data['test_list']['9']} (p={utils.config.p[p_index]})"
             # For the values that should correspond to test 10 ('compression')
             elif t == 18:
-                test_name = utils.config.config_data['test_list'][10]  # Direct mapping for 'compression'
+                test_name = utils.config.config_data['test_list']['10']  # Direct mapping for 'compression'
             else:
                 # Direct mapping for other tests
-                test_name = utils.config.config_data['test_list'][t]
+                test_name = utils.config.config_data['test_list'][str(t)]
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
         else:
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][t], dir_hist_run)
-            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][t], dir_sc_run)
+            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_hist_run)
+            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_sc_run)
 
 
 def iid_test_function():
