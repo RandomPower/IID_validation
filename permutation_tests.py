@@ -43,9 +43,9 @@ def s_prime(S):
         new sequence of -1s and +1s
     """
     if len(S) == 0:
-        raise Exception("Input sequence has lenght 0")
+        raise Exception("Input sequence has length 0")
     if len(S) == 1:
-        raise Exception("Input sequence has lenght 1")
+        raise Exception("Input sequence has length 1")
 
     S_prime = []
     for i in range(len(S) - 1):
@@ -72,7 +72,7 @@ def s_prime_median(S):
         new sequence of -1s and +1s
     """
     if len(S) == 0:
-        raise Exception("Input sequence has lenght 0")
+        raise Exception("Input sequence has length 0")
 
     M = np.median(S)
     S_prime = []
@@ -338,7 +338,7 @@ def covariance(S, p):
 
 
 def compression(S):
-    """Removes redundancy in the sequnce, involving commonly recurring subsequences of characters.
+    """Removes redundancy in the sequence, involving commonly recurring subsequences of characters.
     Encodes input data as a character string containing a list of values separated by a single
     space. Compresses the character string with the bzip2 compression algorithm
 
