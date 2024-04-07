@@ -1,32 +1,10 @@
-import random
-
+import permutation_tests
 import utils.config
 import utils.useful_functions
 
 
-def FY_shuffle(sequence):
-    """Generates a shuffled sequence using Fisher-Yates algorithm
-
-    Parameters
-    ----------
-    sequence : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    list of int
-        shuffled sequence
-    """
-    for i in range(len(sequence) - 1, 0, -1):
-        j = random.randint(0, i)
-        temp = sequence[i]
-        sequence[i] = sequence[j]
-        sequence[j] = temp
-    return sequence
-
-
 def shuffle_from_file(ind, n_symb, n_seq):
-    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by 
+    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process.
 
     Parameters
@@ -71,7 +49,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
 
 
 def shuffle_from_file_Norm(index, n_symb, n_seq, test):
-    """Version of shuffle_from_file function for normalized Tj. 
+    """Version of shuffle_from_file function for normalized Tj.
     The sequence it reads has the same result T on a given test as the previous
     sequence (T(j-1)), it discards it and passes to the next sequence. This is because for Tj normalized we want the
     counters distribution to be a binomial one with probability 1/2, so we want to ignore the cases = and only have
@@ -114,10 +92,10 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
         index += utils.config.step
 
         if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-            t = utils.useful_functions.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+            t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             Ti.append(t)
         else:
-            t = utils.useful_functions.execute_function(test, S, None)
+            t = permutation_tests.execute_function(test, S, None)
             Ti.append(t)
         sequences.append(S)
 
@@ -137,9 +115,9 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             index += utils.config.step
 
             if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-                t = utils.useful_functions.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+                t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
-                t = utils.useful_functions.execute_function(test, S, None)
+                t = permutation_tests.execute_function(test, S, None)
 
             if t == Ti[z - 1]:
                 continue

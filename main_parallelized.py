@@ -7,6 +7,7 @@ import time
 
 import numpy as np
 
+import permutation_tests
 import statistical_analysis.comparison_counters_FyR
 import statistical_analysis.counters_FYShuffle_TjNorm
 import statistical_analysis.counters_FYShuffle_Tx
@@ -23,35 +24,6 @@ logging.basicConfig(
 )
 
 np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
-
-
-def execute_test_suite(sequence):
-    """Executes NIST test suite on a given sequence
-
-    Parameters
-    ----------
-    sequence : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    list of float
-        list of tests results
-    """
-    T = []
-    for test_index in utils.config.config_data['global']['test_list_indexes']:
-        if test_index in [8, 9] and utils.config.config_data['nist_test']['bool_pvalue']:
-            # If bool_pvalue is True, p_values is expected to be a list. Iterate over it.
-            for p_value in utils.config.p:
-                result = utils.useful_functions.execute_function(utils.config.config_data['test_list'][test_index], sequence, p_value)
-                T.append(result)
-        else:
-            # For other cases or if bool_pvalue is False, execute the function with p_values directly.
-            result = utils.useful_functions.execute_function(
-                utils.config.config_data['test_list'][test_index], sequence, utils.config.p
-            )
-            T.append(result)
-    return T
 
 
 def calculate_counters(Tx, Ti):
@@ -125,8 +97,8 @@ def FY_test_mode_parallel(seq):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
         for iteration in range(utils.config.config_data['nist_test']['n_sequences']):
-            s_shuffled = utils.shuffles.FY_shuffle(seq.copy())
-            future = executor.submit(execute_test_suite, s_shuffled)
+            s_shuffled = permutation_tests.FY_shuffle(seq.copy())
+            future = executor.submit(permutation_tests.execute_test_suite, s_shuffled)
             futures.append(future)
 
         completed = 0
@@ -196,7 +168,7 @@ def iid_test_function():
     logging.debug("Sequence calculated: S")
 
     logging.debug("Calculating for each test the reference statistic: Tx")
-    Tx = execute_test_suite(S)
+    Tx = permutation_tests.execute_test_suite(S)
     logging.debug("Reference statistics calculated!")
 
     logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
@@ -250,7 +222,7 @@ def main():
         iid_test_function()
 
     if utils.config.config_data['global']['bool_statistical_analysis']:
-        statistical_analysis_function()        
+        statistical_analysis_function()
 
 
 if __name__ == "__main__":

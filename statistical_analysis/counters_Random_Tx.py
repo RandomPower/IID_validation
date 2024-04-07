@@ -4,6 +4,7 @@ import time
 
 from tqdm import tqdm
 
+import permutation_tests
 import utils.config
 import utils.plot
 import utils.shuffles
@@ -11,8 +12,8 @@ import utils.useful_functions
 
 
 def counters_Random_Tx(S):
-    """Compute the counters C0 and C1 for a given test on a series of random sequences read from file. 
-    The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result 
+    """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
+    The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
 
     Parameters
@@ -27,9 +28,9 @@ def counters_Random_Tx(S):
     """
 
     if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-        Tx = utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, utils.config.config_data['statistical_analysis']['p_value_stat'])
     else:
-        Tx = utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, None)
+        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, None)
     counters_0 = []
     counters_1 = []
     index = utils.config.config_data['statistical_analysis']['n_symbols_stat'] / 2
@@ -43,9 +44,9 @@ def counters_Random_Tx(S):
         Ti = []
         for k in S_shuffled:
             if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-                Ti.append(utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, utils.config.config_data['statistical_analysis']['p_value_stat']))
+                Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, utils.config.config_data['statistical_analysis']['p_value_stat']))
             else:
-                Ti.append(utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, None))
+                Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, None))
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
@@ -64,7 +65,7 @@ def counters_Random_Tx(S):
 
 
 def Random_Tx(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file, 
+    """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
     Parameters

@@ -4,9 +4,9 @@ import time
 
 from tqdm import tqdm
 
+import permutation_tests
 import utils.config
 import utils.plot
-import utils.shuffles
 import utils.useful_functions
 
 
@@ -30,20 +30,20 @@ def counters_FY_TjNorm(S):
     counters_1 = []
     for k in tqdm(range(utils.config.config_data['statistical_analysis']['n_iterations_c_stat'])):
         Ti = []
-        seq = utils.shuffles.FY_shuffle(S.copy())
+        seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
         if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-            Ti.append(utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat']))
+            Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat']))
         else:
-            Ti.append(utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None))
+            Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None))
         j = 1
         while j < utils.config.config_data['statistical_analysis']['n_sequences_stat']:
-            seq = utils.shuffles.FY_shuffle(S.copy())
+            seq = permutation_tests.FY_shuffle(S.copy())
             if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
-                t = utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat'])
+                t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
-                t = utils.useful_functions.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None)
+                t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None)
             if t == Ti[j - 1]:
                 continue
             else:
