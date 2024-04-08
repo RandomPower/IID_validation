@@ -1,7 +1,6 @@
 import bz2
 import random
-
-import numpy as np
+import statistics
 
 import utils.config
 
@@ -74,7 +73,7 @@ def s_prime_median(S):
     if len(S) == 0:
         raise Exception("Input sequence has length 0")
 
-    M = np.median(S)
+    M = statistics.median(S)
     S_prime = []
     for i in range(len(S)):
         if S[i] < M:
@@ -98,12 +97,12 @@ def excursion_test(S):
     float
         maximum deviation from the average
     """
-    X = np.mean(S)
+    X = statistics.mean(S)
     D = [None] * len(S)
     somma = 0
     for i in range(1, len(S) + 1):
         somma += S[i - 1]
-        D[i - 1] = np.abs(somma - (i * X))
+        D[i - 1] = abs(somma - (i * X))
     return max(D)
 
 
@@ -265,7 +264,7 @@ def avg_c(S):
             last_split = i + 1
         else:
             seen.add(x)
-    return np.mean(C) + 1
+    return statistics.mean(C) + 1
 
 
 def max_c(S):
@@ -291,7 +290,7 @@ def max_c(S):
             last_split = i + 1
         else:
             seen.add(x)
-    return np.max(C) + 1
+    return max(C) + 1
 
 
 def periodicity(S, y):
