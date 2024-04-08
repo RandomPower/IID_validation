@@ -33,14 +33,14 @@ def counters_FY_TjNorm(S):
         seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
-        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
             Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat']))
         else:
             Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None))
         j = 1
         while j < utils.config.config_data['statistical_analysis']['n_sequences_stat']:
             seq = permutation_tests.FY_shuffle(S.copy())
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
                 t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
                 t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None)

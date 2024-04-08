@@ -27,7 +27,7 @@ def counters_Random_Tx(S):
         counter 0 and counter 1 lists of values
     """
 
-    if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+    if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
         Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, utils.config.config_data['statistical_analysis']['p_value_stat'])
     else:
         Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, None)
@@ -43,7 +43,7 @@ def counters_Random_Tx(S):
         )
         Ti = []
         for k in S_shuffled:
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
                 Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, utils.config.config_data['statistical_analysis']['p_value_stat']))
             else:
                 Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, None))
