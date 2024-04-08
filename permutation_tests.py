@@ -406,7 +406,7 @@ def execute_test_suite(sequence):
     """
     T = []
     for test_index in utils.config.config_data['global']['test_list_indexes']:
-        if test_index in [8, 9] and utils.config.config_data['nist_test']['bool_pvalue']:
+        if test_index in ['8', '9'] and utils.config.config_data['nist_test']['bool_pvalue']:
             # If bool_pvalue is True, p_values is expected to be a list. Iterate over it.
             for p_value in utils.config.p:
                 result = execute_function(

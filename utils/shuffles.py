@@ -91,7 +91,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             S.append(symbol2)
         index += utils.config.step
 
-        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
             t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             Ti.append(t)
         else:
@@ -114,7 +114,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
 
             index += utils.config.step
 
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == 8 or utils.config.config_data['statistical_analysis']['distribution_test_index'] == 9:
+            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
                 t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
                 t = permutation_tests.execute_function(test, S, None)
