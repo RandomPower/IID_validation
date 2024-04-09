@@ -351,9 +351,7 @@ def compression(S):
     int
         length of the compressed string
     """
-    S_string = " "
-    for i in S:
-        S_string += str(i) + " "
+    S_string = " ".join(map(str, S))
     t = bz2.compress(S_string.encode("utf-8"))
     return len(t)
 
