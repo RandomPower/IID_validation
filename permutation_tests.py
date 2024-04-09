@@ -5,12 +5,12 @@ import statistics
 import utils.config
 
 
-def FY_shuffle(sequence):
+def FY_shuffle(S):
     """Generates a shuffled sequence using Fisher-Yates algorithm
 
     Parameters
     ----------
-    sequence : list of int
+    S : list of int
         sequence of sample values
 
     Returns
@@ -18,12 +18,10 @@ def FY_shuffle(sequence):
     list of int
         shuffled sequence
     """
-    for i in range(len(sequence) - 1, 0, -1):
+    for i in range(len(S) - 1, 0, -1):
         j = random.randint(0, i)
-        temp = sequence[i]
-        sequence[i] = sequence[j]
-        sequence[j] = temp
-    return sequence
+        S[i], S[j] = S[j], S[i]
+    return S
 
 
 def s_prime(S):
