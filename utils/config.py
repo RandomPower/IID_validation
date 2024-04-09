@@ -3,7 +3,6 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 """
 
 import logging
-import os
 import tomllib
 
 
@@ -30,70 +29,17 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-config_data: dict = parse_config_file("conf.toml")
+config_data = parse_config_file("conf.toml")
 
-# GLOBAL VARIABLES
-input_file = os.path.abspath(os.path.join("getbits_20230401_195315_RAW_BITS.BIN"))
-bool_test_NIST = True
-bool_statistical_analysis = False
-
-# NIST TEST VARIABLES
-n_symbols = 100
-n_sequences = 100
-# --> if True: FY shuffle, if False: use random sampling from file
-bool_shuffle_NIST = True
-# --> if True: reference sequence read from beginning; if False: reference sequence from the end
-bool_first_seq = True
-# --> if True: NIST values, if False: user chooses value
-bool_pvalue = False
-see_plots = False
-
-if bool_pvalue:
+if config_data['nist_test']['bool_pvalue']:
     # NIST values
     p = [1, 2, 8, 16, 32]
 else:
     # User sets preferred value
     p = 2
 
-
-# STATISTICAL ANALYSIS VARIABLES
-n_sequences_stat = 200
-n_symbols_stat = 1000
-n_iterations_c_stat = 500
-# Select which test index for counter distribution
-distribution_test_index = 6
-
-# --> if True: FY shuffle, if False: use random sampling from file
-bool_shuffle_stat = True
-
-# User sets preferred value
-p_value_stat = 2
-# Select which test indexes for shuffle/random comparison
-ref_numbers = [1, 3, 4]
-
-# GLOBAL VARIABLES
-# Select which tests to test IID assumption
-test_list_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 # step in reading bin file
-step = n_symbols / 2
-
-# Test list
-test_list = {
-    0: "excursion_test",
-    1: "n_directional_runs",
-    2: "l_directional_runs",
-    3: "n_median_runs",
-    4: "l_median_runs",
-    5: "n_increases_decreases",
-    6: "avg_collision",
-    7: "max_collision",
-    8: "periodicity",
-    9: "covariance",
-    10: "compression",
-}
-
-# test chosen for counters distribution
-test = test_list[distribution_test_index]
+step = config_data['nist_test']['n_symbols'] / 2
 
 
 def file_info():
