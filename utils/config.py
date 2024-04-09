@@ -3,7 +3,6 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 """
 
 import logging
-import os
 import tomllib
 
 
@@ -30,7 +29,7 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-config_data: dict = parse_config_file("conf.toml")
+config_data = parse_config_file("conf.toml")
 
 if config_data['nist_test']['bool_pvalue']:
     # NIST values
