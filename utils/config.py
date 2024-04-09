@@ -32,12 +32,7 @@ def parse_config_file(file_path: str) -> dict:
 
 config_data: dict = parse_config_file("conf.toml")
 
-# NIST TEST VARIABLES
-n_symbols = 100
-
-bool_pvalue = False
-
-if bool_pvalue:
+if config_data['nist_test']['bool_pvalue']:
     # NIST values
     p = [1, 2, 8, 16, 32]
 else:
@@ -45,7 +40,7 @@ else:
     p = 2
 
 # step in reading bin file
-step = n_symbols / 2
+step = config_data['nist_test']['n_symbols'] / 2
 
 
 def file_info():
