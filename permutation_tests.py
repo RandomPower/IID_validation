@@ -98,11 +98,8 @@ def excursion_test(S):
         maximum deviation from the average
     """
     X = statistics.mean(S)
-    D = [None] * len(S)
-    somma = 0
-    for i in range(1, len(S) + 1):
-        somma += S[i - 1]
-        D[i - 1] = abs(somma - (i * X))
+    cumulative_sum = 0
+    D = [abs((cumulative_sum := cumulative_sum + element) - (i * X)) for i, element in enumerate(S, 1)]
     return max(D)
 
 
