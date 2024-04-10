@@ -29,24 +29,56 @@ def counters_FYShuffle_Tx(S):
     counters_0 = []
     counters_1 = []
     # Calculate reference statistics
-    if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+    if (
+        utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+        or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+    ):
+        Tx = permutation_tests.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+            ],
+            S,
+            utils.config.config_data["statistical_analysis"]["p_value_stat"],
+        )
     else:
-        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, None)
+        Tx = permutation_tests.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+            ],
+            S,
+            None,
+        )
 
     # S_shuffled will move by a P_pointer for every n_sequences
-    for i in tqdm(range(utils.config.config_data['statistical_analysis']['n_iterations_c_stat'])):
+    for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
         C0 = 0
         C1 = 0
         Ti = []
-        for k in range(utils.config.config_data['statistical_analysis']['n_sequences_stat']):
+        for k in range(utils.config.config_data["statistical_analysis"]["n_sequences_stat"]):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
+            if (
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+            ):
                 Ti.append(
-                    permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], s_shuffled, utils.config.config_data['statistical_analysis']['p_value_stat'])
+                    permutation_tests.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                        ],
+                        s_shuffled,
+                        utils.config.config_data["statistical_analysis"]["p_value_stat"],
+                    )
                 )
             else:
-                Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], s_shuffled, None))
+                Ti.append(
+                    permutation_tests.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                        ],
+                        s_shuffled,
+                        None,
+                    )
+                )
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:

@@ -23,13 +23,13 @@ def get_data(ref_numbers, Tj_norm):
     Returns
     -------
     list of lists of int, list of lists of int and list of str
-        counters values and list of test names 
+        counters values and list of test names
     """
     # Construct the filenames based on reference numbers
     C0_fy = []
     C0_random = []
     for ref in ref_numbers:
-        if ref in utils.config.config_data['test_list']:
+        if ref in utils.config.config_data["test_list"]:
             if Tj_norm:
                 fy = os.path.abspath(
                     os.path.join(
@@ -78,17 +78,21 @@ def get_data(ref_numbers, Tj_norm):
                 C0_fy.append(eval(last_entry1))
                 C0_random.append(eval(last_entry2))
             except Exception as e:
-                logging.error("Reading or processing files for %s: %s not successful", utils.config.config_data['test_list'][ref], e)
+                logging.error(
+                    "Reading or processing files for %s: %s not successful",
+                    utils.config.config_data["test_list"][ref],
+                    e,
+                )
                 sys.exit(1)
-    return C0_fy, C0_random, [utils.config.config_data['test_list'][i] for i in ref_numbers]
+    return C0_fy, C0_random, [utils.config.config_data["test_list"][i] for i in ref_numbers]
 
 
 def comparison_scatterplot():
-    """Plots the comparison scatterplot between FY_shuffle counters and reading from file. 
+    """Plots the comparison scatterplot between FY_shuffle counters and reading from file.
     The counters values are read from csv files.
     """
-    Cfy, Crand, l1 = get_data(utils.config.config_data['statistical_analysis']['ref_numbers'], False)
-    Cfy_tjNorm, Crand_TjNorm, l2 = get_data(utils.config.config_data['statistical_analysis']['ref_numbers'], True)
+    Cfy, Crand, l1 = get_data(utils.config.config_data["statistical_analysis"]["ref_numbers"], False)
+    Cfy_tjNorm, Crand_TjNorm, l2 = get_data(utils.config.config_data["statistical_analysis"]["ref_numbers"], True)
 
     # Define directory where to save the plot
     comparison_dir = "results/plots/comparison_RvsFY"

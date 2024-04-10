@@ -28,33 +28,71 @@ def counters_Random_Tx(S):
         counter 0 and counter 1 lists of values
     """
 
-    if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+    if (
+        utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+        or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+    ):
+        Tx = permutation_tests.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+            ],
+            S,
+            utils.config.config_data["statistical_analysis"]["p_value_stat"],
+        )
     else:
-        Tx = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], S, None)
+        Tx = permutation_tests.execute_function(
+            utils.config.config_data["test_list"][
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+            ],
+            S,
+            None,
+        )
     counters_0 = []
     counters_1 = []
-    index = utils.config.config_data['statistical_analysis']['n_symbols_stat'] / 2
+    index = utils.config.config_data["statistical_analysis"]["n_symbols_stat"] / 2
 
-    for i in tqdm(range(utils.config.config_data['statistical_analysis']['n_iterations_c_stat'])):
+    for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
         C0 = 0
         C1 = 0
         S_shuffled = utils.shuffles.shuffle_from_file(
-            index, utils.config.config_data['statistical_analysis']['n_symbols_stat'], utils.config.config_data['statistical_analysis']['n_sequences_stat']
+            index,
+            utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
+            utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
         )
         Ti = []
         for k in S_shuffled:
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-                Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, utils.config.config_data['statistical_analysis']['p_value_stat']))
+            if (
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+            ):
+                Ti.append(
+                    permutation_tests.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                        ],
+                        k,
+                        utils.config.config_data["statistical_analysis"]["p_value_stat"],
+                    )
+                )
             else:
-                Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], k, None))
+                Ti.append(
+                    permutation_tests.execute_function(
+                        utils.config.config_data["test_list"][
+                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                        ],
+                        k,
+                        None,
+                    )
+                )
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
                 C0 += 1
             if Tx == Ti[z]:
                 C1 += 1
-        index += utils.config.config_data['statistical_analysis']['n_sequences_stat'] * (utils.config.config_data['statistical_analysis']['n_symbols_stat'] / 2)
+        index += utils.config.config_data["statistical_analysis"]["n_sequences_stat"] * (
+            utils.config.config_data["statistical_analysis"]["n_symbols_stat"] / 2
+        )
 
         counters_0.append(C0)
         counters_1.append(C1)
