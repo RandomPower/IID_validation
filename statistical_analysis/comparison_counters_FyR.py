@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import sys
@@ -6,6 +7,7 @@ import pandas as pd
 
 import utils.config
 import utils.plot
+import utils.useful_functions
 
 
 def get_data(ref_numbers, Tj_norm):
@@ -88,5 +90,25 @@ def comparison_scatterplot():
     Cfy, Crand, l1 = get_data(utils.config.config_data['statistical_analysis']['ref_numbers'], False)
     Cfy_tjNorm, Crand_TjNorm, l2 = get_data(utils.config.config_data['statistical_analysis']['ref_numbers'], True)
 
-    utils.plot.scatterplot_RvsFY(l1, Crand, Cfy)
-    utils.plot.scatterplot_RvsFY_TjNorm(l2, Crand_TjNorm, Cfy_tjNorm)
+    # Define directory where to save the plot
+    comparison_dir = "results/plots/comparison_RvsFY"
+    comparison_TjNorm_dir = "results/plots/comparison_RvsFY_TjNorm"
+    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    dir_comparison_run = os.path.join(
+        comparison_dir,
+        current_run_date,
+        str(utils.useful_functions.get_next_run_number(comparison_dir, current_run_date)),
+    )
+    dir_comparison_TjNorm_run = os.path.join(
+        comparison_TjNorm_dir,
+        current_run_date,
+        str(utils.useful_functions.get_next_run_number(comparison_TjNorm_dir, current_run_date)),
+    )
+
+    # Ensure the directory exists
+    os.makedirs(dir_comparison_run, exist_ok=True)
+    os.makedirs(dir_comparison_TjNorm_run, exist_ok=True)
+
+    # Plot the results
+    utils.plot.scatterplot_RvsFY(l1, Crand, Cfy, dir_comparison_run)
+    utils.plot.scatterplot_RvsFY_TjNorm(l2, Crand_TjNorm, Cfy_tjNorm, dir_comparison_TjNorm_run)

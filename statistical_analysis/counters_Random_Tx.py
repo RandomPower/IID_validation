@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import time
@@ -90,6 +91,19 @@ def Random_Tx(S):
     utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
+    # Define directory path
+    plot_dir = "results/plots/counters_Random_Tx"
+    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    dir_plot_run = os.path.join(
+        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
+    )
+    # Ensure the directory exists
+    os.makedirs(dir_plot_run, exist_ok=True)
+
     utils.plot.counters_distribution_Tx(
-        C0, utils.config.config_data['statistical_analysis']['n_sequences_stat'], utils.config.config_data['statistical_analysis']['n_iterations_c_stat'], "Random_Tx"
+        C0,
+        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
+        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        "Random_Tx",
+        dir_plot_run,
     )

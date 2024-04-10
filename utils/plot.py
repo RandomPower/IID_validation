@@ -94,12 +94,11 @@ def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
     plot_path = os.path.join(plot_dir_s, plot_filename)
 
     plt.savefig(plot_path)
-    plt.show()
     plt.close()
 
 
-def scatterplot_RvsFY(test, C0r, C0fy):
-    """Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with 
+def scatterplot_RvsFY(test, C0r, C0fy, plot_dir):
+    """Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with
     the one obtained through FY shuffling.
     For each test, the mean value of C0 is represented as a dot with error bars and one standard deviation long.
     The two sets of results (random and shuffled) should overlap, hinting towards the IID hypotesis.
@@ -114,6 +113,8 @@ def scatterplot_RvsFY(test, C0r, C0fy):
         list containing the values of counters C0 using sequences read from file
     C0fy : list of lists of int
         list containing the results of counters C0 using FY shuffled sequence
+    plot_dir : str
+        directory where to save the plot
     """
     data_1 = [np.mean(i) for i in C0r]
     err_1 = [np.std(i) for i in C0r]
@@ -130,11 +131,15 @@ def scatterplot_RvsFY(test, C0r, C0fy):
     ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
 
     plt.legend()
-    plt.show()
+
+    plot_filename = "scatterplot_RvsFY.png"
+    plot_path = os.path.join(plot_dir, plot_filename)
+
+    plt.savefig(plot_path)
     plt.close()
 
 
-def scatterplot_RvsFY_TjNorm(test, C0r, C0fy):
+def scatterplot_RvsFY_TjNorm(test, C0r, C0fy, plot_dir):
     """
     Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with 
     the one obtained through FY shuffling.
@@ -148,6 +153,8 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy):
         list containing the values of counters C0 using sequences read from file
     C0fy : list of lists of int
         list containing the results of counters C0 using FY shuffled sequence
+    plot_dir : str
+        directory where to save the plot
     """
     data_1 = [np.mean(i) for i in C0r]
     err_1 = [np.std(i) for i in C0r]
@@ -164,7 +171,12 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy):
     ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
 
     plt.legend()
-    plt.show()
+
+    plot_filename = "scatterplot_RvsFY_TjNorm.png"
+    plot_path = os.path.join(plot_dir, plot_filename)
+
+    plt.savefig(plot_path)
+    plt.close()
 
 
 def binomial_function(n, v, p):
@@ -188,8 +200,8 @@ def binomial_function(n, v, p):
     return f
 
 
-def counters_distribution_Tx(c, n_seq, n_iter, t):
-    """Plots a histogram of distribution of the counter C0 for a given test with the measured mean 
+def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
+    """Plots a histogram of distribution of the counter C0 for a given test with the measured mean
     and standard deviation
 
     Parameters
@@ -202,6 +214,8 @@ def counters_distribution_Tx(c, n_seq, n_iter, t):
         number of iterations
     t : str
         test executed
+    plot_dir : str
+        directory where to save the plot
     """
     # Calculate the parameters of the distribution
     p = sum(c) / (n_seq * n_iter)
@@ -249,10 +263,15 @@ def counters_distribution_Tx(c, n_seq, n_iter, t):
     # Setting title and positioning the legend
     ax.set_title(f"Distribution {t} of the counter for test {utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}", size=14)
     plt.legend(loc="upper right")
-    plt.show()
+
+    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.png"
+    plot_path = os.path.join(plot_dir, plot_filename)
+
+    plt.savefig(plot_path)
+    plt.close()
 
 
-def counters_distribution_Tj(c, n_seq, n_iter, t):
+def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
     """Plots a histogram of distribution of the counter C0 for a given test adjuested for Tj normalized
 
     Parameters
@@ -265,6 +284,8 @@ def counters_distribution_Tj(c, n_seq, n_iter, t):
         number of iterations
     t : str
         test executed
+    plot_dir : str
+        directory where to save the plot
     """
     # calculate the parameters of the distribution
     p = 0.5
@@ -326,4 +347,9 @@ def counters_distribution_Tj(c, n_seq, n_iter, t):
 
     ax.set_title(f"Distribution {t} of the counter for test {utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}", size=14)
     plt.legend()
-    plt.show()
+
+    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.png"
+    plot_path = os.path.join(plot_dir, plot_filename)
+
+    plt.savefig(plot_path)
+    plt.close()

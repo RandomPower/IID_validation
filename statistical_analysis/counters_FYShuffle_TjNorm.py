@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import time
@@ -91,6 +92,19 @@ def FY_TjNorm(S):
     utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
+    # Define directory path
+    plot_dir = "results/plots/counters_FYShuffle_TjNorm"
+    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    dir_plot_run = os.path.join(
+        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
+    )
+    # Ensure the directory exists
+    os.makedirs(dir_plot_run, exist_ok=True)
+
     utils.plot.counters_distribution_Tj(
-        C0, utils.config.config_data['statistical_analysis']['n_sequences_stat'], utils.config.config_data['statistical_analysis']['n_iterations_c_stat'], "FY_TjNorm"
+        C0,
+        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
+        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        "FY_TjNorm",
+        dir_plot_run,
     )
