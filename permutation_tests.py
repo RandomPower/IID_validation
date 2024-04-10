@@ -1,6 +1,7 @@
 import bz2
 import random
 import statistics
+import typing
 
 import utils.config
 
@@ -81,7 +82,7 @@ def s_prime_median(S):
     return S_prime
 
 
-def excursion_test(S):
+def _excursion(S):
     """Measures how far the running sum of sample values deviates from its
     average value at each point in the sequence
 
@@ -101,7 +102,7 @@ def excursion_test(S):
     return max(D)
 
 
-def n_directional_runs(S):
+def _n_directional_runs(S):
     """Measures the number of runs constructed using the relations between consecutive samples
 
     Parameters
@@ -123,7 +124,7 @@ def n_directional_runs(S):
     return T
 
 
-def l_directional_runs(S):
+def _l_directional_runs(S):
     """Measures the length of the longest run constructed using the relations between
     consecutive samples
 
@@ -156,7 +157,7 @@ def l_directional_runs(S):
     return T
 
 
-def n_increases_decreases(S):
+def _n_increases_decreases(S):
     """Measures the maximum number of increases or decreases between consecutive sample values
 
     Parameters
@@ -182,7 +183,7 @@ def n_increases_decreases(S):
     return max(count_minus, count_plus)
 
 
-def n_median_runs(S):
+def _n_median_runs(S):
     """Measures the number of runs that are constructed with respect to the median of the sequence
 
     Parameters
@@ -204,7 +205,7 @@ def n_median_runs(S):
     return T
 
 
-def l_median_runs(S):
+def _l_median_runs(S):
     """Measures the length of the longest run constructed with respect to the median of the sequence
 
     Parameters
@@ -236,7 +237,7 @@ def l_median_runs(S):
     return T
 
 
-def avg_c(S):
+def _avg_collision(S):
     """Counts the number of successive sample values until a duplicate is found
 
     Parameters
@@ -262,7 +263,7 @@ def avg_c(S):
     return statistics.mean(C) + 1
 
 
-def max_c(S):
+def _max_collision(S):
     """Counts the number of successive sample values until a duplicate is found
 
     Parameters
@@ -288,7 +289,7 @@ def max_c(S):
     return max(C) + 1
 
 
-def periodicity(S, y):
+def _periodicity(S, y):
     """Determines the number of periodic samples in the sequence
 
     Parameters
@@ -310,7 +311,7 @@ def periodicity(S, y):
     return T
 
 
-def covariance(S, p):
+def _covariance(S, p):
     """Measures the strength of the lagged correlation
 
     Parameters
@@ -331,7 +332,7 @@ def covariance(S, p):
     return T
 
 
-def compression(S):
+def _compression(S):
     """Removes redundancy in the sequence, involving commonly recurring subsequences of characters.
     Encodes input data as a character string containing a list of values separated by a single
     space. Compresses the character string with the bzip2 compression algorithm
@@ -351,45 +352,50 @@ def compression(S):
     return len(t)
 
 
-def execute_function(function_name, S, y):
-    """Calls functions to execute based on the function name provided
+_Test = typing.NamedTuple("Test", [("id", int), ("name", str), ("pretty_name", str), ("run", typing.Callable)])
+
+excursion = _Test(0, "excursion", "5.1.1 Excursion Test Statistic", _excursion)
+n_directional_runs = _Test(1, "n_directional_runs", "5.1.2 Number of Directional Runs", _n_directional_runs)
+l_directional_runs = _Test(2, "l_directional_runs", "5.1.3 Length of Directional Runs", _l_directional_runs)
+n_increases_decreases = _Test(
+    3, "n_increases_decreases", "5.1.4 Number of Increases and Decreases", _n_increases_decreases
+)
+n_median_runs = _Test(4, "n_median_runs", "5.1.5 Number of Runs Based on the Median", _n_median_runs)
+l_median_runs = _Test(5, "l_median_runs", "5.1.6 Length of Runs Based on Median", _l_median_runs)
+avg_collision = _Test(6, "avg_collision", "5.1.7 Average Collision Test Statistic", _avg_collision)
+max_collision = _Test(7, "max_collision", "5.1.8 Maximum Collision Test Statistic", _max_collision)
+periodicity = _Test(8, "periodicity", "5.1.9 Periodicity Test Statistic", _periodicity)
+covariance = _Test(9, "covariance", "5.1.10 Covariance Test Statistic", _covariance)
+compression = _Test(10, "compression", "5.1.11 Compression Test Statistic", _compression)
+tests = [
+    excursion,
+    n_directional_runs,
+    l_directional_runs,
+    n_increases_decreases,
+    n_median_runs,
+    l_median_runs,
+    avg_collision,
+    max_collision,
+    periodicity,
+    covariance,
+    compression,
+]
+
+
+def run_tests(S, p, test_list=[i.id for i in tests]):
+    """Run tests on a specified sequence, using a specified p value.
+    If no tests are specified, all tests are run.
 
     Parameters
     ----------
-    function_name : str
-        function name to be executed
     S : list of int
         sequence of sample values
-    y : int
-        lag parameter p
 
-    Returns
-    -------
-    int or float
-        output of the executed test function
-    """
-    return {
-        "excursion_test": lambda: excursion_test(S),
-        "n_directional_runs": lambda: n_directional_runs(S),
-        "l_directional_runs": lambda: l_directional_runs(S),
-        "n_median_runs": lambda: n_median_runs(S),
-        "l_median_runs": lambda: l_median_runs(S),
-        "n_increases_decreases": lambda: n_increases_decreases(S),
-        "avg_collision": lambda: avg_c(S),
-        "max_collision": lambda: max_c(S),
-        "periodicity": lambda: periodicity(S, y),
-        "covariance": lambda: covariance(S, y),
-        "compression": lambda: compression(S),
-    }[function_name]()
+    p : list of int
+        list of p values
 
-
-def execute_test_suite(sequence):
-    """Executes NIST test suite on a given sequence
-
-    Parameters
-    ----------
-    sequence : list of int
-        sequence of sample values
+    test_list : list of int
+        list of test indexes to run
 
     Returns
     -------
@@ -397,18 +403,12 @@ def execute_test_suite(sequence):
         list of tests results
     """
     T = []
-    for test_index in utils.config.config_data['global']['test_list_indexes']:
-        if test_index in ['8', '9'] and utils.config.config_data['nist_test']['bool_pvalue']:
-            # If bool_pvalue is True, p_values is expected to be a list. Iterate over it.
-            for p_value in utils.config.p:
-                result = execute_function(
-                    utils.config.config_data['test_list'][test_index], sequence, p_value
-                )
+    for test_index in test_list:
+        if test_index in [8, 9]:
+            for p_value in p:
+                result = tests[test_index].run(S, p_value)
                 T.append(result)
         else:
-            # For other cases or if bool_pvalue is False, execute the function with p_values directly.
-            result = execute_function(
-                utils.config.config_data['test_list'][test_index], sequence, utils.config.p
-            )
+            result = tests[test_index].run(S)
             T.append(result)
     return T

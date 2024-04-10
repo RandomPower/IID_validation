@@ -11,7 +11,7 @@ import utils.plot
 import utils.useful_functions
 
 
-def counters_FY_TjNorm(S):
+def counters_FY_TjNorm(S, test):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
     C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the results of the
     test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one.
@@ -34,51 +34,17 @@ def counters_FY_TjNorm(S):
         seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
-        if (
-            utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-            or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-        ):
-            Ti.append(
-                permutation_tests.execute_function(
-                    utils.config.config_data["test_list"][
-                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                    ],
-                    seq,
-                    utils.config.config_data["statistical_analysis"]["p_value_stat"],
-                )
-            )
+        if test in [8, 9]:
+            Ti.append(permutation_tests.tests[test].run(seq, utils.config.config_data['statistical_analysis']['p_value_stat']))
         else:
-            Ti.append(
-                permutation_tests.execute_function(
-                    utils.config.config_data["test_list"][
-                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                    ],
-                    seq,
-                    None,
-                )
-            )
+            Ti.append(permutation_tests.tests[test].run(seq))
         j = 1
         while j < utils.config.config_data["statistical_analysis"]["n_sequences_stat"]:
             seq = permutation_tests.FY_shuffle(S.copy())
-            if (
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-            ):
-                t = permutation_tests.execute_function(
-                    utils.config.config_data["test_list"][
-                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                    ],
-                    seq,
-                    utils.config.config_data["statistical_analysis"]["p_value_stat"],
-                )
+            if test in [8, 9]:
+                t = permutation_tests.tests[test].run(seq, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
-                t = permutation_tests.execute_function(
-                    utils.config.config_data["test_list"][
-                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                    ],
-                    seq,
-                    None,
-                )
+                t = permutation_tests.tests[test].run(seq)
             if t == Ti[j - 1]:
                 continue
             else:
@@ -110,16 +76,17 @@ def FY_TjNorm(S):
         sequence of sample values
     """
     logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
+    distribution_test_index = utils.config.config_data['statistical_analysis']['distribution_test_index']
     f = os.path.abspath(
         os.path.join(
             "results",
             "counters_distribution",
             "FYShuffleTjNorm",
-            f"fyShuffleTjNorm_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}.csv",
+            f"fyShuffleTjNorm_{permutation_tests.tests[distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FY_TjNorm(S)
+    C0, C1 = counters_FY_TjNorm(S, distribution_test_index)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv

@@ -12,7 +12,7 @@ import utils.shuffles
 import utils.useful_functions
 
 
-def counters_Random_Tx(S):
+def counters_Random_Tx(S, test):
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
@@ -28,25 +28,10 @@ def counters_Random_Tx(S):
         counter 0 and counter 1 lists of values
     """
 
-    if (
-        utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-        or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-    ):
-        Tx = permutation_tests.execute_function(
-            utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-            ],
-            S,
-            utils.config.config_data["statistical_analysis"]["p_value_stat"],
-        )
+    if test in [8, 9]:
+        Tx = permutation_tests.tests[test].run(S, utils.config.config_data['statistical_analysis']['p_value_stat'])
     else:
-        Tx = permutation_tests.execute_function(
-            utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-            ],
-            S,
-            None,
-        )
+        Tx = permutation_tests.tests[test].run(S)
     counters_0 = []
     counters_1 = []
     index = utils.config.config_data["statistical_analysis"]["n_symbols_stat"] / 2
@@ -61,29 +46,10 @@ def counters_Random_Tx(S):
         )
         Ti = []
         for k in S_shuffled:
-            if (
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-            ):
-                Ti.append(
-                    permutation_tests.execute_function(
-                        utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                        ],
-                        k,
-                        utils.config.config_data["statistical_analysis"]["p_value_stat"],
-                    )
-                )
+            if test in [8, 9]:
+                Ti.append(permutation_tests.tests[test].run(k, utils.config.config_data['statistical_analysis']['p_value_stat']))
             else:
-                Ti.append(
-                    permutation_tests.execute_function(
-                        utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                        ],
-                        k,
-                        None,
-                    )
-                )
+                Ti.append(permutation_tests.tests[test].run(k))
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
@@ -113,16 +79,17 @@ def Random_Tx(S):
         sequence of sample values
     """
     logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
+    distribution_test_index = utils.config.config_data['statistical_analysis']['distribution_test_index']
     f = os.path.abspath(
         os.path.join(
             "results",
             "counters_distribution",
             "RandomTx",
-            f"RandomTx_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}.csv",
+            f"RandomTx_{permutation_tests.tests[distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_Random_Tx(S)
+    C0, C1 = counters_Random_Tx(S, distribution_test_index)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv

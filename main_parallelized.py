@@ -98,7 +98,7 @@ def FY_test_mode_parallel(seq):
         futures = []
         for iteration in range(utils.config.config_data['nist_test']['n_sequences']):
             s_shuffled = permutation_tests.FY_shuffle(seq.copy())
-            future = executor.submit(permutation_tests.execute_test_suite, s_shuffled)
+            future = executor.submit(permutation_tests.run_tests, s_shuffled, utils.config.p)
             futures.append(future)
 
         completed = 0
@@ -142,22 +142,22 @@ def iid_plots(Tx, Ti):
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{utils.config.config_data['test_list']['8']} (p={utils.config.p[p_index]})"
+                test_name = f"{permutation_tests.tests[8].name} (p={utils.config.p[p_index]})"
             # Handle the special case for test 9 ('covariance')
             elif 13 <= t <= 17:
                 p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{utils.config.config_data['test_list']['9']} (p={utils.config.p[p_index]})"
+                test_name = f"{permutation_tests.tests[9].name} (p={utils.config.p[p_index]})"
             # For the values that should correspond to test 10 ('compression')
             elif t == 18:
-                test_name = utils.config.config_data['test_list']['10']  # Direct mapping for 'compression'
+                test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
             else:
                 # Direct mapping for other tests
-                test_name = utils.config.config_data['test_list'][str(t)]
+                test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
         else:
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_hist_run)
-            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], utils.config.config_data['test_list'][str(t)], dir_sc_run)
+            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_hist_run)
+            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
 
 
 def iid_test_function():
@@ -168,7 +168,7 @@ def iid_test_function():
     logging.debug("Sequence calculated: S")
 
     logging.debug("Calculating for each test the reference statistic: Tx")
-    Tx = permutation_tests.execute_test_suite(S)
+    Tx = permutation_tests.run_tests(S, utils.config.p)
     logging.debug("Reference statistics calculated!")
 
     logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
@@ -196,7 +196,8 @@ def iid_test_function():
 
 def statistical_analysis_function():
     logging.debug("----------------------------------------------------------------\n \n")
-    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']])
+    distribution_test_index = utils.config.config_data['statistical_analysis']['distribution_test_index']
+    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[distribution_test_index].name)
     t_start = time.process_time()
     S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['statistical_analysis']['n_symbols_stat'])
     logging.debug("Sequence calculated: S")
@@ -205,7 +206,7 @@ def statistical_analysis_function():
             executor.submit(statistical_analysis.counters_FYShuffle_Tx.FY_Tx, S),
             executor.submit(statistical_analysis.counters_FYShuffle_TjNorm.FY_TjNorm, S),
             executor.submit(statistical_analysis.counters_Random_Tx.Random_Tx, S),
-            executor.submit(statistical_analysis.counters_Random_TjNorm.Random_TjNorm, S),
+            executor.submit(statistical_analysis.counters_Random_TjNorm.Random_TjNorm, S, distribution_test_index),
         ]
         # Wait for all tasks to complete
         for task in tasks:

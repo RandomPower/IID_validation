@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+import permutation_tests
 import utils.config
 
 
@@ -268,10 +269,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    ax.set_title(
-        f"Distribution {t} of the counter for test {utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}",
-        size=14,
-    )
+    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[utils.config.config_data['statistical_analysis']['distribution_test_index']].name}", size=14)
     plt.legend(loc="upper right")
 
     plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.pdf"
@@ -355,10 +353,7 @@ def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    ax.set_title(
-        f"Distribution {t} of the counter for test {utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}",
-        size=14,
-    )
+    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[utils.config.config_data['statistical_analysis']['distribution_test_index']].name}", size=14)
     plt.legend()
 
     plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.pdf"
