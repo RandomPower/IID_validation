@@ -46,7 +46,7 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
     # Displaying the legend
     ax.legend()
 
-    plot_filename = f"{t.replace(' ', '_')}.png"
+    plot_filename = f"{t.replace(' ', '_')}.pdf"
     plot_path = os.path.join(plot_dir_h, plot_filename)
 
     plt.savefig(plot_path)
@@ -95,7 +95,7 @@ def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
     plt.subplots_adjust(left=0.1)
     plt.title(t)
 
-    plot_filename = f"{t.replace(' ', '_')}.png"
+    plot_filename = f"{t.replace(' ', '_')}.pdf"
     plot_path = os.path.join(plot_dir_s, plot_filename)
 
     plt.savefig(plot_path)
@@ -137,7 +137,7 @@ def scatterplot_RvsFY(test, C0r, C0fy, plot_dir):
 
     plt.legend()
 
-    plot_filename = "scatterplot_RvsFY.png"
+    plot_filename = "scatterplot_RvsFY.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
@@ -179,7 +179,7 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy, plot_dir):
 
     plt.legend()
 
-    plot_filename = "scatterplot_RvsFY_TjNorm.png"
+    plot_filename = "scatterplot_RvsFY_TjNorm.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
@@ -274,7 +274,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
     )
     plt.legend(loc="upper right")
 
-    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.png"
+    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
@@ -361,7 +361,7 @@ def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
     )
     plt.legend()
 
-    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.png"
+    plot_filename = f"{t.replace(' ', '_')}_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']].replace(' ', '_')}.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
