@@ -1,3 +1,4 @@
+import argparse
 import concurrent.futures
 import datetime
 import logging
@@ -211,6 +212,48 @@ def statistical_analysis_function():
 
 
 def main():
+    """
+    Instantiate an ArgumentParser object.
+    """
+    parser = argparse.ArgumentParser()
+
+    """
+    Create argument groups and add arguments to the them.
+    """
+    # Global
+    global_args = parser.add_argument_group("global", "global settings")
+    global_args.add_argument("-c", "--config", type=str, help="Configuration file")
+    global_args.add_argument("-i", "--input_file", type=str, help="Random bit file.", required=True)
+    global_args.add_argument("-t", "--test_nist", action="store_true", help="IID validation test.")
+    global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
+    global_args.add_argument("--test_list_idx", nargs="+", type=list[str], help="Selection of test numbers to execute.")
+
+    # Nist test
+    nist_test_args = parser.add_argument_group("nist test", "nist randomness test suite configuration")
+    nist_test_args.add_argument("-s", "--n_symbols", type=int, help="Number of symbols in the random-bit sequence.", required=True)
+    nist_test_args.add_argument("-S", "--n_sequences", type=int, help="Number of sequences on which the test will be carried out.", required=True)
+    nist_test_args.add_argument("-N", "--shuffle_nist", action="store_true", help="Fisher-Yates shuffle.")
+    nist_test_args.add_argument("-f", "--first_seq", action="store_true", help="Read the sequence from the start of the input file.")
+    nist_test_args.add_argument("-P", '--see_plots', action="store_true", help="See plots.")
+    nist_test_args.add_argument("--nist_pvalues", nargs="+", type=list[str], help="User-defined p-value.")
+
+    # Statistical analysis
+    stat_analysis_args = parser.add_argument_group("statistical analysis", "statistical analysis options")
+    stat_analysis_args.add_argument("--n_seq_stat", type=int, help="Number of sequences for the statistical analysis.", required=True)
+    stat_analysis_args.add_argument("--n_symb_stat", type=int, help="Number of symbols in a sequence for the statistical analysis.", required=True)
+    stat_analysis_args.add_argument("--n_iter_c_stat", type=int, help="Number of iterations to do on sequences for the stat analysis.", required=True)
+    stat_analysis_args.add_argument("-d", "--distr_test_idx", type=int, help="Test to execute.", required=True)
+    stat_analysis_args.add_argument("-sh", "--shuffle_stat", action="store_true", help="Produce sequences using Fisher-Yates.")
+    stat_analysis_args.add_argument("-ps", "--pvalue_stat", type=int, help="User-defined p-value for the statistical analysis.", required=True)
+    stat_analysis_args.add_argument("-r", "--ref_nums", nargs="+", type=list[str], help="Number of tests to consider for comparing the stat results.")
+
+    """
+    Parse arguments
+    """
+    args = parser.parse_args()
+
+    utils.config.update_config_data(args)
+
     logging.basicConfig(
         filename="IID_validation.log",
         filemode="w",
