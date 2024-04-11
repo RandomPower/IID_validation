@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import time
@@ -28,22 +29,56 @@ def counters_FY_TjNorm(S):
     """
     counters_0 = []
     counters_1 = []
-    for k in tqdm(range(utils.config.config_data['statistical_analysis']['n_iterations_c_stat'])):
+    for k in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
         Ti = []
         seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
-        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-            Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat']))
+        if (
+            utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+            or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+        ):
+            Ti.append(
+                permutation_tests.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                    ],
+                    seq,
+                    utils.config.config_data["statistical_analysis"]["p_value_stat"],
+                )
+            )
         else:
-            Ti.append(permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None))
+            Ti.append(
+                permutation_tests.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                    ],
+                    seq,
+                    None,
+                )
+            )
         j = 1
-        while j < utils.config.config_data['statistical_analysis']['n_sequences_stat']:
+        while j < utils.config.config_data["statistical_analysis"]["n_sequences_stat"]:
             seq = permutation_tests.FY_shuffle(S.copy())
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-                t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, utils.config.config_data['statistical_analysis']['p_value_stat'])
+            if (
+                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
+                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
+            ):
+                t = permutation_tests.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                    ],
+                    seq,
+                    utils.config.config_data["statistical_analysis"]["p_value_stat"],
+                )
             else:
-                t = permutation_tests.execute_function(utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']], seq, None)
+                t = permutation_tests.execute_function(
+                    utils.config.config_data["test_list"][
+                        utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+                    ],
+                    seq,
+                    None,
+                )
             if t == Ti[j - 1]:
                 continue
             else:
@@ -91,6 +126,19 @@ def FY_TjNorm(S):
     utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
+    # Define directory path
+    plot_dir = "results/plots/counters_FYShuffle_TjNorm"
+    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    dir_plot_run = os.path.join(
+        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
+    )
+    # Ensure the directory exists
+    os.makedirs(dir_plot_run, exist_ok=True)
+
     utils.plot.counters_distribution_Tj(
-        C0, utils.config.config_data['statistical_analysis']['n_sequences_stat'], utils.config.config_data['statistical_analysis']['n_iterations_c_stat'], "FY_TjNorm"
+        C0,
+        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
+        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        "FY_TjNorm",
+        dir_plot_run,
     )
