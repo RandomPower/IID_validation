@@ -11,7 +11,7 @@ import utils.plot
 import utils.useful_functions
 
 
-def counters_FYShuffle_Tx(S):
+def counters_FYShuffle_Tx(S, test):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
     The given test is performed on the first sequence to obtain the reference value:
     C0 is incremented if the result of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
@@ -29,25 +29,10 @@ def counters_FYShuffle_Tx(S):
     counters_0 = []
     counters_1 = []
     # Calculate reference statistics
-    if (
-        utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-        or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-    ):
-        Tx = permutation_tests.execute_function(
-            utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-            ],
-            S,
-            utils.config.config_data["statistical_analysis"]["p_value_stat"],
-        )
+    if test in [8, 9]:
+        Tx = permutation_tests.tests[test].run(S, utils.config.config_data['statistical_analysis']['p_value_stat'])
     else:
-        Tx = permutation_tests.execute_function(
-            utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-            ],
-            S,
-            None,
-        )
+        Tx = permutation_tests.tests[test].run(S)
 
     # S_shuffled will move by a P_pointer for every n_sequences
     for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
@@ -56,29 +41,12 @@ def counters_FYShuffle_Tx(S):
         Ti = []
         for k in range(utils.config.config_data["statistical_analysis"]["n_sequences_stat"]):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
-            if (
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "8"
-                or utils.config.config_data["statistical_analysis"]["distribution_test_index"] == "9"
-            ):
+            if test in [8, 9]:
                 Ti.append(
-                    permutation_tests.execute_function(
-                        utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                        ],
-                        s_shuffled,
-                        utils.config.config_data["statistical_analysis"]["p_value_stat"],
-                    )
+                    permutation_tests.tests[test].run(s_shuffled, utils.config.config_data['statistical_analysis']['p_value_stat'])
                 )
             else:
-                Ti.append(
-                    permutation_tests.execute_function(
-                        utils.config.config_data["test_list"][
-                            utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-                        ],
-                        s_shuffled,
-                        None,
-                    )
-                )
+                Ti.append(permutation_tests.tests[test].run(s_shuffled))
 
         for z in range(len(Ti)):
             if Tx > Ti[z]:
@@ -104,16 +72,17 @@ def FY_Tx(S):
         sequence of sample values
     """
     logging.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
+    distribution_test_index = utils.config.config_data['statistical_analysis']['distribution_test_index']
     f = os.path.abspath(
         os.path.join(
             "results",
             "counters_distribution",
             "FYShuffleTx",
-            f"fyShuffleTx_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}.csv",
+            f"fyShuffleTx_{permutation_tests.tests[distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FYShuffle_Tx(S)
+    C0, C1 = counters_FYShuffle_Tx(S, distribution_test_index)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv

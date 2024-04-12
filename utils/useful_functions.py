@@ -5,6 +5,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
+import permutation_tests
 import utils.config
 
 
@@ -41,7 +42,7 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f):
         utils.config.config_data['statistical_analysis']['n_symbols_stat'],
         utils.config.config_data['statistical_analysis']['n_sequences_stat'],
         shuffle_type,
-        utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']],
+        permutation_tests.tests[utils.config.config_data['statistical_analysis']['distribution_test_index']].name,
         c0,
         c1,
         str(elapsed),
@@ -74,7 +75,7 @@ def save_failure_test(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [utils.config.config_data['test_list'].get(i) for i in utils.config.config_data['global']['test_list_indexes']]
+    t = [permutation_tests.tests[i].name for i in utils.config.config_data['global']['test_list_indexes']]
     d = [utils.config.config_data['nist_test']['n_symbols'], utils.config.config_data['nist_test']['n_sequences'], t, C0, C1, b, test_time, str(datetime.now())]
     dt = pd.DataFrame(d, index=header).T
     h = True
@@ -118,17 +119,16 @@ def save_test_values(Tx, Ti):
             "compression",
         ]
     else:
-        header = [utils.config.config_data['test_list'][k] for k in utils.config.config_data['global']['test_list_indexes']]
+        header = [permutation_tests.tests[i].name for i in utils.config.config_data['global']['test_list_indexes']]
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
     # df.insert("time Ti", tf, True)
     file_path = "results/save_test_values.csv"
     write_header = not os.path.isfile(file_path)
-    write_mode = "w" if write_header else "a"
 
     # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
-    df.to_csv(file_path, mode=write_mode, header=write_header, index=False)
+    df.to_csv(file_path, mode="a", header=write_header, index=False)
 
 
 def benchmark_timing(tot_time, p):

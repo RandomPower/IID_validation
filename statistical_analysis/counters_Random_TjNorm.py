@@ -5,6 +5,7 @@ import time
 
 from tqdm import tqdm
 
+import permutation_tests
 import utils.config
 import utils.plot
 import utils.shuffles
@@ -38,9 +39,7 @@ def counters_random_TjNorm():
             index,
             utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
             utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-            utils.config.config_data["test_list"][
-                utils.config.config_data["statistical_analysis"]["distribution_test_index"]
-            ],
+            utils.config.config_data["statistical_analysis"]["distribution_test_index"],
         )
 
         for z in range(0, len(Ti) - 1, 2):
@@ -63,7 +62,7 @@ def counters_random_TjNorm():
     return counters_0, counters_1
 
 
-def Random_TjNorm(S):
+def Random_TjNorm(S, test):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
@@ -71,6 +70,8 @@ def Random_TjNorm(S):
     ----------
     S : list of int
         sequence of sample values
+    test : int
+        index of the test used to produce the counters
     """
     logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = os.path.abspath(
@@ -78,7 +79,7 @@ def Random_TjNorm(S):
             "results",
             "counters_distribution",
             "RandomTjNorm",
-            f"randomTjNorm_{utils.config.config_data['test_list'][utils.config.config_data['statistical_analysis']['distribution_test_index']]}.csv",
+            f"randomTjNorm_{permutation_tests.tests[test].name}.csv",
         )
     )
     t = time.process_time()

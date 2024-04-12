@@ -5,6 +5,8 @@ CONFIGURATION FILE - CHANGE VARIABLES TO RUN THE DESIRED CONFIGURATION
 import logging
 import tomllib
 
+import permutation_tests
+
 
 def parse_config_file(file_path: str) -> dict:
     """Parse the specified file into a Python dictionary
@@ -36,7 +38,7 @@ if config_data['nist_test']['bool_pvalue']:
     p = [1, 2, 8, 16, 32]
 else:
     # User sets preferred value
-    p = 2
+    p = [2]
 
 # step in reading bin file
 step = config_data['nist_test']['n_symbols'] / 2
@@ -69,7 +71,7 @@ def config_info():
     logging.debug("CONFIG INFO - NIST")
     logging.debug("Number of symbols per sequence = %s", config_data['nist_test']['n_symbols'])
     logging.debug("Number of shuffled sequences = %s", config_data['nist_test']['n_sequences'])
-    ts = [config_data['test_list'][i] for i in config_data['global']['test_list_indexes']]
+    ts = [permutation_tests.tests[i].name for i in config_data['global']['test_list_indexes']]
     logging.debug("Tests for entropy validation selected: %s", ts)
     if config_data['nist_test']['bool_first_seq']:
         logging.debug("Reference sequence read from the beginning of the file")
@@ -84,8 +86,8 @@ def config_info():
     logging.debug("Number of symbols per sequence = %s", config_data['statistical_analysis']['n_symbols_stat'])
     logging.debug("Number of shuffled sequences = %s", config_data['statistical_analysis']['n_sequences_stat'])
     logging.debug("Number of iterations for counter: %s", config_data['statistical_analysis']['n_iterations_c_stat'])
-    logging.debug("Test selected for counter distribution analysis: %s", config_data['test_list'][config_data['statistical_analysis']['distribution_test_index']])
-    comp = [config_data['test_list'][i] for i in config_data['statistical_analysis']['ref_numbers']]
+    logging.debug("Test selected for counter distribution analysis: %s", permutation_tests.tests[config_data['statistical_analysis']['distribution_test_index']].name)
+    comp = [permutation_tests.tests[i].name for i in config_data['statistical_analysis']['ref_numbers']]
     logging.debug("Tests selected test for shuffle/random comparison: %s", comp)
     logging.debug("p parameter used: user value: %s", config_data['statistical_analysis']['p_value_stat'])
     logging.debug("----------------------------------------------------------------\n \nMAIN")

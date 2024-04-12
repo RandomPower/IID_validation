@@ -48,7 +48,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
         return sequences
 
 
-def shuffle_from_file_Norm(index, n_symb, n_seq, test):
+def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
     """Version of shuffle_from_file function for normalized Tj.
     The sequence it reads has the same result T on a given test as the previous
     sequence (T(j-1)), it discards it and passes to the next sequence. This is because for Tj normalized we want the
@@ -67,8 +67,8 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
         number of symbols
     n_seq : int
         number of sequences
-    test : str
-        function name to be executed
+    test : int
+        test index to be executed
 
     Returns
     -------
@@ -91,11 +91,11 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
             S.append(symbol2)
         index += utils.config.step
 
-        if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-            t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+        if test in [8, 9]:
+            t = permutation_tests.tests[test].run(S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             Ti.append(t)
         else:
-            t = permutation_tests.execute_function(test, S, None)
+            t = permutation_tests.tests[test].run(S)
             Ti.append(t)
         sequences.append(S)
 
@@ -114,10 +114,10 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test):
 
             index += utils.config.step
 
-            if utils.config.config_data['statistical_analysis']['distribution_test_index'] == '8' or utils.config.config_data['statistical_analysis']['distribution_test_index'] == '9':
-                t = permutation_tests.execute_function(test, S, utils.config.config_data['statistical_analysis']['p_value_stat'])
+            if test in [8, 9]:
+                t = permutation_tests.tests[test].run(S, utils.config.config_data['statistical_analysis']['p_value_stat'])
             else:
-                t = permutation_tests.execute_function(test, S, None)
+                t = permutation_tests.tests[test].run(S)
 
             if t == Ti[z - 1]:
                 continue
