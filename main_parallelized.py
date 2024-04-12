@@ -200,7 +200,7 @@ def statistical_analysis_function():
     t_start = time.process_time()
     S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['statistical_analysis']['n_symbols_stat'])
     logging.debug("Sequence calculated: S")
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
             executor.submit(statistical_analysis.counters_FYShuffle_Tx.FY_Tx, S),
             executor.submit(statistical_analysis.counters_FYShuffle_TjNorm.FY_TjNorm, S),
