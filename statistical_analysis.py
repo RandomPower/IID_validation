@@ -23,6 +23,8 @@ def counters_FYShuffle_Tx(S, test):
     ----------
     S : list of int
         sequence of sample values
+    test : int
+        index of the test used to produce the counters
 
     Returns
     -------
@@ -121,6 +123,8 @@ def counters_Random_Tx(S, test):
     ----------
     S : list of int
         sequence of sample values
+    test : int
+        index of the test used to produce the counters
 
     Returns
     -------
@@ -228,6 +232,8 @@ def counters_FY_TjNorm(S, test):
     ----------
     S : list of int
         sequence of sample values
+    test : int
+        index of the test used to produce the counters
 
     Returns
     -------
@@ -329,11 +335,6 @@ def counters_random_TjNorm():
     C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence;
     if the results of the test are equal the second sequence is ignored.
     Each pair of sequences is considered as disjointed from the following one.
-
-    Parameters
-    ----------
-    S : list of int
-        sequence of sample values
 
     Returns
     -------
