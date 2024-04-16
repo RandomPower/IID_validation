@@ -8,11 +8,7 @@ import time
 import numpy as np
 
 import permutation_tests
-import statistical_analysis.comparison_counters_FyR
-import statistical_analysis.counters_FYShuffle_TjNorm
-import statistical_analysis.counters_FYShuffle_Tx
-import statistical_analysis.counters_Random_TjNorm
-import statistical_analysis.counters_Random_Tx
+import statistical_analysis
 import utils.config
 import utils.plot
 import utils.read
@@ -203,16 +199,16 @@ def statistical_analysis_function():
     logging.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
-            executor.submit(statistical_analysis.counters_FYShuffle_Tx.FY_Tx, S),
-            executor.submit(statistical_analysis.counters_FYShuffle_TjNorm.FY_TjNorm, S),
-            executor.submit(statistical_analysis.counters_Random_Tx.Random_Tx, S),
-            executor.submit(statistical_analysis.counters_Random_TjNorm.Random_TjNorm, S, distribution_test_index),
+            executor.submit(statistical_analysis.FY_Tx, S),
+            executor.submit(statistical_analysis.FY_TjNorm, S),
+            executor.submit(statistical_analysis.Random_Tx, S),
+            executor.submit(statistical_analysis.Random_TjNorm, S, distribution_test_index),
         ]
         # Wait for all tasks to complete
         for task in tasks:
             task.result()
 
-    statistical_analysis.comparison_counters_FyR.comparison_scatterplot()
+    statistical_analysis.comparison_scatterplot()
     logging.debug("Statistical analysis completed.")
 
 
