@@ -15,12 +15,6 @@ import utils.read
 import utils.shuffles
 import utils.useful_functions
 
-logging.basicConfig(
-    filename="IID_validation.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
-)
-
-np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
-
 
 def calculate_counters(Tx, Ti):
     """Calculate counters values on a given sequence based on the condition provided by NIST
@@ -213,6 +207,15 @@ def statistical_analysis_function():
 
 
 def main():
+    logging.basicConfig(
+        filename="IID_validation.log",
+        filemode="w",
+        format="%(name)s - %(levelname)s - %(message)s",
+        level=logging.DEBUG,
+    )
+
+    np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
+
     utils.config.file_info()
     utils.config.config_info()
     if utils.config.config_data['global']['bool_test_NIST']:
