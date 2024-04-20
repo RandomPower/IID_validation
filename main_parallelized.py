@@ -218,10 +218,10 @@ def main():
 
     utils.config.file_info()
     utils.config.config_info()
-    if utils.config.config_data['global']['bool_test_NIST']:
+    if utils.config.config_data["global"]["bool_test_NIST"]:
         iid_test_function()
 
-    if utils.config.config_data['global']['bool_statistical_analysis']:
+    if utils.config.config_data["global"]["bool_statistical_analysis"]:
         statistical_analysis_function()
 
 
