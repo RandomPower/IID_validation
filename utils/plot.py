@@ -281,7 +281,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
 
 
 def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
-    """Plots a histogram of distribution of the counter C0 for a given test adjuested for Tj normalized
+    """Plots a histogram of distribution of the counter C0 for a given test adjusted for Tj normalized
 
     Parameters
     ----------
