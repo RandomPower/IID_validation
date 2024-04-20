@@ -3,8 +3,6 @@ import random
 import statistics
 import typing
 
-import utils.config
-
 
 def FY_shuffle(S):
     """Generates a shuffled sequence using Fisher-Yates algorithm
