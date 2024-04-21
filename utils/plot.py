@@ -269,7 +269,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    test = permutation_tests.tests[utils.config.config_data['statistical_analysis']['distribution_test_index']]
+    test = permutation_tests.tests[utils.config.config_data["statistical_analysis"]["distribution_test_index"]]
     ax.set_title(f"Distribution {t} of the counter for test {test.name}", size=14)
     plt.legend(loc="upper right")
 
@@ -354,7 +354,7 @@ def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    test = permutation_tests.tests[utils.config.config_data['statistical_analysis']['distribution_test_index']]
+    test = permutation_tests.tests[utils.config.config_data["statistical_analysis"]["distribution_test_index"]]
     ax.set_title(f"Distribution {t} of the counter for test {test.name}", size=14)
     plt.legend()
 
