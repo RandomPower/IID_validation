@@ -15,9 +15,10 @@ import utils.useful_functions
 
 
 def counters_FYShuffle_Tx(S, test):
-    """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-    The given test is performed on the first sequence to obtain the reference value:
-    C0 is incremented if the result of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
+    """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
+    one. The given test is performed on the first sequence to obtain the reference value:
+    C0 is incremented if the result of the test T computed on a sequence is bigger than that it,
+    C1 is incremented if they are equal.
 
     Parameters
     ----------
@@ -70,8 +71,8 @@ def counters_FYShuffle_Tx(S, test):
 
 
 def FY_Tx(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one,
-    save the values in a file and plot the distribution
+    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
+    a starting one, save the values in a file and plot the distribution
 
     Parameters
     ----------
@@ -223,9 +224,10 @@ def Random_Tx(S):
 
 
 def counters_FY_TjNorm(S, test):
-    """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting one.
-    C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if the results of the
-    test are equal the second sequence is ignored. Each pair of sequences is considered as disjointed from the following one.
+    """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
+    one. C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if
+    the results of the test are equal the second sequence is ignored.
+    Each pair of sequences is considered as disjointed from the following one.
 
 
     Parameters
@@ -286,8 +288,8 @@ def counters_FY_TjNorm(S, test):
 
 
 def FY_TjNorm(S):
-    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from a starting one,
-    save the values in a file and plot the distribution
+    """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
+    a starting one, save the values in a file and plot the distribution
 
     Parameters
     ----------

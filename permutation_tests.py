@@ -96,7 +96,7 @@ def _excursion(S):
     """
     X = statistics.mean(S)
     cumulative_sum = 0
-    D = [abs((cumulative_sum := cumulative_sum + element) - (i * X)) for i, element in enumerate(S, 1)]
+    D = [abs((cumulative_sum := cumulative_sum + element) - (i * X)) for i, element in enumerate(S, 1)]  # noqa: F841
     return max(D)
 
 

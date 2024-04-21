@@ -191,7 +191,6 @@ def statistical_analysis_function():
     logging.debug("----------------------------------------------------------------\n \n")
     distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
     logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[distribution_test_index].name)
-    t_start = time.process_time()
     S = utils.read.read_file(
         file=utils.config.config_data["global"]["input_file"],
         n_symbols=utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
