@@ -3,9 +3,13 @@
     "isort.check": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
-    "isort.args":["--profile", "black"],
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
     "flake8.args": [
-        "--max-line-length=120"
+        "--max-line-length=120",
+        "--ignore=E203,E701,W503"
     ],
     "black-formatter.args": [
         "--line-length",
