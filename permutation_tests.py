@@ -43,12 +43,12 @@ def s_prime(S):
     if len(S) == 1:
         raise Exception("Input sequence has length 1")
 
-    S_prime = []
+    S_prime = [0] * (len(S) - 1)
     for i in range(len(S) - 1):
         if S[i] > S[i + 1]:
-            S_prime.append(-1)
+            S_prime[i] = -1
         else:
-            S_prime.append(1)
+            S_prime[i] = 1
 
     return S_prime
 
