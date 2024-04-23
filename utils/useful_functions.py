@@ -60,7 +60,7 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     df.to_csv(f, mode="a", header=h, index=False)
 
 
-def save_failure_test(C0, C1, b, test_time):
+def save_IID_validation(C0, C1, b, test_time):
     """Saves IID failure and the counters values generated in the NIST test part
 
     Parameters
@@ -88,11 +88,11 @@ def save_failure_test(C0, C1, b, test_time):
     ]
     dt = pd.DataFrame(d, index=header).T
     h = True
-    if os.path.exists("results/failure_rate.csv"):
+    if os.path.exists("results/IID_validation.csv"):
         h = False
-        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
     else:
-        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
 
 
 def save_test_values(Tx, Ti):
@@ -138,32 +138,6 @@ def save_test_values(Tx, Ti):
 
     # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
     df.to_csv(file_path, mode="a", header=write_header, index=False)
-
-
-def benchmark_timing(tot_time, p):
-    """Saves time taken to execute the tests on the shuffled sequences in a txt file
-
-    Parameters
-    ----------
-    tot_time : float
-        total process time
-    p : string
-        parallelized / non parallelized mode
-    """
-    if len(utils.config.config_data["global"]["test_list_indexes"]) == 11:
-        test_ind = "all tests run"
-    else:
-        test_ind = "tests run: " + str(utils.config.config_data["global"]["test_list_indexes"])
-    lines = [
-        str(datetime.now()),
-        "n_symbols: " + str(utils.config.config_data["nist_test"]["n_symbols"]),
-        "n_sequences: " + str(utils.config.config_data["nist_test"]["n_sequences"]),
-        test_ind,
-        "total_time: " + str(tot_time) + " s",
-        p,
-    ]
-    with open("results/benchmark_timing_Ti_NIST_test.txt", "a") as f:
-        f.write("\n".join(map(str, lines)) + "\n" "\n")
 
 
 def get_next_run_number(base_dir, current_run_date):
