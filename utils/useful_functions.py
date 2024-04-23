@@ -140,32 +140,6 @@ def save_test_values(Tx, Ti):
     df.to_csv(file_path, mode="a", header=write_header, index=False)
 
 
-def benchmark_timing(tot_time, p):
-    """Saves time taken to execute the tests on the shuffled sequences in a txt file
-
-    Parameters
-    ----------
-    tot_time : float
-        total process time
-    p : string
-        parallelized / non parallelized mode
-    """
-    if len(utils.config.config_data["global"]["test_list_indexes"]) == 11:
-        test_ind = "all tests run"
-    else:
-        test_ind = "tests run: " + str(utils.config.config_data["global"]["test_list_indexes"])
-    lines = [
-        str(datetime.now()),
-        "n_symbols: " + str(utils.config.config_data["nist_test"]["n_symbols"]),
-        "n_sequences: " + str(utils.config.config_data["nist_test"]["n_sequences"]),
-        test_ind,
-        "total_time: " + str(tot_time) + " s",
-        p,
-    ]
-    with open("results/benchmark_timing_Ti_NIST_test.txt", "a") as f:
-        f.write("\n".join(map(str, lines)) + "\n" "\n")
-
-
 def get_next_run_number(base_dir, current_run_date):
     """Calculates the iteration number to create numbered of sequenced folders
 

@@ -153,7 +153,6 @@ def iid_plots(Tx, Ti):
 def iid_test_function():
     logging.debug("NIST TEST")
     logging.debug("Process started")
-    t_start = time.process_time()
     S = utils.read.read_file(
         file=utils.config.config_data["global"]["input_file"],
         n_symbols=utils.config.config_data["nist_test"]["n_symbols"],
@@ -168,7 +167,6 @@ def iid_test_function():
     t0 = time.process_time()
     Ti = FY_test_mode_parallel(S)
     ti = time.process_time() - t0
-    utils.useful_functions.benchmark_timing(ti, "parallelizing")
     logging.debug("Shuffled sequences Ti statistics calculated")
 
     C0, C1 = calculate_counters(Tx, Ti)
@@ -179,8 +177,6 @@ def iid_test_function():
         logging.info("IID assumption validated")
     else:
         logging.info("IID assumption rejected")
-    tu = time.process_time() - t_start
-    logging.debug("Total process time = %s", tu)
 
     # plots
     if utils.config.config_data["nist_test"]["see_plots"]:
