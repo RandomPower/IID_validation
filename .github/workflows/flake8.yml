@@ -1,0 +1,15 @@
+name: flake8
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v3
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          ignore: "E203,E701,W503"
+          max-line-length: "120"
