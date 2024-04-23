@@ -40,9 +40,6 @@ else:
     # User sets preferred value
     p = [2]
 
-# step in reading bin file
-step = config_data["nist_test"]["n_symbols"] / 2
-
 
 def file_info():
     f = open(config_data["global"]["input_file"], "r+b")

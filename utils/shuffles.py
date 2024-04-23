@@ -41,7 +41,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
             sequences.append(S)
 
             # Increment the offset by step-byte
-            ind += utils.config.step
+            ind += utils.config.config_data["nist_test"]["n_symbols"] / 2
 
             # TO DO: exception
 
@@ -89,7 +89,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
             S.append(symbol1)
             symbol2 = i & 0b00001111
             S.append(symbol2)
-        index += utils.config.step
+        index += utils.config.config_data["nist_test"]["n_symbols"] / 2
 
         if test in [8, 9]:
             t = permutation_tests.tests[test].run(S, utils.config.config_data["statistical_analysis"]["p_value_stat"])
@@ -112,7 +112,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
                 symbol2 = i & 0b00001111
                 S.append(symbol2)
 
-            index += utils.config.step
+            index += utils.config.config_data["nist_test"]["n_symbols"] / 2
 
             if test in [8, 9]:
                 t = permutation_tests.tests[test].run(
