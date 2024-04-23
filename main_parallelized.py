@@ -36,7 +36,7 @@ def calculate_counters(Tx, Ti):
     C1 = [0 for k in range(len(Tx))]
 
     for u in range(len(Tx)):
-        for t in range(utils.config.config_data['nist_test']['n_sequences']):
+        for t in range(utils.config.config_data["nist_test"]["n_sequences"]):
             if Tx[u] > Ti[t][u]:
                 C0[u] += 1
             if Tx[u] == Ti[t][u]:
@@ -86,7 +86,7 @@ def FY_test_mode_parallel(seq):
     Ti = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(utils.config.config_data['nist_test']['n_sequences']):
+        for iteration in range(utils.config.config_data["nist_test"]["n_sequences"]):
             s_shuffled = permutation_tests.FY_shuffle(seq.copy())
             future = executor.submit(permutation_tests.run_tests, s_shuffled, utils.config.p)
             futures.append(future)
@@ -128,7 +128,7 @@ def iid_plots(Tx, Ti):
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
-        if utils.config.config_data['nist_test']['bool_pvalue']:
+        if utils.config.config_data["nist_test"]["bool_pvalue"]:
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
@@ -154,7 +154,10 @@ def iid_test_function():
     logging.debug("NIST TEST")
     logging.debug("Process started")
     t_start = time.process_time()
-    S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['nist_test']['n_symbols'])
+    S = utils.read.read_file(
+        file=utils.config.config_data["global"]["input_file"],
+        n_symbols=utils.config.config_data["nist_test"]["n_symbols"],
+    )
     logging.debug("Sequence calculated: S")
 
     logging.debug("Calculating for each test the reference statistic: Tx")
@@ -180,16 +183,18 @@ def iid_test_function():
     logging.debug("Total process time = %s", tu)
 
     # plots
-    if utils.config.config_data['nist_test']['see_plots']:
+    if utils.config.config_data["nist_test"]["see_plots"]:
         iid_plots(Tx, Ti)
 
 
 def statistical_analysis_function():
     logging.debug("----------------------------------------------------------------\n \n")
-    distribution_test_index = utils.config.config_data['statistical_analysis']['distribution_test_index']
+    distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
     logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[distribution_test_index].name)
-    t_start = time.process_time()
-    S = utils.read.read_file(file=utils.config.config_data['global']['input_file'], n_symbols=utils.config.config_data['statistical_analysis']['n_symbols_stat'])
+    S = utils.read.read_file(
+        file=utils.config.config_data["global"]["input_file"],
+        n_symbols=utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
+    )
     logging.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
