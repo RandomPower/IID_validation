@@ -71,7 +71,7 @@ def file_info():
             logging.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
         else:
             logging.error("SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
-            exit(-1)
+            raise Exception(f"Insufficient sequences (provided {max_sequences}, required {tot_seqs}) in {config_data['global']['input_file']}")
     logging.debug("----------------------------------------------------------------\n")
 
 

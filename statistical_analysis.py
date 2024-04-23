@@ -475,9 +475,12 @@ def get_data(ref_numbers, Tj_norm):
                     f"randomTx_{permutation_tests.tests[ref].name}.csv",
                 )
             )
-        if not os.path.exists(fy) or not os.path.exists(rand):
-            logging.error("File(s) for reference number %s do not exist.", ref)
-            sys.exit(1)
+        if not os.path.exists(fy):
+            logging.error("Results file for test number %s does not exist: %s", ref, fy)
+            raise ValueError(f"Results file for test number {ref} does not exist: {fy}")
+        if not os.path.exists(rand):
+            logging.error("Results file for test number %s does not exist: %s", ref, rand)
+            raise ValueError(f"Results file for test number {ref} does not exist: {rand}")
 
         try:
             data1 = pd.read_csv(fy)
@@ -490,7 +493,7 @@ def get_data(ref_numbers, Tj_norm):
             C0_random.append(eval(last_entry2))
         except Exception as e:
             logging.error("Reading or processing files for %s: %s not successful", permutation_tests.tests[ref], e)
-            sys.exit(1)
+            raise e
     return C0_fy, C0_random
 
 
