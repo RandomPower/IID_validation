@@ -60,7 +60,7 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f):
     df.to_csv(f, mode="a", header=h, index=False)
 
 
-def save_failure_test(C0, C1, b, test_time):
+def save_IID_validation(C0, C1, b, test_time):
     """Saves IID failure and the counters values generated in the NIST test part
 
     Parameters
@@ -88,11 +88,11 @@ def save_failure_test(C0, C1, b, test_time):
     ]
     dt = pd.DataFrame(d, index=header).T
     h = True
-    if os.path.exists("results/failure_rate.csv"):
+    if os.path.exists("results/IID_validation.csv"):
         h = False
-        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
     else:
-        dt.to_csv("results/failure_rate.csv", mode="a", header=h, index=False)
+        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
 
 
 def save_test_values(Tx, Ti):

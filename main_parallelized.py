@@ -173,10 +173,11 @@ def iid_test_function():
     logging.debug("C0 = %s", C0)
     logging.debug("C1 = %s", C1)
 
-    if iid_result(C0, C1, Tx):
-        logging.info("IID assumption validated")
-    else:
-        logging.info("IID assumption rejected")
+    IID_assumption = iid_result(C0, C1, Tx)
+
+    logging.info("IID assumption %s", "validated" if IID_assumption else "rejected")
+    # save results of the IID validation
+    utils.useful_functions.save_IID_validation(C0, C1, IID_assumption, ti)
 
     # plots
     if utils.config.config_data["nist_test"]["see_plots"]:
