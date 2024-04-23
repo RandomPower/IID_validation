@@ -128,7 +128,7 @@ def iid_plots(Tx, Ti):
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
-        if utils.config.config_data["nist_test"]["bool_pvalue"]:
+        if utils.config.p == [1, 2, 8, 16, 32]:
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
@@ -145,9 +145,11 @@ def iid_plots(Tx, Ti):
                 test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
-        else:
+        elif len(utils.config.p) == 1:
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
+        else:
+            raise Exception("Support for arbitrary p values not implemented yet")
 
 
 def iid_test_function():

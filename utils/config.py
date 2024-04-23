@@ -88,10 +88,10 @@ def config_info():
         logging.debug("Reference sequence read from the beginning of the file")
     else:
         logging.debug("Reference sequence read from the end of the file")
-    if config_data["nist_test"]["bool_pvalue"]:
+    if p == [1, 2, 8, 16, 32]:
         logging.debug("p parameter used: NIST")
     else:
-        logging.debug("p parameter used: user value \n")
+        logging.debug("p parameter used: user value")
 
     logging.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
     logging.debug("Number of symbols per sequence = %s", config_data["statistical_analysis"]["n_symbols_stat"])

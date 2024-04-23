@@ -105,7 +105,7 @@ def save_test_values(Tx, Ti):
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if utils.config.config_data["nist_test"]["bool_pvalue"]:
+    if utils.config.p == [1, 2, 8, 16, 32]:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -127,8 +127,11 @@ def save_test_values(Tx, Ti):
             "covariance_p4",
             "compression",
         ]
-    else:
+    elif len(utils.config.p) == 1:
         header = [permutation_tests.tests[i].name for i in utils.config.config_data["global"]["test_list_indexes"]]
+    else:
+        raise Exception("Support for arbitrary p values not implemented yet")
+
     df2 = pd.DataFrame(np.array(Ti), columns=header)
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
