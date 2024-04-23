@@ -2,9 +2,17 @@ name: Black
 
 on:
   pull_request:
+    paths:
+      - "**.py"
+      - ".github/workflows/black.yml"
+      - ".github/workflows/flake8.yml"
   push:
     branches:
       - main
+    paths:
+      - "**.py"
+      - ".github/workflows/black.yml"
+      - ".github/workflows/flake8.yml"
 
 
 jobs:
