@@ -71,12 +71,12 @@ def s_prime_median(S):
         raise Exception("Input sequence has length 0")
 
     M = statistics.median(S)
-    S_prime = []
+    S_prime = [0] * (len(S))
     for i in range(len(S)):
         if S[i] < M:
-            S_prime.append(-1)
+            S_prime[i] = -1
         else:
-            S_prime.append(1)
+            S_prime[i] = 1
     return S_prime
 
 
