@@ -183,7 +183,7 @@ def iid_test_function():
     utils.useful_functions.save_IID_validation(C0, C1, IID_assumption, ti)
 
     # plots
-    if utils.config.config_data['nist_test']['plot']:
+    if utils.config.config_data["nist_test"]["plot"]:
         iid_plots(Tx, Ti)
 
 
@@ -222,24 +222,34 @@ def main():
     global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
 
     # Nist test
-    nist_test_args = parser.add_argument_group("nist test", "nist IID test suite configuration")
-    nist_test_args.add_argument("--nist_selected_tests", nargs="+", type=int, help="Selection of test numbers to execute.")
-    nist_test_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the random-bit sequence.")
-    nist_test_args.add_argument("--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out.")
-    nist_test_args.add_argument("--shuffle", action="store_true", help="Fisher-Yates shuffle.")
-    nist_test_args.add_argument("--first_seq", action="store_true", help="Read the sequence from the start of the input file.")
-    nist_test_args.add_argument('--plot', action="store_true", help="See plots.")
-    nist_test_args.add_argument("--pvalues", nargs="+", type=int, help="User-defined p-value.")
+    nist_args = parser.add_argument_group("nist test", "nist IID test suite configuration")
+    nist_args.add_argument("--nist_selected_tests", nargs="+", type=int, help="Selection of test numbers to execute.")
+    nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the random-bit sequence.")
+    nist_args.add_argument(
+        "--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out."
+    )
+    nist_args.add_argument("--shuffle", action="store_true", help="Fisher-Yates shuffle.")
+    nist_args.add_argument(
+        "--first_seq", action="store_true", help="Read the sequence from the start of the input file."
+    )
+    nist_args.add_argument("--plot", action="store_true", help="See plots.")
+    nist_args.add_argument("--pvalues", nargs="+", type=int, help="User-defined p-value.")
 
     # Statistical analysis
-    stat_analysis_args = parser.add_argument_group("statistical analysis", "statistical analysis options")
-    stat_analysis_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
-    stat_analysis_args.add_argument("--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis.")
-    stat_analysis_args.add_argument("--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis.")
-    stat_analysis_args.add_argument("--distr_test_idx", type=int, help="Test to execute.")
-    stat_analysis_args.add_argument("--shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
-    stat_analysis_args.add_argument("--stat_pvalue", type=int, help="User-defined p-value for the statistical analysis.")
-    stat_analysis_args.add_argument("--ref_nums", nargs="+", type=int, help="Number of tests to consider for comparing the stat results.")
+    stat_args = parser.add_argument_group("statistical analysis", "statistical analysis options")
+    stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
+    stat_args.add_argument(
+        "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
+    )
+    stat_args.add_argument(
+        "--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis."
+    )
+    stat_args.add_argument("--distr_test_idx", type=int, help="Test to execute.")
+    stat_args.add_argument("--shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
+    stat_args.add_argument("--stat_pvalue", type=int, help="User-defined p-value for the statistical analysis.")
+    stat_args.add_argument(
+        "--ref_nums", nargs="+", type=int, help="Number of tests to consider for comparing the stat results."
+    )
 
     args = parser.parse_args()
 
@@ -256,10 +266,10 @@ def main():
 
     utils.config.file_info()
     utils.config.config_info()
-    if utils.config.config_data['global']['test_nist']:
+    if utils.config.config_data["global"]["test_nist"]:
         iid_test_function()
 
-    if utils.config.config_data['global']['stat_analysis']:
+    if utils.config.config_data["global"]["stat_analysis"]:
         statistical_analysis_function()
 
 

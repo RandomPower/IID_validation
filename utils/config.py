@@ -23,7 +23,7 @@ class Config:
             self._set_defaults()
 
         def _set_defaults(self) -> None:
-            """ Initialise member variables to default values."""
+            """Initialise member variables to default values."""
             self._selected_tests = self.DEFAULT_SELECTED_TESTS
             self._n_symbols = self.DEFAULT_N_SYMBOLS
             self._n_sequences = self.DEFAULT_N_SEQUENCES
@@ -73,7 +73,7 @@ class Config:
             self._set_defaults()
 
         def _set_defaults(self) -> None:
-            """ Initialise member variables to default values."""
+            """Initialise member variables to default values."""
             self._n_sequences = self.DEFAULT_N_SEQUENCES
             self._n_symbols = self.DEFAULT_N_SYMBOLS
             self._n_iterations_c = self.DEFAULT_N_ITERATIONS_C
@@ -127,7 +127,7 @@ class Config:
         self._validate()
 
     def _set_defaults(self) -> None:
-        """ Initialise member variables to default values."""
+        """Initialise member variables to default values."""
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
 
@@ -146,24 +146,37 @@ class Config:
                 if (not isinstance(self._input_file, str)) or (
                     not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
                 ):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "input_file", "binary file")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "input_file", "binary file"
+                    )
 
             if "test_nist" in conf["global"]:
                 self._nist_test = conf["global"]["test_nist"]
                 if not isinstance(self._nist_test, bool):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "test_nist", "bool")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "test_nist", "bool"
+                    )
 
             if "stat_analysis" in conf["global"]:
                 self._statistical_analysis = conf["global"]["stat_analysis"]
                 if not isinstance(self._statistical_analysis, bool):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "stat_analysis", "bool")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "stat_analysis", "bool"
+                    )
 
         # nist_test section
         if "nist_test" in conf:
             if "selected_tests" in conf["nist_test"]:
                 self.nist._selected_tests = conf["nist_test"]["selected_tests"]
-                if (not isinstance(self.nist._selected_tests, list)) or (not all(isinstance(i, int) for i in self.nist._selected_tests)):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "selected_tests", "list of integers")
+                if (not isinstance(self.nist._selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in self.nist._selected_tests)
+                ):
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "selected_tests",
+                        "list of integers",
+                    )
 
             if "n_symbols" in conf["nist_test"]:
                 self.nist._n_symbols = conf["nist_test"]["n_symbols"]
@@ -173,7 +186,9 @@ class Config:
             if "n_sequences" in conf["nist_test"]:
                 self.nist._n_sequences = conf["nist_test"]["n_sequences"]
                 if not isinstance(self.nist._n_sequences, int):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int"
+                    )
 
             if "shuffle" in conf["nist_test"]:
                 self.nist._shuffle = conf["nist_test"]["shuffle"]
@@ -183,7 +198,9 @@ class Config:
             if "first_seq" in conf["nist_test"]:
                 self.nist._first_seq = conf["nist_test"]["first_seq"]
                 if not isinstance(self.nist._first_seq, bool):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "first_seq", "bool")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "first_seq", "bool"
+                    )
 
             if "plot" in conf["nist_test"]:
                 self.nist._plot = conf["nist_test"]["plot"]
@@ -192,15 +209,21 @@ class Config:
 
             if "p" in conf["nist_test"]:
                 self.nist._pvalues = conf["nist_test"]["p"]
-                if (not isinstance(self.nist._pvalues, list)) or (not all(isinstance(i, int) for i in self.nist._pvalues)):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "p", "list of integers")
+                if (not isinstance(self.nist._pvalues, list)) or (
+                    not all(isinstance(i, int) for i in self.nist._pvalues)
+                ):
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "p", "list of integers"
+                    )
 
         # statistical_analysis section
         if "statistical_analysis" in conf:
             if "n_sequences" in conf["statistical_analysis"]:
                 self.stat._n_sequences = conf["statistical_analysis"]["n_sequences"]
                 if not isinstance(self.stat._n_sequences, int):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int"
+                    )
 
             if "n_symbols" in conf["statistical_analysis"]:
                 self.stat._n_symbols = conf["statistical_analysis"]["n_symbols"]
@@ -210,12 +233,19 @@ class Config:
             if "n_iterations_c" in conf["statistical_analysis"]:
                 self.stat._n_iterations_c = conf["statistical_analysis"]["n_iterations_c"]
                 if not isinstance(self.stat.n_iterations_c, int):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_iterations_c", "int")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_iterations_c", "int"
+                    )
 
             if "distribution_test_index" in conf["statistical_analysis"]:
                 self.stat._distribution_test_index = conf["statistical_analysis"]["distribution_test_index"]
                 if not isinstance(self.stat._distribution_test_index, int):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "distribution_test_index", "int")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "distribution_test_index",
+                        "int",
+                    )
 
             if "shuffle" in conf["statistical_analysis"]:
                 self.stat._shuffle = conf["statistical_analysis"]["shuffle"]
@@ -230,10 +260,12 @@ class Config:
             if "ref_numbers" in conf["statistical_analysis"]:
                 self.stat._ref_numbers = conf["statistical_analysis"]["ref_numbers"]
                 if not isinstance(self.stat._ref_numbers, list):
-                    logging.error("%s: invalid configuration parameter %s (expected %s)", filename, "ref_numbers", "list")
+                    logging.error(
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "ref_numbers", "list"
+                    )
 
     def _parse_args(self, args: argparse.Namespace) -> None:
-        """ Parse the command-line arguments.
+        """Parse the command-line arguments.
 
         Args: args (argparse.Namespace): the list of arguments.
         """
@@ -324,7 +356,9 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "stat_n_iter_c" ({self.stat._n_iterations_c})')
 
         if (not self.stat._distribution_test_index) or (not isinstance(self.stat._distribution_test_index, int)):
-            raise ValueError(f'Invalid configuration parameter: "distr_test_idx" ({self.stat._distribution_test_index})')
+            raise ValueError(
+                f'Invalid configuration parameter: "distr_test_idx" ({self.stat._distribution_test_index})'
+            )
 
         if not isinstance(self.stat._shuffle, bool):
             raise ValueError(f'Invalid configuration parameter: "shuffle" ({self.stat._shuffle})')
@@ -386,7 +420,7 @@ def init_config_data(args):
 
 
 def update_config_data(args: argparse.Namespace) -> None:
-    """ Update the configuration dictionary with the user-defined args.
+    """Update the configuration dictionary with the user-defined args.
 
     Args:
         args (argparse.Namespace): the namespace containing the parsed args.
@@ -436,15 +470,21 @@ def file_info():
     size = f.tell()
     logging.debug("FILE INFO")
     logging.debug("Size of file is: %s bytes", size)
-    logging.debug("Number of symbols per sequence for counters analysis: %s", config_data['statistical_analysis']['n_symbols'])
-    logging.debug("Number of sequences wanted for counters analysis: %s", config_data['statistical_analysis']['n_sequences'])
+    logging.debug(
+        "Number of symbols per sequence for counters analysis: %s", config_data["statistical_analysis"]["n_symbols"]
+    )
+    logging.debug(
+        "Number of sequences wanted for counters analysis: %s", config_data["statistical_analysis"]["n_sequences"]
+    )
     # total number of symbols in the file
     max_symbols = size * 2
-    max_sequences = max_symbols / config_data['statistical_analysis']['n_symbols']
+    max_sequences = max_symbols / config_data["statistical_analysis"]["n_symbols"]
     logging.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
-    tot_seqs = config_data['statistical_analysis']['n_iterations_c'] * config_data['statistical_analysis']['n_sequences']
+    tot_seqs = (
+        config_data["statistical_analysis"]["n_iterations_c"] * config_data["statistical_analysis"]["n_sequences"]
+    )
     logging.debug("Total sequences necessary = %s", tot_seqs)
-    if not config_data['statistical_analysis']['shuffle']:
+    if not config_data["statistical_analysis"]["shuffle"]:
         if tot_seqs <= max_sequences:
             logging.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
         else:
@@ -458,11 +498,11 @@ def file_info():
 
 def config_info():
     logging.debug("CONFIG INFO - NIST")
-    logging.debug("Number of symbols per sequence = %s", config_data['nist_test']['n_symbols'])
-    logging.debug("Number of shuffled sequences = %s", config_data['nist_test']['n_sequences'])
-    ts = [permutation_tests.tests[i].name for i in config_data['global']['selected_tests']]
+    logging.debug("Number of symbols per sequence = %s", config_data["nist_test"]["n_symbols"])
+    logging.debug("Number of shuffled sequences = %s", config_data["nist_test"]["n_sequences"])
+    ts = [permutation_tests.tests[i].name for i in config_data["global"]["selected_tests"]]
     logging.debug("Tests for entropy validation selected: %s", ts)
-    if config_data['nist_test']['first_seq']:
+    if config_data["nist_test"]["first_seq"]:
         logging.debug("Reference sequence read from the beginning of the file")
     else:
         logging.debug("Reference sequence read from the end of the file")
@@ -472,11 +512,14 @@ def config_info():
         logging.debug("p parameter used: user value")
 
     logging.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
-    logging.debug("Number of symbols per sequence = %s", config_data['statistical_analysis']['n_symbols'])
-    logging.debug("Number of shuffled sequences = %s", config_data['statistical_analysis']['n_sequences'])
-    logging.debug("Number of iterations for counter: %s", config_data['statistical_analysis']['n_iterations_c'])
-    logging.debug("Test selected for counter distribution analysis: %s", permutation_tests.tests[config_data['statistical_analysis']['distribution_test_index']].name)
-    comp = [permutation_tests.tests[i].name for i in config_data['statistical_analysis']['ref_numbers']]
+    logging.debug("Number of symbols per sequence = %s", config_data["statistical_analysis"]["n_symbols"])
+    logging.debug("Number of shuffled sequences = %s", config_data["statistical_analysis"]["n_sequences"])
+    logging.debug("Number of iterations for counter: %s", config_data["statistical_analysis"]["n_iterations_c"])
+    logging.debug(
+        "Test selected for counter distribution analysis: %s",
+        permutation_tests.tests[config_data["statistical_analysis"]["distribution_test_index"]].name,
+    )
+    comp = [permutation_tests.tests[i].name for i in config_data["statistical_analysis"]["ref_numbers"]]
     logging.debug("Tests selected test for shuffle/random comparison: %s", comp)
-    logging.debug("p parameter used: user value: %s", config_data['statistical_analysis']['p_value'])
+    logging.debug("p parameter used: user value: %s", config_data["statistical_analysis"]["p_value"])
     logging.debug("----------------------------------------------------------------\n \nMAIN")
