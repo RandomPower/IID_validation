@@ -465,7 +465,7 @@ else:
 
 
 def file_info():
-    f = open(config_data["global"]["input_file"], "r+b")
+    f = open(config_data["global"]["input_file"], "rb")
     f.seek(0, 2)
     size = f.tell()
     logging.debug("FILE INFO")

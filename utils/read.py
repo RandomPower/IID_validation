@@ -19,7 +19,7 @@ def read_file(file, n_symbols):
     list of int
         sequence of symbols
     """
-    with open(file, "r+b") as f:
+    with open(file, "rb") as f:
         tot_bytes = int(n_symbols / 2)
         if utils.config.config_data["nist_test"]["bool_first_seq"]:
             my_bytes = f.read(tot_bytes)
