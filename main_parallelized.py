@@ -47,7 +47,8 @@ def calculate_counters(Tx, Ti):
 
 
 def iid_result(C0, C1, Tx):
-    """Determine whether the sequence is iid
+    """Determine whether the sequence is iid by checking that the value of the reference result Tx is between 0.05% and
+    99.95% of the results Ti for the rest of the population of n_sequences sequences.
 
     Parameters
     ----------
@@ -65,7 +66,9 @@ def iid_result(C0, C1, Tx):
     """
     IID = True
     for b in range(len(Tx)):
-        if (C0[b] + C1[b] <= 5) or (C0[b] >= 9995):
+        if (C0[b] + C1[b] <= 0.0005 * utils.config.conf.nist.n_sequences) or (
+            C0[b] >= 0.9995 * utils.config.conf.nist.n_sequences
+        ):
             IID = False
             break
     return IID
