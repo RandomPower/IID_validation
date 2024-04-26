@@ -3,7 +3,7 @@ import utils.config
 import utils.useful_functions
 
 
-def shuffle_from_file(ind, n_symb, n_seq):
+def shuffle_from_file(file, ind, n_symb, n_seq):
     """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process.
 
@@ -21,7 +21,7 @@ def shuffle_from_file(ind, n_symb, n_seq):
     list of int
         sequences of lists of symbols
     """
-    with open(utils.config.config_data["global"]["input_file"], "rb") as f:
+    with open(file, "rb") as f:
         sequences = []
         for z in range(n_seq):
             # Move to the current offset
@@ -41,14 +41,14 @@ def shuffle_from_file(ind, n_symb, n_seq):
             sequences.append(S)
 
             # Increment the offset by step-byte
-            ind += utils.config.config_data["nist_test"]["n_symbols"] / 2
+            ind += n_symb / 2
 
             # TO DO: exception
 
         return sequences
 
 
-def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
+def shuffle_from_file_Norm(file, index, n_symb, n_seq, test: int, conf: utils.config.Config):
     """Version of shuffle_from_file function for normalized Tj.
     The sequence it reads has the same result T on a given test as the previous
     sequence (T(j-1)), it discards it and passes to the next sequence. This is because for Tj normalized we want the
@@ -61,6 +61,8 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
 
     Parameters
     ----------
+    file : str
+        the input binary file
     index : int
         position where to read in the file
     n_symb : int
@@ -75,7 +77,7 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
     tuple of (list of lists of int, list of int)
         sequences of lists of symbols, Ti test values calculated on the shuffled sequences
     """
-    with open(utils.config.config_data["global"]["input_file"], "rb") as f:
+    with open(file, "rb") as f:
         sequences = []
         Ti = []
 
@@ -89,10 +91,10 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
             S.append(symbol1)
             symbol2 = i & 0b00001111
             S.append(symbol2)
-        index += utils.config.config_data["nist_test"]["n_symbols"] / 2
+        index += n_symb / 2
 
         if test in [8, 9]:
-            t = permutation_tests.tests[test].run(S, utils.config.config_data["statistical_analysis"]["p_value_stat"])
+            t = permutation_tests.tests[test].run(S, conf.stat.p_value)
             Ti.append(t)
         else:
             t = permutation_tests.tests[test].run(S)
@@ -112,12 +114,10 @@ def shuffle_from_file_Norm(index, n_symb, n_seq, test: int):
                 symbol2 = i & 0b00001111
                 S.append(symbol2)
 
-            index += utils.config.config_data["nist_test"]["n_symbols"] / 2
+            index += n_symb / 2
 
             if test in [8, 9]:
-                t = permutation_tests.tests[test].run(
-                    S, utils.config.config_data["statistical_analysis"]["p_value_stat"]
-                )
+                t = permutation_tests.tests[test].run(S, conf.stat.p_value)
             else:
                 t = permutation_tests.tests[test].run(S)
 

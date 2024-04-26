@@ -300,8 +300,8 @@ class Config:
             self.stat._n_iterations_c = args.stat_n_iter_c
         if args.distr_test_idx:
             self.stat._distribution_test_index = args.distr_test_idx
-        if args.shuffle:
-            self.stat._shuffle = args.shuffle
+        if args.stat_shuffle:
+            self.stat._shuffle = args.stat_shuffle
         if args.stat_pvalue:
             self.stat._p_value = args.stat_pvalue
         if args.ref_nums:
@@ -419,107 +419,55 @@ def init_config_data(args):
     conf = Config(args)
 
 
-def update_config_data(args: argparse.Namespace) -> None:
-    """Update the configuration dictionary with the user-defined args.
-
-    Args:
-        args (argparse.Namespace): the namespace containing the parsed args.
-    """
-    # Mandatory arguments
-    config_data["global"]["input_file"] = args.input_file
-    config_data["nist_test"]["n_symbols"] = args.n_symbols
-    config_data["nist_test"]["n_sequences"] = args.n_sequences
-    config_data["statistical_analysis"]["n_sequences"] = args.stat_n_sequences
-    config_data["statistical_analysis"]["n_symbols"] = args.stat_n_symbols
-    config_data["statistical_analysis"]["n_iterations_c"] = args.stat_n_iter_c
-    config_data["statistical_analysis"]["distribution_test_index"] = args.distr_test_idx
-    config_data["statistical_analysis"]["p_value"] = args.stat_pvalue
-
-    # Optional arguments
-    if args.test_nist is not None:
-        config_data["global"]["test_nist"] = args.test_nist
-    if args.stat_analysis is not None:
-        config_data["global"]["stat_analysis"] = args.stat_analysis
-    if args.shuffle is not None:
-        config_data["nist_test"]["shuffle"] = args.shuffle
-    if args.first_seq is not None:
-        config_data["nist_test"]["first_seq"] = args.first_seq
-    if args.pvalue is not None:
-        config_data["nist_test"]["bool_pvalue"] = args.pvalue
-    if args.plot is not None:
-        config_data["nist_test"]["plot"] = args.plot
-    if args.shuffle is not None:
-        config_data["statistical_analysis"]["shuffle"] = args.shuffle
-    if args.ref_nums is not None:
-        config_data["statistical_analysis"]["ref_numbers"] = args.ref_nums
-
-
-config_data = parse_config_file("conf.toml")
-
-if config_data["nist_test"]["bool_pvalue"]:
-    # NIST values
-    p = [1, 2, 8, 16, 32]
-else:
-    # User sets preferred value
-    p = [2]
-
-
 def file_info():
-    f = open(config_data["global"]["input_file"], "rb")
+    f = open(conf.input_file, "rb")
     f.seek(0, 2)
     size = f.tell()
     logging.debug("FILE INFO")
     logging.debug("Size of file is: %s bytes", size)
-    logging.debug(
-        "Number of symbols per sequence for counters analysis: %s", config_data["statistical_analysis"]["n_symbols"]
-    )
-    logging.debug(
-        "Number of sequences wanted for counters analysis: %s", config_data["statistical_analysis"]["n_sequences"]
-    )
+    logging.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
+    logging.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_sequences)
     # total number of symbols in the file
     max_symbols = size * 2
-    max_sequences = max_symbols / config_data["statistical_analysis"]["n_symbols"]
+    max_sequences = max_symbols / conf.stat.n_symbols
     logging.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
-    tot_seqs = (
-        config_data["statistical_analysis"]["n_iterations_c"] * config_data["statistical_analysis"]["n_sequences"]
-    )
+    tot_seqs = conf.stat.n_iterations_c * conf.stat.n_sequences
     logging.debug("Total sequences necessary = %s", tot_seqs)
-    if not config_data["statistical_analysis"]["shuffle"]:
+    if not conf.stat.shuffle:
         if tot_seqs <= max_sequences:
             logging.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
         else:
             logging.error("SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
             raise Exception(
-                f"Insufficient sequences (provided {max_sequences}, required {tot_seqs})"
-                + f" in {config_data['global']['input_file']}"
+                f"Insufficient sequences (provided {max_sequences}, required {tot_seqs}) in {conf.input_file}"
             )
     logging.debug("----------------------------------------------------------------\n")
 
 
 def config_info():
     logging.debug("CONFIG INFO - NIST")
-    logging.debug("Number of symbols per sequence = %s", config_data["nist_test"]["n_symbols"])
-    logging.debug("Number of shuffled sequences = %s", config_data["nist_test"]["n_sequences"])
-    ts = [permutation_tests.tests[i].name for i in config_data["global"]["selected_tests"]]
+    logging.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
+    logging.debug("Number of shuffled sequences = %s", conf.nist.n_sequences)
+    ts = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
     logging.debug("Tests for entropy validation selected: %s", ts)
-    if config_data["nist_test"]["first_seq"]:
+    if conf.nist.first_seq:
         logging.debug("Reference sequence read from the beginning of the file")
     else:
         logging.debug("Reference sequence read from the end of the file")
-    if p == [1, 2, 8, 16, 32]:
+    if conf.nist.pvalues == conf.nist.DEFAULT_PVALUES:
         logging.debug("p parameter used: NIST")
     else:
         logging.debug("p parameter used: user value")
 
     logging.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
-    logging.debug("Number of symbols per sequence = %s", config_data["statistical_analysis"]["n_symbols"])
-    logging.debug("Number of shuffled sequences = %s", config_data["statistical_analysis"]["n_sequences"])
-    logging.debug("Number of iterations for counter: %s", config_data["statistical_analysis"]["n_iterations_c"])
+    logging.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
+    logging.debug("Number of shuffled sequences = %s", conf.stat.n_sequences)
+    logging.debug("Number of iterations for counter: %s", conf.stat.n_iterations_c)
     logging.debug(
         "Test selected for counter distribution analysis: %s",
-        permutation_tests.tests[config_data["statistical_analysis"]["distribution_test_index"]].name,
+        permutation_tests.tests[conf.stat.distribution_test_index].name,
     )
-    comp = [permutation_tests.tests[i].name for i in config_data["statistical_analysis"]["ref_numbers"]]
+    comp = [permutation_tests.tests[i].name for i in conf.stat.ref_numbers]
     logging.debug("Tests selected test for shuffle/random comparison: %s", comp)
-    logging.debug("p parameter used: user value: %s", config_data["statistical_analysis"]["p_value"])
+    logging.debug("p parameter used: user value: %s", conf.stat.p_value)
     logging.debug("----------------------------------------------------------------\n \nMAIN")

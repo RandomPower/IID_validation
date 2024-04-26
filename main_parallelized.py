@@ -37,7 +37,7 @@ def calculate_counters(Tx, Ti):
     C1 = [0 for k in range(len(Tx))]
 
     for u in range(len(Tx)):
-        for t in range(utils.config.config_data["nist_test"]["n_sequences"]):
+        for t in range(utils.config.conf.nist.n_sequences):
             if Tx[u] > Ti[t][u]:
                 C0[u] += 1
             if Tx[u] == Ti[t][u]:
@@ -87,9 +87,14 @@ def FY_test_mode_parallel(seq):
     Ti = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(utils.config.config_data["nist_test"]["n_sequences"]):
+        for iteration in range(utils.config.conf.nist.n_sequences):
             s_shuffled = permutation_tests.FY_shuffle(seq.copy())
-            future = executor.submit(permutation_tests.run_tests, s_shuffled, utils.config.p)
+            future = executor.submit(
+                permutation_tests.run_tests,
+                s_shuffled,
+                utils.config.conf.nist.pvalues,
+                utils.config.conf.nist.selected_tests,
+            )
             futures.append(future)
 
         completed = 0
@@ -129,15 +134,15 @@ def iid_plots(Tx, Ti):
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
-        if utils.config.p == [1, 2, 8, 16, 32]:
+        if utils.config.conf.nist.pvalues == utils.config.conf.nist.DEFAULT_PVALUES:
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[8].name} (p={utils.config.p[p_index]})"
+                test_name = f"{permutation_tests.tests[8].name} (p={utils.config.conf.nist.pvalues[p_index]})"
             # Handle the special case for test 9 ('covariance')
             elif 13 <= t <= 17:
                 p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[9].name} (p={utils.config.p[p_index]})"
+                test_name = f"{permutation_tests.tests[9].name} (p={utils.config.conf.nist.pvalues[p_index]})"
             # For the values that should correspond to test 10 ('compression')
             elif t == 18:
                 test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
@@ -146,7 +151,7 @@ def iid_plots(Tx, Ti):
                 test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
-        elif len(utils.config.p) == 1:
+        elif len(utils.config.conf.nist.pvalues) == 1:
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_hist_run)
             utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
         else:
@@ -157,13 +162,13 @@ def iid_test_function():
     logging.debug("NIST TEST")
     logging.debug("Process started")
     S = utils.read.read_file(
-        file=utils.config.config_data["global"]["input_file"],
-        n_symbols=utils.config.config_data["nist_test"]["n_symbols"],
+        file=utils.config.conf.input_file,
+        n_symbols=utils.config.conf.nist.n_symbols,
     )
     logging.debug("Sequence calculated: S")
 
     logging.debug("Calculating for each test the reference statistic: Tx")
-    Tx = permutation_tests.run_tests(S, utils.config.p)
+    Tx = permutation_tests.run_tests(S, utils.config.conf.nist.pvalues, utils.config.conf.nist.selected_tests)
     logging.debug("Reference statistics calculated!")
 
     logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
@@ -183,25 +188,25 @@ def iid_test_function():
     utils.useful_functions.save_IID_validation(C0, C1, IID_assumption, ti)
 
     # plots
-    if utils.config.config_data["nist_test"]["plot"]:
+    if utils.config.conf.nist.plot:
         iid_plots(Tx, Ti)
 
 
 def statistical_analysis_function():
     logging.debug("----------------------------------------------------------------\n \n")
-    distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+    distribution_test_index = utils.config.conf.stat.distribution_test_index
     logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[distribution_test_index].name)
     S = utils.read.read_file(
-        file=utils.config.config_data["global"]["input_file"],
-        n_symbols=utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
+        file=utils.config.conf.input_file,
+        n_symbols=utils.config.conf.stat.n_symbols,
     )
     logging.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
-            executor.submit(statistical_analysis.FY_Tx, S),
-            executor.submit(statistical_analysis.FY_TjNorm, S),
-            executor.submit(statistical_analysis.Random_Tx, S),
-            executor.submit(statistical_analysis.Random_TjNorm, S, distribution_test_index),
+            executor.submit(statistical_analysis.FY_Tx, S, utils.config.conf),
+            executor.submit(statistical_analysis.FY_TjNorm, S, utils.config.conf),
+            executor.submit(statistical_analysis.Random_Tx, S, utils.config.conf),
+            executor.submit(statistical_analysis.Random_TjNorm, S, utils.config.conf),
         ]
         # Wait for all tasks to complete
         for task in tasks:
@@ -215,15 +220,17 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Global
-    global_args = parser.add_argument_group("global", "global settings")
+    global_args = parser.add_argument_group("[global]", "global settings")
     global_args.add_argument("-c", "--config", type=str, help="Configuration file")
     global_args.add_argument("-i", "--input_file", type=str, help="Random bit file.")
     global_args.add_argument("-t", "--test_nist", action="store_true", help="IID validation test.")
     global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
 
     # Nist test
-    nist_args = parser.add_argument_group("nist test", "nist IID test suite configuration")
-    nist_args.add_argument("--nist_selected_tests", nargs="+", type=int, help="Selection of test numbers to execute.")
+    nist_args = parser.add_argument_group("[nist_test]", "nist IID test suite configuration")
+    nist_args.add_argument(
+        "--nist_selected_tests", metavar="INDEX", nargs="+", type=int, help="Selection of test numbers to execute."
+    )
     nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the random-bit sequence.")
     nist_args.add_argument(
         "--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out."
@@ -233,10 +240,10 @@ def main():
         "--first_seq", action="store_true", help="Read the sequence from the start of the input file."
     )
     nist_args.add_argument("--plot", action="store_true", help="See plots.")
-    nist_args.add_argument("--pvalues", nargs="+", type=int, help="User-defined p-value.")
+    nist_args.add_argument("--pvalues", metavar="P", nargs="+", type=int, help="User-defined p-value.")
 
     # Statistical analysis
-    stat_args = parser.add_argument_group("statistical analysis", "statistical analysis options")
+    stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
     stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
     stat_args.add_argument(
         "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
@@ -244,11 +251,17 @@ def main():
     stat_args.add_argument(
         "--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis."
     )
-    stat_args.add_argument("--distr_test_idx", type=int, help="Test to execute.")
-    stat_args.add_argument("--shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
-    stat_args.add_argument("--stat_pvalue", type=int, help="User-defined p-value for the statistical analysis.")
+    stat_args.add_argument("--distr_test_idx", metavar="INDEX", type=int, help="Test to execute.")
+    stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
     stat_args.add_argument(
-        "--ref_nums", nargs="+", type=int, help="Number of tests to consider for comparing the stat results."
+        "--stat_pvalue", metavar="P", type=int, help="User-defined p-value for the statistical analysis."
+    )
+    stat_args.add_argument(
+        "--ref_nums",
+        metavar="INDEX",
+        nargs="+",
+        type=int,
+        help="Tests to consider for comparing the stat results.",
     )
 
     args = parser.parse_args()
@@ -266,10 +279,10 @@ def main():
 
     utils.config.file_info()
     utils.config.config_info()
-    if utils.config.config_data["global"]["test_nist"]:
+    if utils.config.conf.nist_test:
         iid_test_function()
 
-    if utils.config.config_data["global"]["stat_analysis"]:
+    if utils.config.conf.statistical_analysis:
         statistical_analysis_function()
 
 
