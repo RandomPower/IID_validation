@@ -13,7 +13,7 @@ import utils.shuffles
 import utils.useful_functions
 
 
-def counters_FYShuffle_Tx(S, test):
+def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. The given test is performed on the first sequence to obtain the reference value:
     C0 is incremented if the result of the test T computed on a sequence is bigger than that it,
@@ -25,6 +25,8 @@ def counters_FYShuffle_Tx(S, test):
         sequence of sample values
     test : int
         index of the test used to produce the counters
+    conf : Config
+        application configuration parameters
 
     Returns
     -------
@@ -35,23 +37,19 @@ def counters_FYShuffle_Tx(S, test):
     counters_1 = []
     # Calculate reference statistics
     if test in [8, 9]:
-        Tx = permutation_tests.tests[test].run(S, utils.config.config_data["statistical_analysis"]["p_value_stat"])
+        Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
     else:
         Tx = permutation_tests.tests[test].run(S)
 
     # S_shuffled will move by a P_pointer for every n_sequences
-    for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
+    for i in tqdm(range(conf.stat.n_iterations_c)):
         C0 = 0
         C1 = 0
         Ti = []
-        for k in range(utils.config.config_data["statistical_analysis"]["n_sequences_stat"]):
+        for k in range(conf.stat.n_sequences):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
             if test in [8, 9]:
-                Ti.append(
-                    permutation_tests.tests[test].run(
-                        s_shuffled, utils.config.config_data["statistical_analysis"]["p_value_stat"]
-                    )
-                )
+                Ti.append(permutation_tests.tests[test].run(s_shuffled, conf.stat.p_value))
             else:
                 Ti.append(permutation_tests.tests[test].run(s_shuffled))
 
@@ -69,7 +67,7 @@ def counters_FYShuffle_Tx(S, test):
     return counters_0, counters_1
 
 
-def FY_Tx(S):
+def FY_Tx(S, conf: utils.config.Config):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
@@ -77,23 +75,24 @@ def FY_Tx(S):
     ----------
     S : list of int
         sequence of sample values
+    conf : Config
+        application configuration parameters
     """
     logging.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
-    distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
     f = os.path.abspath(
         os.path.join(
             "results",
             "counters_distribution",
             "FYShuffleTx",
-            f"fyShuffleTx_{permutation_tests.tests[distribution_test_index].name}.csv",
+            f"fyShuffleTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FYShuffle_Tx(S, distribution_test_index)
+    C0, C1 = counters_FYShuffle_Tx(S, conf.stat.distribution_test_index, conf)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f, conf)
 
     # Plot results
     # Define directory path
@@ -107,14 +106,15 @@ def FY_Tx(S):
 
     utils.plot.counters_distribution_Tx(
         C0,
-        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        conf.stat.n_sequences,
+        conf.stat.n_iterations_c,
+        conf.stat.distribution_test_index,
         "FY_Tx",
         dir_plot_run,
     )
 
 
-def counters_Random_Tx(S, test):
+def counters_Random_Tx(S, test, conf: utils.config.Config):
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
@@ -125,37 +125,32 @@ def counters_Random_Tx(S, test):
         sequence of sample values
     test : int
         index of the test used to produce the counters
+    conf : Config
+        application configuration parameters
 
     Returns
     -------
     list of int, list of int
         counter 0 and counter 1 lists of values
     """
-
     if test in [8, 9]:
-        Tx = permutation_tests.tests[test].run(S, utils.config.config_data["statistical_analysis"]["p_value_stat"])
+        Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
     else:
         Tx = permutation_tests.tests[test].run(S)
     counters_0 = []
     counters_1 = []
-    index = utils.config.config_data["statistical_analysis"]["n_symbols_stat"] / 2
+    index = conf.stat.n_symbols / 2
 
-    for i in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
+    for i in tqdm(range(conf.stat.n_iterations_c)):
         C0 = 0
         C1 = 0
         S_shuffled = utils.shuffles.shuffle_from_file(
-            index,
-            utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
-            utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
+            conf.input_file, index, conf.stat.n_symbols, conf.stat.n_sequences
         )
         Ti = []
         for k in S_shuffled:
             if test in [8, 9]:
-                Ti.append(
-                    permutation_tests.tests[test].run(
-                        k, utils.config.config_data["statistical_analysis"]["p_value_stat"]
-                    )
-                )
+                Ti.append(permutation_tests.tests[test].run(k, conf.stat.p_value))
             else:
                 Ti.append(permutation_tests.tests[test].run(k))
 
@@ -164,9 +159,7 @@ def counters_Random_Tx(S, test):
                 C0 += 1
             if Tx == Ti[z]:
                 C1 += 1
-        index += utils.config.config_data["statistical_analysis"]["n_sequences_stat"] * (
-            utils.config.config_data["statistical_analysis"]["n_symbols_stat"] / 2
-        )
+        index += conf.stat.n_sequences * (conf.stat.n_symbols / 2)
 
         counters_0.append(C0)
         counters_1.append(C1)
@@ -177,7 +170,7 @@ def counters_Random_Tx(S, test):
     return counters_0, counters_1
 
 
-def Random_Tx(S):
+def Random_Tx(S, conf: utils.config.Config):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
@@ -185,23 +178,24 @@ def Random_Tx(S):
     ----------
     S : list of int
         sequence of sample values
+    conf : Config
+        application configuration parameters
     """
     logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
-    distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
     f = os.path.abspath(
         os.path.join(
             "results",
             "counters_distribution",
             "RandomTx",
-            f"RandomTx_{permutation_tests.tests[distribution_test_index].name}.csv",
+            f"RandomTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_Random_Tx(S, distribution_test_index)
+    C0, C1 = counters_Random_Tx(S, conf.stat.distribution_test_index, conf)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f, conf)
 
     # Plot results
     # Define directory path
@@ -215,14 +209,15 @@ def Random_Tx(S):
 
     utils.plot.counters_distribution_Tx(
         C0,
-        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        conf.stat.n_sequences,
+        conf.stat.n_iterations_c,
+        conf.stat.distribution_test_index,
         "Random_Tx",
         dir_plot_run,
     )
 
 
-def counters_FY_TjNorm(S, test):
+def counters_FY_TjNorm(S, test, conf: utils.config.Config):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if
     the results of the test are equal the second sequence is ignored.
@@ -235,6 +230,8 @@ def counters_FY_TjNorm(S, test):
         sequence of sample values
     test : int
         index of the test used to produce the counters
+    conf : Config
+        application configuration parameters
 
     Returns
     -------
@@ -243,26 +240,20 @@ def counters_FY_TjNorm(S, test):
     """
     counters_0 = []
     counters_1 = []
-    for k in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
+    for k in tqdm(range(conf.stat.n_iterations_c)):
         Ti = []
         seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
         if test in [8, 9]:
-            Ti.append(
-                permutation_tests.tests[test].run(
-                    seq, utils.config.config_data["statistical_analysis"]["p_value_stat"]
-                )
-            )
+            Ti.append(permutation_tests.tests[test].run(seq, conf.stat.p_value))
         else:
             Ti.append(permutation_tests.tests[test].run(seq))
         j = 1
-        while j < utils.config.config_data["statistical_analysis"]["n_sequences_stat"]:
+        while j < conf.stat.n_sequences:
             seq = permutation_tests.FY_shuffle(S.copy())
             if test in [8, 9]:
-                t = permutation_tests.tests[test].run(
-                    seq, utils.config.config_data["statistical_analysis"]["p_value_stat"]
-                )
+                t = permutation_tests.tests[test].run(seq, conf.stat.p_value)
             else:
                 t = permutation_tests.tests[test].run(seq)
             if t == Ti[j - 1]:
@@ -286,7 +277,7 @@ def counters_FY_TjNorm(S, test):
     return counters_0, counters_1
 
 
-def FY_TjNorm(S):
+def FY_TjNorm(S, conf: utils.config.Config):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
@@ -294,9 +285,11 @@ def FY_TjNorm(S):
     ----------
     S : list of int
         sequence of sample values
+    conf : Config
+        application configuration parameters
     """
     logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
-    distribution_test_index = utils.config.config_data["statistical_analysis"]["distribution_test_index"]
+    distribution_test_index = conf.stat.distribution_test_index
     f = os.path.abspath(
         os.path.join(
             "results",
@@ -306,11 +299,11 @@ def FY_TjNorm(S):
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FY_TjNorm(S, distribution_test_index)
+    C0, C1 = counters_FY_TjNorm(S, distribution_test_index, conf)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f, conf)
 
     # Plot results
     # Define directory path
@@ -324,14 +317,15 @@ def FY_TjNorm(S):
 
     utils.plot.counters_distribution_Tj(
         C0,
-        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        conf.stat.n_sequences,
+        conf.stat.n_iterations_c,
+        conf.stat.distribution_test_index,
         "FY_TjNorm",
         dir_plot_run,
     )
 
 
-def counters_random_TjNorm():
+def counters_random_TjNorm(conf: utils.config.Config):
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence;
     if the results of the test are equal the second sequence is ignored.
@@ -341,19 +335,23 @@ def counters_random_TjNorm():
     -------
     list of int, list of int
         counter 0 and counter 1 lists of values
+    conf : Config
+        application configuration parameters
     """
     counters_0 = []
     counters_1 = []
     index = 0
 
-    for k in tqdm(range(utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"])):
+    for k in tqdm(range(conf.stat.n_iterations_c)):
         C0 = 0
         C1 = 0
         s_sequences, Ti = utils.shuffles.shuffle_from_file_Norm(
+            conf.input_file,
             index,
-            utils.config.config_data["statistical_analysis"]["n_symbols_stat"],
-            utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-            utils.config.config_data["statistical_analysis"]["distribution_test_index"],
+            conf.stat.n_symbols,
+            conf.stat.n_sequences,
+            conf.stat.distribution_test_index,
+            conf,
         )
 
         for z in range(0, len(Ti) - 1, 2):
@@ -364,11 +362,7 @@ def counters_random_TjNorm():
 
         counters_0.append(C0)
         counters_1.append(C1)
-        index += (
-            utils.config.config_data["statistical_analysis"]["n_sequences_stat"]
-            * utils.config.config_data["statistical_analysis"]["n_symbols_stat"]
-            / 2
-        )
+        index += conf.stat.n_sequences * conf.stat.n_symbols / 2
 
     logging.debug("Random_TjNorm counter_0: %s", counters_0)
     logging.debug("Random_TjNorm counter_1: %s", counters_1)
@@ -376,7 +370,7 @@ def counters_random_TjNorm():
     return counters_0, counters_1
 
 
-def Random_TjNorm(S, test):
+def Random_TjNorm(S, conf: utils.config.Config):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
@@ -384,8 +378,8 @@ def Random_TjNorm(S, test):
     ----------
     S : list of int
         sequence of sample values
-    test : int
-        index of the test used to produce the counters
+    conf : Config
+        application configuration parameters
     """
     logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = os.path.abspath(
@@ -393,15 +387,15 @@ def Random_TjNorm(S, test):
             "results",
             "counters_distribution",
             "RandomTjNorm",
-            f"randomTjNorm_{permutation_tests.tests[test].name}.csv",
+            f"randomTjNorm_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
         )
     )
     t = time.process_time()
-    C0, C1 = counters_random_TjNorm()
+    C0, C1 = counters_random_TjNorm(conf)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f)
+    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f, conf)
 
     # Plot results
     # Define directory path
@@ -414,8 +408,9 @@ def Random_TjNorm(S, test):
     os.makedirs(dir_plot_run, exist_ok=True)
     utils.plot.counters_distribution_Tj(
         C0,
-        utils.config.config_data["statistical_analysis"]["n_sequences_stat"],
-        utils.config.config_data["statistical_analysis"]["n_iterations_c_stat"],
+        conf.stat.n_sequences,
+        conf.stat.n_iterations_c,
+        conf.stat.distribution_test_index,
         "Random_TjNorm",
         dir_plot_run,
     )
@@ -500,7 +495,7 @@ def comparison_scatterplot():
     """Plots the comparison scatterplot between FY_shuffle counters and reading from file.
     The counters values are read from csv files.
     """
-    test_indexes = utils.config.config_data["statistical_analysis"]["ref_numbers"]
+    test_indexes = utils.config.conf.stat.ref_numbers
     test_names = [permutation_tests.tests[i].name for i in test_indexes]
 
     Cfy, Crand = get_data(test_indexes, False)

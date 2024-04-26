@@ -69,24 +69,24 @@ def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
     plot_dir_s : str
         directory where to save the plot
     """
-    x = [k for k in range(utils.config.config_data["nist_test"]["n_sequences"])]
+    x = [k for k in range(utils.config.conf.nist.n_sequences)]
 
     fig, ax = plt.subplots(figsize=(11, 7))
     ax.scatter(x, Ti, s=10)
     plt.xticks(
         np.arange(
             0,
-            utils.config.config_data["nist_test"]["n_sequences"],
-            utils.config.config_data["nist_test"]["n_sequences"] / 10,
+            utils.config.conf.nist.n_sequences,
+            utils.config.conf.nist.n_sequences / 10,
         )
     )
     plt.axhline(y=Tx, color="r", linestyle="-", label="axvline - full height")
     ax.text(Tx, 0.5, f"Tx={Tx}")
 
     my_text = (
-        rf"n_simbols={utils.config.config_data['nist_test']['n_symbols']}"
+        rf"n_simbols={utils.config.conf.nist.n_symbols}"
         + "\n"
-        + rf"n_iterations={utils.config.config_data['nist_test']['n_sequences']}"
+        + rf"n_iterations={utils.config.conf.nist.n_sequences}"
         + "\n"
         + rf"Tx={Tx}"
     )
@@ -171,9 +171,7 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy, plot_dir):
     fig, ax = plt.subplots()
     ax.errorbar(test, data_1, err_1, fmt="o", capsize=3, label="randomized sequences")
     ax.errorbar(test, data_2, err_2, fmt="o", capsize=3, label="shuffled FY sequences")
-    ax.axhline(
-        utils.config.config_data["statistical_analysis"]["n_sequences_stat"] / 4, color="red", linestyle="dashed"
-    )
+    ax.axhline(utils.config.conf.stat.n_sequences / 4, color="red", linestyle="dashed")
     plt.xlabel("Test")
     plt.ylabel("Values of the counter C0")
     ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
@@ -208,7 +206,7 @@ def binomial_function(n, v, p):
     return f
 
 
-def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
+def counters_distribution_Tx(c, n_seq, n_iter, test, t, plot_dir):
     """Plots a histogram of distribution of the counter C0 for a given test with the measured mean
     and standard deviation
 
@@ -220,6 +218,8 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
         number of sequences
     n_iter : int
         number of iterations
+    test : int
+        index of the executed permutation test
     t : str
         test executed
     plot_dir : str
@@ -269,18 +269,17 @@ def counters_distribution_Tx(c, n_seq, n_iter, t, plot_dir):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    test = permutation_tests.tests[utils.config.config_data["statistical_analysis"]["distribution_test_index"]]
-    ax.set_title(f"Distribution {t} of the counter for test {test.name}", size=14)
+    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[test].name}", size=14)
     plt.legend(loc="upper right")
 
-    plot_filename = f"{t}_{test.name}.pdf"
+    plot_filename = f"{t}_{permutation_tests.tests[test].name}.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
     plt.close()
 
 
-def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
+def counters_distribution_Tj(c, n_seq, n_iter, test, t, plot_dir):
     """Plots a histogram of distribution of the counter C0 for a given test adjusted for Tj normalized
 
     Parameters
@@ -291,6 +290,8 @@ def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
         number of sequences
     n_iter : int
         number of iterations
+    test : int
+        index of the executed permutation test
     t : str
         test executed
     plot_dir : str
@@ -354,11 +355,10 @@ def counters_distribution_Tj(c, n_seq, n_iter, t, plot_dir):
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    test = permutation_tests.tests[utils.config.config_data["statistical_analysis"]["distribution_test_index"]]
-    ax.set_title(f"Distribution {t} of the counter for test {test.name}", size=14)
+    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[test].name}", size=14)
     plt.legend()
 
-    plot_filename = f"{t}_{test.name}.pdf"
+    plot_filename = f"{t}_{permutation_tests.tests[test].name}.pdf"
     plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
