@@ -1,9 +1,7 @@
 import os
 
-import utils.config
 
-
-def read_file(file, n_symbols):
+def read_file(file: str, n_symbols: int, first_seq: bool):
     """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process
 
@@ -21,7 +19,7 @@ def read_file(file, n_symbols):
     """
     with open(file, "rb") as f:
         tot_bytes = int(n_symbols / 2)
-        if utils.config.conf.nist.first_seq:
+        if first_seq:
             my_bytes = f.read(tot_bytes)
         else:
             f.seek(-tot_bytes, os.SEEK_END)

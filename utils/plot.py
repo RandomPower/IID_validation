@@ -54,12 +54,14 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
     plt.close()
 
 
-def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
+def scatterplot_TxTi(conf: utils.config.Config, Tx, Ti, t: str, plot_dir_s: str):
     """Plots tests values in a scatter plot with one dot for each observation of every shuffled sequence
     and a red line for the reference Tx value
 
     Parameters
     ----------
+    conf : Config
+        application configuration values
     Tx : list of float
         Tx test values calculated on one sequence
     Ti : list of float
@@ -69,27 +71,21 @@ def scatterplot_TxTi(Tx, Ti, t, plot_dir_s):
     plot_dir_s : str
         directory where to save the plot
     """
-    x = [k for k in range(utils.config.conf.nist.n_sequences)]
+    x = [k for k in range(conf.nist.n_sequences)]
 
     fig, ax = plt.subplots(figsize=(11, 7))
     ax.scatter(x, Ti, s=10)
     plt.xticks(
         np.arange(
             0,
-            utils.config.conf.nist.n_sequences,
-            utils.config.conf.nist.n_sequences / 10,
+            conf.nist.n_sequences,
+            conf.nist.n_sequences / 10,
         )
     )
     plt.axhline(y=Tx, color="r", linestyle="-", label="axvline - full height")
     ax.text(Tx, 0.5, f"Tx={Tx}")
 
-    my_text = (
-        rf"n_simbols={utils.config.conf.nist.n_symbols}"
-        + "\n"
-        + rf"n_iterations={utils.config.conf.nist.n_sequences}"
-        + "\n"
-        + rf"Tx={Tx}"
-    )
+    my_text = f"n_simbols={conf.nist.n_symbols}\n" + f"n_iterations={conf.nist.n_sequences}\n" + f"Tx={Tx}"
     props = dict(boxstyle="square", facecolor="grey", alpha=0.15)
     ax.text(0.93, 1.13, my_text, transform=ax.transAxes, fontsize=12, verticalalignment="top", bbox=props)
 
@@ -145,7 +141,7 @@ def scatterplot_RvsFY(test, C0r, C0fy, plot_dir):
     plt.close()
 
 
-def scatterplot_RvsFY_TjNorm(test, C0r, C0fy, plot_dir):
+def scatterplot_RvsFY_TjNorm(conf: utils.config.Config, test, C0r, C0fy, plot_dir):
     """
     Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with
     the one obtained through FY shuffling.
@@ -171,7 +167,7 @@ def scatterplot_RvsFY_TjNorm(test, C0r, C0fy, plot_dir):
     fig, ax = plt.subplots()
     ax.errorbar(test, data_1, err_1, fmt="o", capsize=3, label="randomized sequences")
     ax.errorbar(test, data_2, err_2, fmt="o", capsize=3, label="shuffled FY sequences")
-    ax.axhline(utils.config.conf.stat.n_sequences / 4, color="red", linestyle="dashed")
+    ax.axhline(conf.stat.n_sequences / 4, color="red", linestyle="dashed")
     plt.xlabel("Test")
     plt.ylabel("Values of the counter C0")
     ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
