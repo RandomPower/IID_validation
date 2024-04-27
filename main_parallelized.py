@@ -162,28 +162,28 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
 
 
 def iid_test_function(conf: utils.config.Config):
-    logging.debug("NIST TEST")
-    logging.debug("Process started")
+    logger.debug("NIST TEST")
+    logger.debug("Process started")
     S = utils.read.read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
-    logging.debug("Sequence calculated: S")
+    logger.debug("Sequence calculated: S")
 
-    logging.debug("Calculating for each test the reference statistic: Tx")
+    logger.debug("Calculating for each test the reference statistic: Tx")
     Tx = permutation_tests.run_tests(S, conf.nist.pvalues, conf.nist.selected_tests)
-    logging.debug("Reference statistics calculated!")
+    logger.debug("Reference statistics calculated!")
 
-    logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
+    logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
     t0 = time.process_time()
     Ti = FY_test_mode_parallel(conf, S)
     ti = time.process_time() - t0
-    logging.debug("Shuffled sequences Ti statistics calculated")
+    logger.debug("Shuffled sequences Ti statistics calculated")
 
     C0, C1 = calculate_counters(Tx, Ti)
-    logging.debug("C0 = %s", C0)
-    logging.debug("C1 = %s", C1)
+    logger.debug("C0 = %s", C0)
+    logger.debug("C1 = %s", C1)
 
     IID_assumption = iid_result(C0, C1, Tx, conf.nist.n_sequences)
 
-    logging.info("IID assumption %s", "validated" if IID_assumption else "rejected")
+    logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
     utils.useful_functions.save_IID_validation(conf, C0, C1, IID_assumption, ti)
 
@@ -193,10 +193,10 @@ def iid_test_function(conf: utils.config.Config):
 
 
 def statistical_analysis_function(conf: utils.config.Config):
-    logging.debug("----------------------------------------------------------------\n \n")
-    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[conf.stat.distribution_test_index].name)
+    logger.debug("----------------------------------------------------------------\n \n")
+    logger.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[conf.stat.distribution_test_index].name)
     S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
-    logging.debug("Sequence calculated: S")
+    logger.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
             executor.submit(statistical_analysis.FY_Tx, S, conf),
@@ -209,7 +209,7 @@ def statistical_analysis_function(conf: utils.config.Config):
             task.result()
 
     statistical_analysis.comparison_scatterplot(conf)
-    logging.debug("Statistical analysis completed.")
+    logger.debug("Statistical analysis completed.")
 
 
 def main():
@@ -263,12 +263,21 @@ def main():
     args = parser.parse_args()
     conf = utils.config.Config(args)
 
-    logging.basicConfig(
-        filename="IID_validation.log",
-        filemode="w",
-        format="%(name)s - %(levelname)s - %(message)s",
-        level=logging.DEBUG,
-    )
+    # Configure logging
+    # Write all loggers to file, each with their own level, from DEBUG up
+    f_handler = logging.FileHandler("IID_validation.log", mode="w")
+    f_handler.setLevel(logging.DEBUG)
+    f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s"))
+    logging.getLogger().addHandler(f_handler)
+
+    # Write the application-specific logger to stderr, from INFO up
+    s_handler = logging.StreamHandler()
+    s_handler.setLevel(logging.INFO)
+    s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
+    logger.addHandler(s_handler)
+
+    # Set application-specific logger level from DEBUG up
+    logger.setLevel(logging.DEBUG)
 
     np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
@@ -280,6 +289,9 @@ def main():
     if conf.statistical_analysis:
         statistical_analysis_function(conf)
 
+
+# Configure application logger
+logger = logging.getLogger("IID_validation")
 
 if __name__ == "__main__":
     main()
