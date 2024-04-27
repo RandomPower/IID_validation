@@ -56,11 +56,7 @@ def save_counters(
     # Convert the dictionary to a DataFrame and export it to a csv file
     df = pd.DataFrame(data, index=header).T
 
-    directory = os.path.dirname(f)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
     h = not os.path.exists(f)
-
     df.to_csv(f, mode="a", header=h, index=False)
 
 
@@ -92,12 +88,11 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
         str(datetime.now()),
     ]
     dt = pd.DataFrame(d, index=header).T
-    h = True
-    if os.path.exists("results/IID_validation.csv"):
-        h = False
-        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
-    else:
-        dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
+    # Check if the directory exists
+    os.makedirs("IID_validation", exist_ok=True)
+    f = os.path.join("IID_validation", "IID_validation.csv")
+    h = not os.path.exists(f)
+    dt.to_csv(f, mode="a", header=h, index=False)
 
 
 def save_test_values(conf: utils.config.Config, Tx, Ti):
@@ -143,41 +138,8 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
     a = pd.DataFrame([Tx], columns=header)
     df = pd.concat([a, df2]).reset_index(drop=True)
     # df.insert("time Ti", tf, True)
-    file_path = "results/save_test_values.csv"
+    file_path = os.path.join("results", "save_test_values.csv")
     write_header = not os.path.isfile(file_path)
 
     # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
     df.to_csv(file_path, mode="a", header=write_header, index=False)
-
-
-def get_next_run_number(base_dir, current_run_date):
-    """Calculates the iteration number to create numbered of sequenced folders
-
-
-    Parameters
-    ----------
-    base_dir : str
-        base path to the directory
-    current_run_date : str
-        date at which the script is run
-
-    Returns
-    -------
-    int
-        next iteration number for the folder
-    """
-    # Check existing directories for the current date
-    date_dir = os.path.join(base_dir, current_run_date)
-    if not os.path.exists(date_dir):
-        os.makedirs(date_dir, exist_ok=True)
-        return 1  # If the date directory doesn't exist, start with 1
-
-    existing_runs = os.listdir(date_dir)
-    if not existing_runs:
-        return 1  # If there are no runs yet for today, start with 1
-
-    # Determine the next run number by finding the maximum existing run number and adding 1
-    run_numbers = [int(run) for run in existing_runs if run.isdigit()]
-    next_run_number = max(run_numbers) + 1 if run_numbers else 1
-
-    return next_run_number
