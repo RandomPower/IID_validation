@@ -486,7 +486,9 @@ def get_data(ref_numbers, Tj_norm):
             C0_fy.append(eval(last_entry1))
             C0_random.append(eval(last_entry2))
         except Exception as e:
-            logging.error("Reading or processing files for %s: %s not successful", permutation_tests.tests[ref], e)
+            logging.error(
+                "Reading or processing files for test %s not successful: %s", permutation_tests.tests[ref], e
+            )
             raise e
     return C0_fy, C0_random
 
