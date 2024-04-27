@@ -46,7 +46,7 @@ def calculate_counters(Tx, Ti):
     return C0, C1
 
 
-def iid_result(C0, C1, Tx, n_sequences: int):
+def iid_result(C0: list[int], C1: list[int], n_sequences: int):
     """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
     99.95% of the results Ti for the rest of the population of n_sequences sequences.
 
@@ -56,8 +56,6 @@ def iid_result(C0, C1, Tx, n_sequences: int):
         counter 0
     C1 : list of int
         counter 1
-    Tx : list of int
-        reference test values
     n_sequences : int
         number of sequences in the population
 
@@ -66,12 +64,12 @@ def iid_result(C0, C1, Tx, n_sequences: int):
     bool
         iid result
     """
-    IID = True
-    for b in range(len(Tx)):
+    if len(C0) != len(C1):
+        raise Exception(f"Counter lengths must match: C0 ({len(C0)}), C1 ({len(C1)})")
+    for b in range(len(C0)):
         if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
-            IID = False
-            break
-    return IID
+            return False
+    return True
 
 
 def FY_test_mode_parallel(conf: utils.config.Config, seq: list[int]):
