@@ -60,8 +60,8 @@ def scatterplot_TxTi(conf: utils.config.Config, Tx, Ti, t: str, plot_dir_s: str)
 
     Parameters
     ----------
-    conf : Config
-        application configuration values
+    conf : utils.config.Config
+        application configuration parameters
     Tx : list of float
         Tx test values calculated on one sequence
     Ti : list of float
@@ -149,6 +149,8 @@ def scatterplot_RvsFY_TjNorm(conf: utils.config.Config, test, C0r, C0fy, plot_di
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     test : str
         test executed
     C0r : list of lists of int

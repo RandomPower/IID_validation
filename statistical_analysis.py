@@ -17,7 +17,7 @@ import utils.useful_functions
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
-def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
+def counters_FYShuffle_Tx(conf: utils.config.Config, S):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. The given test is performed on the first sequence to obtain the reference value:
     C0 is incremented if the result of the test T computed on a sequence is bigger than that it,
@@ -25,12 +25,10 @@ def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    test : int
-        index of the test used to produce the counters
-    conf : Config
-        application configuration parameters
 
     Returns
     -------
@@ -39,6 +37,7 @@ def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
     """
     counters_0 = []
     counters_1 = []
+    test = conf.stat.distribution_test_index
     # Calculate reference statistics
     if test in [8, 9]:
         Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
@@ -71,16 +70,16 @@ def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
     return counters_0, counters_1
 
 
-def FY_Tx(S, conf: utils.config.Config):
+def FY_Tx(conf: utils.config.Config, S):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    conf : Config
-        application configuration parameters
     """
     logger.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
     f = os.path.abspath(
@@ -92,7 +91,7 @@ def FY_Tx(S, conf: utils.config.Config):
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FYShuffle_Tx(S, conf.stat.distribution_test_index, conf)
+    C0, C1 = counters_FYShuffle_Tx(conf, S)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
@@ -118,25 +117,24 @@ def FY_Tx(S, conf: utils.config.Config):
     )
 
 
-def counters_Random_Tx(S, test, conf: utils.config.Config):
+def counters_Random_Tx(conf: utils.config.Config, S):
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    test : int
-        index of the test used to produce the counters
-    conf : Config
-        application configuration parameters
 
     Returns
     -------
     list of int, list of int
         counter 0 and counter 1 lists of values
     """
+    test = conf.stat.distribution_test_index
     if test in [8, 9]:
         Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
     else:
@@ -174,16 +172,16 @@ def counters_Random_Tx(S, test, conf: utils.config.Config):
     return counters_0, counters_1
 
 
-def Random_Tx(S, conf: utils.config.Config):
+def Random_Tx(conf: utils.config.Config, S):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    conf : Config
-        application configuration parameters
     """
     logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
     f = os.path.abspath(
@@ -195,7 +193,7 @@ def Random_Tx(S, conf: utils.config.Config):
         )
     )
     t = time.process_time()
-    C0, C1 = counters_Random_Tx(S, conf.stat.distribution_test_index, conf)
+    C0, C1 = counters_Random_Tx(conf, S)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
@@ -221,7 +219,7 @@ def Random_Tx(S, conf: utils.config.Config):
     )
 
 
-def counters_FY_TjNorm(S, test, conf: utils.config.Config):
+def counters_FY_TjNorm(conf: utils.config.Config, S):
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if
     the results of the test are equal the second sequence is ignored.
@@ -230,12 +228,10 @@ def counters_FY_TjNorm(S, test, conf: utils.config.Config):
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    test : int
-        index of the test used to produce the counters
-    conf : Config
-        application configuration parameters
 
     Returns
     -------
@@ -244,6 +240,7 @@ def counters_FY_TjNorm(S, test, conf: utils.config.Config):
     """
     counters_0 = []
     counters_1 = []
+    test = conf.stat.distribution_test_index
     for k in tqdm(range(conf.stat.n_iterations_c)):
         Ti = []
         seq = permutation_tests.FY_shuffle(S.copy())
@@ -281,16 +278,16 @@ def counters_FY_TjNorm(S, test, conf: utils.config.Config):
     return counters_0, counters_1
 
 
-def FY_TjNorm(S, conf: utils.config.Config):
+def FY_TjNorm(conf: utils.config.Config, S):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    conf : Config
-        application configuration parameters
     """
     logger.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     distribution_test_index = conf.stat.distribution_test_index
@@ -303,7 +300,7 @@ def FY_TjNorm(S, conf: utils.config.Config):
         )
     )
     t = time.process_time()
-    C0, C1 = counters_FY_TjNorm(S, distribution_test_index, conf)
+    C0, C1 = counters_FY_TjNorm(conf, S)
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
@@ -335,12 +332,15 @@ def counters_random_TjNorm(conf: utils.config.Config):
     if the results of the test are equal the second sequence is ignored.
     Each pair of sequences is considered as disjointed from the following one.
 
+    Parameters
+    ----------
+    conf : utils.config.Config
+        application configuration parameters
+
     Returns
     -------
     list of int, list of int
         counter 0 and counter 1 lists of values
-    conf : Config
-        application configuration parameters
     """
     counters_0 = []
     counters_1 = []
@@ -374,16 +374,16 @@ def counters_random_TjNorm(conf: utils.config.Config):
     return counters_0, counters_1
 
 
-def Random_TjNorm(S, conf: utils.config.Config):
+def Random_TjNorm(conf: utils.config.Config, S):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     S : list of int
         sequence of sample values
-    conf : Config
-        application configuration parameters
     """
     logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = os.path.abspath(
@@ -501,8 +501,8 @@ def comparison_scatterplot(conf: utils.config.Config):
 
     Parameters
     ----------
-    conf : Config
-        application configuration values
+    conf : utils.config.Config
+        application configuration parameters
     """
     test_indexes = conf.stat.ref_numbers
     test_names = [permutation_tests.tests[i].name for i in test_indexes]

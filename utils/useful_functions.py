@@ -16,8 +16,8 @@ def save_counters(
 
     Parameters
     ----------
-    conf : Config
-        application configuration values
+    conf : utils.config.Config
+        application configuration parameters
     c0 : list of int
         counter C0
     c1 : list of int
@@ -69,7 +69,7 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
 
     Parameters
     ----------
-    conf : Config
+    conf : utils.config.Config
         application configuration parameters
     C0 : list of int
         counter C0
@@ -105,7 +105,7 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
 
     Parameters
     ----------
-    conf : Config
+    conf : utils.config.Config
         application configuration parameters
     Tx : list of float
         Tx test values calculated on one sequence
