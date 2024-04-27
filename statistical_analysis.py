@@ -92,7 +92,7 @@ def FY_Tx(S, conf: utils.config.Config):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f, conf)
+    utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
     # Define directory path
@@ -195,7 +195,7 @@ def Random_Tx(S, conf: utils.config.Config):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f, conf)
+    utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
     # Define directory path
@@ -303,7 +303,7 @@ def FY_TjNorm(S, conf: utils.config.Config):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "FY_shuffle", f, conf)
+    utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
     # Define directory path
@@ -395,7 +395,7 @@ def Random_TjNorm(S, conf: utils.config.Config):
     elapsed_time = time.process_time() - t
 
     # Saving results in test.csv
-    utils.useful_functions.save_counters(C0, C1, elapsed_time, "Shuffle_from_file", f, conf)
+    utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
     # Define directory path
@@ -493,11 +493,16 @@ def get_data(ref_numbers, Tj_norm):
     return C0_fy, C0_random
 
 
-def comparison_scatterplot():
-    """Plots the comparison scatterplot between FY_shuffle counters and reading from file.
+def comparison_scatterplot(conf: utils.config.Config):
+    """Plots the comparison scatterplot between FY_shuffle counters and reading from file for the specified tests.
     The counters values are read from csv files.
+
+    Parameters
+    ----------
+    conf : Config
+        application configuration values
     """
-    test_indexes = utils.config.conf.stat.ref_numbers
+    test_indexes = conf.stat.ref_numbers
     test_names = [permutation_tests.tests[i].name for i in test_indexes]
 
     Cfy, Crand = get_data(test_indexes, False)
@@ -524,4 +529,4 @@ def comparison_scatterplot():
 
     # Plot the results
     utils.plot.scatterplot_RvsFY(test_names, Crand, Cfy, dir_comparison_run)
-    utils.plot.scatterplot_RvsFY_TjNorm(test_names, Crand_TjNorm, Cfy_tjNorm, dir_comparison_TjNorm_run)
+    utils.plot.scatterplot_RvsFY_TjNorm(conf, test_names, Crand_TjNorm, Cfy_tjNorm, dir_comparison_TjNorm_run)

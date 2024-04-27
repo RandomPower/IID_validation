@@ -413,13 +413,7 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-def init_config_data(args):
-    """Initialize a Config object."""
-    global conf
-    conf = Config(args)
-
-
-def file_info():
+def file_info(conf: Config):
     f = open(conf.input_file, "rb")
     f.seek(0, 2)
     size = f.tell()
@@ -444,7 +438,7 @@ def file_info():
     logging.debug("----------------------------------------------------------------\n")
 
 
-def config_info():
+def config_info(conf: Config):
     logging.debug("CONFIG INFO - NIST")
     logging.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
     logging.debug("Number of shuffled sequences = %s", conf.nist.n_sequences)

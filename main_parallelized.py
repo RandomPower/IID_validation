@@ -74,7 +74,7 @@ def iid_result(C0, C1, Tx):
     return IID
 
 
-def FY_test_mode_parallel(seq):
+def FY_test_mode_parallel(conf: utils.config.Config, seq: list[int]):
     """Executes NIST test suite on shuffled sequence in parallel along n_sequences iterations
 
     Parameters
@@ -90,13 +90,13 @@ def FY_test_mode_parallel(seq):
     Ti = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(utils.config.conf.nist.n_sequences):
+        for iteration in range(conf.nist.n_sequences):
             s_shuffled = permutation_tests.FY_shuffle(seq.copy())
             future = executor.submit(
                 permutation_tests.run_tests,
                 s_shuffled,
-                utils.config.conf.nist.pvalues,
-                utils.config.conf.nist.selected_tests,
+                conf.nist.pvalues,
+                conf.nist.selected_tests,
             )
             futures.append(future)
 
@@ -111,7 +111,7 @@ def FY_test_mode_parallel(seq):
     return Ti
 
 
-def iid_plots(Tx, Ti):
+def iid_plots(conf: utils.config.Config, Tx, Ti):
     """Plot histogram and scatterplot of Ti values with respect to the Tx test value
 
     Parameters
@@ -137,15 +137,15 @@ def iid_plots(Tx, Ti):
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
-        if utils.config.conf.nist.pvalues == utils.config.conf.nist.DEFAULT_PVALUES:
+        if conf.nist.pvalues == conf.nist.DEFAULT_PVALUES:
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[8].name} (p={utils.config.conf.nist.pvalues[p_index]})"
+                test_name = f"{permutation_tests.tests[8].name} (p={conf.nist.pvalues[p_index]})"
             # Handle the special case for test 9 ('covariance')
             elif 13 <= t <= 17:
                 p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[9].name} (p={utils.config.conf.nist.pvalues[p_index]})"
+                test_name = f"{permutation_tests.tests[9].name} (p={conf.nist.pvalues[p_index]})"
             # For the values that should correspond to test 10 ('compression')
             elif t == 18:
                 test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
@@ -153,30 +153,27 @@ def iid_plots(Tx, Ti):
                 # Direct mapping for other tests
                 test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
-            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], test_name, dir_sc_run)
-        elif len(utils.config.conf.nist.pvalues) == 1:
+            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], test_name, dir_sc_run)
+        elif len(conf.nist.pvalues) == 1:
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_hist_run)
-            utils.plot.scatterplot_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
+            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
         else:
             raise Exception("Support for arbitrary p values not implemented yet")
 
 
-def iid_test_function():
+def iid_test_function(conf: utils.config.Config):
     logging.debug("NIST TEST")
     logging.debug("Process started")
-    S = utils.read.read_file(
-        file=utils.config.conf.input_file,
-        n_symbols=utils.config.conf.nist.n_symbols,
-    )
+    S = utils.read.read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
     logging.debug("Sequence calculated: S")
 
     logging.debug("Calculating for each test the reference statistic: Tx")
-    Tx = permutation_tests.run_tests(S, utils.config.conf.nist.pvalues, utils.config.conf.nist.selected_tests)
+    Tx = permutation_tests.run_tests(S, conf.nist.pvalues, conf.nist.selected_tests)
     logging.debug("Reference statistics calculated!")
 
     logging.debug("Calculating each test statistic for each shuffled sequence: Ti")
     t0 = time.process_time()
-    Ti = FY_test_mode_parallel(S)
+    Ti = FY_test_mode_parallel(conf, S)
     ti = time.process_time() - t0
     logging.debug("Shuffled sequences Ti statistics calculated")
 
@@ -188,34 +185,30 @@ def iid_test_function():
 
     logging.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
-    utils.useful_functions.save_IID_validation(C0, C1, IID_assumption, ti)
+    utils.useful_functions.save_IID_validation(conf, C0, C1, IID_assumption, ti)
 
     # plots
-    if utils.config.conf.nist.plot:
-        iid_plots(Tx, Ti)
+    if conf.nist.plot:
+        iid_plots(conf, Tx, Ti)
 
 
-def statistical_analysis_function():
+def statistical_analysis_function(conf: utils.config.Config):
     logging.debug("----------------------------------------------------------------\n \n")
-    distribution_test_index = utils.config.conf.stat.distribution_test_index
-    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[distribution_test_index].name)
-    S = utils.read.read_file(
-        file=utils.config.conf.input_file,
-        n_symbols=utils.config.conf.stat.n_symbols,
-    )
+    logging.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[conf.stat.distribution_test_index].name)
+    S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
     logging.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
-            executor.submit(statistical_analysis.FY_Tx, S, utils.config.conf),
-            executor.submit(statistical_analysis.FY_TjNorm, S, utils.config.conf),
-            executor.submit(statistical_analysis.Random_Tx, S, utils.config.conf),
-            executor.submit(statistical_analysis.Random_TjNorm, S, utils.config.conf),
+            executor.submit(statistical_analysis.FY_Tx, S, conf),
+            executor.submit(statistical_analysis.FY_TjNorm, S, conf),
+            executor.submit(statistical_analysis.Random_Tx, S, conf),
+            executor.submit(statistical_analysis.Random_TjNorm, S, conf),
         ]
         # Wait for all tasks to complete
         for task in tasks:
             task.result()
 
-    statistical_analysis.comparison_scatterplot()
+    statistical_analysis.comparison_scatterplot(conf)
     logging.debug("Statistical analysis completed.")
 
 
@@ -268,8 +261,7 @@ def main():
     )
 
     args = parser.parse_args()
-
-    utils.config.init_config_data(args)
+    conf = utils.config.Config(args)
 
     logging.basicConfig(
         filename="IID_validation.log",
@@ -280,13 +272,13 @@ def main():
 
     np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
-    utils.config.file_info()
-    utils.config.config_info()
-    if utils.config.conf.nist_test:
-        iid_test_function()
+    utils.config.file_info(conf)
+    utils.config.config_info(conf)
+    if conf.nist_test:
+        iid_test_function(conf)
 
-    if utils.config.conf.statistical_analysis:
-        statistical_analysis_function()
+    if conf.statistical_analysis:
+        statistical_analysis_function(conf)
 
 
 if __name__ == "__main__":

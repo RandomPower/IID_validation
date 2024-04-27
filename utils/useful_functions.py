@@ -9,11 +9,15 @@ import permutation_tests
 import utils.config
 
 
-def save_counters(c0, c1, elapsed_time, shuffle_type, f, conf: utils.config.Config):
+def save_counters(
+    conf: utils.config.Config, c0: list[int], c1: list[int], elapsed_time: float, shuffle_type: str, f: str
+):
     """Saves counters values obtained in the statistical analysis
 
     Parameters
     ----------
+    conf : Config
+        application configuration values
     c0 : list of int
         counter C0
     c1 : list of int
@@ -60,11 +64,13 @@ def save_counters(c0, c1, elapsed_time, shuffle_type, f, conf: utils.config.Conf
     df.to_csv(f, mode="a", header=h, index=False)
 
 
-def save_IID_validation(C0, C1, b, test_time):
+def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int], b: bool, test_time: float):
     """Saves IID failure and the counters values generated in the NIST test part
 
     Parameters
     ----------
+    conf : Config
+        application configuration parameters
     C0 : list of int
         counter C0
     C1 : list of int
@@ -75,11 +81,10 @@ def save_IID_validation(C0, C1, b, test_time):
         total process time
     """
     header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
-    t = [permutation_tests.tests[i].name for i in utils.config.conf.nist.selected_tests]
     d = [
-        utils.config.conf.nist.n_symbols,
-        utils.config.conf.nist.n_sequences,
-        t,
+        conf.nist.n_symbols,
+        conf.nist.n_sequences,
+        [permutation_tests.tests[i].name for i in conf.nist.selected_tests],
         C0,
         C1,
         b,
@@ -95,17 +100,19 @@ def save_IID_validation(C0, C1, b, test_time):
         dt.to_csv("results/IID_validation.csv", mode="a", header=h, index=False)
 
 
-def save_test_values(Tx, Ti):
+def save_test_values(conf: utils.config.Config, Tx, Ti):
     """Saves Tx test values and Ti test values in a csv file
 
     Parameters
     ----------
+    conf : Config
+        application configuration parameters
     Tx : list of float
         Tx test values calculated on one sequence
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if utils.config.conf.nist.pvalues == utils.config.conf.nist.DEFAULT_PVALUES:
+    if conf.nist.pvalues == conf.nist.DEFAULT_PVALUES:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -127,8 +134,8 @@ def save_test_values(Tx, Ti):
             "covariance_p4",
             "compression",
         ]
-    elif len(utils.config.conf.nist.pvalues) == 1:
-        header = [permutation_tests.tests[i].name for i in utils.config.conf.nist.selected_tests]
+    elif len(conf.nist.pvalues) == 1:
+        header = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
     else:
         raise Exception("Support for arbitrary p values not implemented yet")
 
