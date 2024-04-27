@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import pathlib
 import time
 
 import pandas as pd
@@ -11,6 +12,9 @@ import utils.config
 import utils.plot
 import utils.shuffles
 import utils.useful_functions
+
+# Configure per-module logger
+logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
 def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
@@ -61,8 +65,8 @@ def counters_FYShuffle_Tx(S, test, conf: utils.config.Config):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    logging.debug("FY_Tx counter_0: %s", counters_0)
-    logging.debug("FY_Tx counter_1: %s", counters_1)
+    logger.debug("FY_Tx counter_0: %s", counters_0)
+    logger.debug("FY_Tx counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -78,7 +82,7 @@ def FY_Tx(S, conf: utils.config.Config):
     conf : Config
         application configuration parameters
     """
-    logging.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
+    logger.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
     f = os.path.abspath(
         os.path.join(
             "results",
@@ -164,8 +168,8 @@ def counters_Random_Tx(S, test, conf: utils.config.Config):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    logging.debug("Random_Tx counter_0: %s", counters_0)
-    logging.debug("Random_Tx counter_1: %s", counters_1)
+    logger.debug("Random_Tx counter_0: %s", counters_0)
+    logger.debug("Random_Tx counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -181,7 +185,7 @@ def Random_Tx(S, conf: utils.config.Config):
     conf : Config
         application configuration parameters
     """
-    logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
+    logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
     f = os.path.abspath(
         os.path.join(
             "results",
@@ -271,8 +275,8 @@ def counters_FY_TjNorm(S, test, conf: utils.config.Config):
         counters_0.append(C0)
         counters_1.append(C1)
 
-    logging.debug("FY_TjNorm counter_0: %s", counters_0)
-    logging.debug("FY_TjNorm counter_1: %s", counters_1)
+    logger.debug("FY_TjNorm counter_0: %s", counters_0)
+    logger.debug("FY_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -288,7 +292,7 @@ def FY_TjNorm(S, conf: utils.config.Config):
     conf : Config
         application configuration parameters
     """
-    logging.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
+    logger.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     distribution_test_index = conf.stat.distribution_test_index
     f = os.path.abspath(
         os.path.join(
@@ -364,8 +368,8 @@ def counters_random_TjNorm(conf: utils.config.Config):
         counters_1.append(C1)
         index += conf.stat.n_sequences * conf.stat.n_symbols / 2
 
-    logging.debug("Random_TjNorm counter_0: %s", counters_0)
-    logging.debug("Random_TjNorm counter_1: %s", counters_1)
+    logger.debug("Random_TjNorm counter_0: %s", counters_0)
+    logger.debug("Random_TjNorm counter_1: %s", counters_1)
 
     return counters_0, counters_1
 
@@ -381,7 +385,7 @@ def Random_TjNorm(S, conf: utils.config.Config):
     conf : Config
         application configuration parameters
     """
-    logging.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
+    logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
     f = os.path.abspath(
         os.path.join(
             "results",
@@ -470,10 +474,10 @@ def get_data(ref_numbers, Tj_norm):
                 )
             )
         if not os.path.exists(fy):
-            logging.error("Results file for test number %s does not exist: %s", ref, fy)
+            logger.error("Results file for test number %s does not exist: %s", ref, fy)
             raise ValueError(f"Results file for test number {ref} does not exist: {fy}")
         if not os.path.exists(rand):
-            logging.error("Results file for test number %s does not exist: %s", ref, rand)
+            logger.error("Results file for test number %s does not exist: %s", ref, rand)
             raise ValueError(f"Results file for test number {ref} does not exist: {rand}")
 
         try:
@@ -486,9 +490,7 @@ def get_data(ref_numbers, Tj_norm):
             C0_fy.append(eval(last_entry1))
             C0_random.append(eval(last_entry2))
         except Exception as e:
-            logging.error(
-                "Reading or processing files for test %s not successful: %s", permutation_tests.tests[ref], e
-            )
+            logger.error("Reading or processing files for test %s not successful: %s", permutation_tests.tests[ref], e)
             raise e
     return C0_fy, C0_random
 
