@@ -37,7 +37,7 @@ def calculate_counters(Tx, Ti):
     C1 = [0 for k in range(len(Tx))]
 
     for u in range(len(Tx)):
-        for t in range(utils.config.conf.nist.n_sequences):
+        for t in range(len(Ti)):
             if Tx[u] > Ti[t][u]:
                 C0[u] += 1
             if Tx[u] == Ti[t][u]:
@@ -46,8 +46,8 @@ def calculate_counters(Tx, Ti):
     return C0, C1
 
 
-def iid_result(C0, C1, Tx):
-    """Determine whether the sequence is iid by checking that the value of the reference result Tx is between 0.05% and
+def iid_result(C0, C1, Tx, n_sequences: int):
+    """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
     99.95% of the results Ti for the rest of the population of n_sequences sequences.
 
     Parameters
@@ -58,6 +58,8 @@ def iid_result(C0, C1, Tx):
         counter 1
     Tx : list of int
         reference test values
+    n_sequences : int
+        number of sequences in the population
 
     Returns
     -------
@@ -66,9 +68,7 @@ def iid_result(C0, C1, Tx):
     """
     IID = True
     for b in range(len(Tx)):
-        if (C0[b] + C1[b] <= 0.0005 * utils.config.conf.nist.n_sequences) or (
-            C0[b] >= 0.9995 * utils.config.conf.nist.n_sequences
-        ):
+        if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
             IID = False
             break
     return IID
@@ -181,7 +181,7 @@ def iid_test_function(conf: utils.config.Config):
     logging.debug("C0 = %s", C0)
     logging.debug("C1 = %s", C1)
 
-    IID_assumption = iid_result(C0, C1, Tx)
+    IID_assumption = iid_result(C0, C1, Tx, conf.nist.n_sequences)
 
     logging.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
