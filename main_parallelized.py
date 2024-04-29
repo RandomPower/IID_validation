@@ -179,7 +179,7 @@ def iid_test_function(conf: utils.config.Config):
     logger.debug("C0 = %s", C0)
     logger.debug("C1 = %s", C1)
 
-    IID_assumption = iid_result(C0, C1, Tx, conf.nist.n_sequences)
+    IID_assumption = iid_result(C0, C1, conf.nist.n_sequences)
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
