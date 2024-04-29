@@ -72,12 +72,14 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int):
     return True
 
 
-def FY_test_mode_parallel(conf: utils.config.Config, seq: list[int]):
+def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
     """Executes NIST test suite on shuffled sequence in parallel along n_sequences iterations
 
     Parameters
     ----------
-    sequence : ist of int
+    conf : utils.config.Config
+        application configuration parameters
+    S : list of int
         sequence of sample values
 
     Returns
@@ -89,7 +91,7 @@ def FY_test_mode_parallel(conf: utils.config.Config, seq: list[int]):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
         for iteration in range(conf.nist.n_sequences):
-            s_shuffled = permutation_tests.FY_shuffle(seq.copy())
+            s_shuffled = permutation_tests.FY_shuffle(S.copy())
             future = executor.submit(
                 permutation_tests.run_tests,
                 s_shuffled,
@@ -114,6 +116,8 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
 
     Parameters
     ----------
+    conf : utils.config.Config
+        application configuration parameters
     Tx : list of int
         reference test values
     Ti : list of int
@@ -160,6 +164,13 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
 
 
 def iid_test_function(conf: utils.config.Config):
+    """IID test function
+
+    Parameters
+    ----------
+    conf : utils.config.Config
+        application configuration parameters
+    """
     logger.debug("NIST TEST")
     logger.debug("Process started")
     S = utils.read.read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
@@ -191,16 +202,23 @@ def iid_test_function(conf: utils.config.Config):
 
 
 def statistical_analysis_function(conf: utils.config.Config):
+    """Statistical analysis function
+
+    Parameters
+    ----------
+    conf : utils.config.Config
+        application configuration parameters
+    """
     logger.debug("----------------------------------------------------------------\n \n")
     logger.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[conf.stat.distribution_test_index].name)
     S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
     logger.debug("Sequence calculated: S")
     with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         tasks = [
-            executor.submit(statistical_analysis.FY_Tx, S, conf),
-            executor.submit(statistical_analysis.FY_TjNorm, S, conf),
-            executor.submit(statistical_analysis.Random_Tx, S, conf),
-            executor.submit(statistical_analysis.Random_TjNorm, S, conf),
+            executor.submit(statistical_analysis.FY_Tx, conf, S),
+            executor.submit(statistical_analysis.FY_TjNorm, conf, S),
+            executor.submit(statistical_analysis.Random_Tx, conf, S),
+            executor.submit(statistical_analysis.Random_TjNorm, conf, S),
         ]
         # Wait for all tasks to complete
         for task in tasks:

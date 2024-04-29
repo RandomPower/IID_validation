@@ -71,6 +71,8 @@ def shuffle_from_file_Norm(file, index, n_symb, n_seq, test: int, conf: utils.co
         number of sequences
     test : int
         test index to be executed
+    conf : utils.config.Config
+        application configuration parameters
 
     Returns
     -------
