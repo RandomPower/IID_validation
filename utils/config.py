@@ -2,6 +2,7 @@ import argparse
 import logging
 import pathlib
 import tomllib
+import os
 
 import permutation_tests
 
@@ -146,13 +147,15 @@ class Config:
         # Global section
         if "global" in conf:
             if "input_file" in conf["global"]:
-                self._input_file = conf["global"]["input_file"]
+                self._input_file = os.path.abspath(os.path.expanduser(conf["global"]["input_file"]))
                 if (not isinstance(self._input_file, str)) or (
                     not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
                 ):
                     logger.error(
                         "%s: invalid configuration parameter %s (expected %s)", filename, "input_file", "binary file"
                     )
+                if not os.path.isfile(self._input_file):
+                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
 
             if "test_nist" in conf["global"]:
                 self._nist_test = conf["global"]["test_nist"]
@@ -271,7 +274,7 @@ class Config:
         """
         # Global
         if args.input_file:
-            self._input_file = args.input_file
+            self._input_file = os.path.abspath(os.path.expanduser(args.input_file))
         if args.test_nist:
             self._nist_test = args.test_nist
         if args.stat_analysis:
@@ -314,7 +317,11 @@ class Config:
         Check type and sanity of parameter values."""
         # Global
         # An input file is required
-        if (not self._input_file) or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))):
+        if (
+            (not self._input_file)
+            or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT")))
+            or (not os.path.isfile(self._input_file))
+        ):
             raise ValueError(f'Invalid or missing configuration parameter: "input_file" ({self._input_file})')
 
         if not isinstance(self._nist_test, bool):
@@ -418,6 +425,7 @@ def file_info(conf: Config):
     f.seek(0, 2)
     size = f.tell()
     logger.debug("FILE INFO")
+    logger.debug("Input file: %s", conf.input_file)
     logger.debug("Size of file is: %s bytes", size)
     logger.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
     logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_sequences)
