@@ -2,6 +2,7 @@ import argparse
 import logging
 import pathlib
 import tomllib
+import os
 
 import permutation_tests
 
@@ -146,7 +147,7 @@ class Config:
         # Global section
         if "global" in conf:
             if "input_file" in conf["global"]:
-                self._input_file = conf["global"]["input_file"]
+                self._input_file = os.path.abspath(os.path.expanduser(conf["global"]["input_file"]))
                 if (not isinstance(self._input_file, str)) or (
                     not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
                 ):
@@ -271,7 +272,7 @@ class Config:
         """
         # Global
         if args.input_file:
-            self._input_file = args.input_file
+            self._input_file = os.path.abspath(os.path.expanduser(args.input_file))
         if args.test_nist:
             self._nist_test = args.test_nist
         if args.stat_analysis:
@@ -418,6 +419,7 @@ def file_info(conf: Config):
     f.seek(0, 2)
     size = f.tell()
     logger.debug("FILE INFO")
+    logger.debug("Input file: %s", conf.input_file)
     logger.debug("Size of file is: %s bytes", size)
     logger.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
     logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_sequences)
