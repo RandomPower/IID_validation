@@ -1,4 +1,3 @@
-import datetime
 import logging
 import os
 import pathlib
@@ -82,13 +81,15 @@ def FY_Tx(conf: utils.config.Config, S):
         sequence of sample values
     """
     logger.debug("Statistical analysis FISHER YATES SHUFFLE FOR Tx VALUES")
-    f = os.path.abspath(
-        os.path.join(
-            "results",
-            "counters_distribution",
-            "FYShuffleTx",
-            f"fyShuffleTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
-        )
+    # Define and create the directory
+    directory_path = os.path.join(
+        "statistical_analysis",
+        "FYShuffleTx",
+    )
+    os.makedirs(directory_path, exist_ok=True)
+
+    f = os.path.join(
+        directory_path, f"fyShuffleTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv"
     )
     t = time.process_time()
     C0, C1 = counters_FYShuffle_Tx(conf, S)
@@ -98,22 +99,13 @@ def FY_Tx(conf: utils.config.Config, S):
     utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
-    # Define directory path
-    plot_dir = "results/plots/counters_FYShuffle_Tx"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_plot_run = os.path.join(
-        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
-    )
-    # Ensure the directory exists
-    os.makedirs(dir_plot_run, exist_ok=True)
-
     utils.plot.counters_distribution_Tx(
         C0,
         conf.stat.n_sequences,
         conf.stat.n_iterations_c,
         conf.stat.distribution_test_index,
         "FY_Tx",
-        dir_plot_run,
+        directory_path,
     )
 
 
@@ -184,13 +176,16 @@ def Random_Tx(conf: utils.config.Config, S):
         sequence of sample values
     """
     logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE FOR Tx VALUES")
-    f = os.path.abspath(
-        os.path.join(
-            "results",
-            "counters_distribution",
-            "RandomTx",
-            f"RandomTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
-        )
+    # Define and create the directory
+    directory_path = os.path.join(
+        "statistical_analysis",
+        "RandomTx",
+    )
+    os.makedirs(directory_path, exist_ok=True)
+
+    f = os.path.join(
+        directory_path,
+        f"RandomTx_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
     )
     t = time.process_time()
     C0, C1 = counters_Random_Tx(conf, S)
@@ -200,22 +195,13 @@ def Random_Tx(conf: utils.config.Config, S):
     utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
-    # Define directory path
-    plot_dir = "results/plots/counters_Random_Tx"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_plot_run = os.path.join(
-        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
-    )
-    # Ensure the directory exists
-    os.makedirs(dir_plot_run, exist_ok=True)
-
     utils.plot.counters_distribution_Tx(
         C0,
         conf.stat.n_sequences,
         conf.stat.n_iterations_c,
         conf.stat.distribution_test_index,
         "Random_Tx",
-        dir_plot_run,
+        directory_path,
     )
 
 
@@ -291,13 +277,16 @@ def FY_TjNorm(conf: utils.config.Config, S):
     """
     logger.debug("\nStatistical analysis FISHER YATES SHUFFLE WITH NORMALIZED Tj")
     distribution_test_index = conf.stat.distribution_test_index
-    f = os.path.abspath(
-        os.path.join(
-            "results",
-            "counters_distribution",
-            "FYShuffleTjNorm",
-            f"fyShuffleTjNorm_{permutation_tests.tests[distribution_test_index].name}.csv",
-        )
+    # Define and create the directory
+    directory_path = os.path.join(
+        "statistical_analysis",
+        "FYShuffleTjNorm",
+    )
+    os.makedirs(directory_path, exist_ok=True)
+
+    f = os.path.join(
+        directory_path,
+        f"fyShuffleTjNorm_{permutation_tests.tests[distribution_test_index].name}.csv",
     )
     t = time.process_time()
     C0, C1 = counters_FY_TjNorm(conf, S)
@@ -307,22 +296,13 @@ def FY_TjNorm(conf: utils.config.Config, S):
     utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "FY_shuffle", f)
 
     # Plot results
-    # Define directory path
-    plot_dir = "results/plots/counters_FYShuffle_TjNorm"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_plot_run = os.path.join(
-        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
-    )
-    # Ensure the directory exists
-    os.makedirs(dir_plot_run, exist_ok=True)
-
     utils.plot.counters_distribution_Tj(
         C0,
         conf.stat.n_sequences,
         conf.stat.n_iterations_c,
         conf.stat.distribution_test_index,
         "FY_TjNorm",
-        dir_plot_run,
+        directory_path,
     )
 
 
@@ -386,13 +366,16 @@ def Random_TjNorm(conf: utils.config.Config, S):
         sequence of sample values
     """
     logger.debug("\nStatistical analysis RANDOM SAMPLING FROM FILE WITH Tj NORMALIZED")
-    f = os.path.abspath(
-        os.path.join(
-            "results",
-            "counters_distribution",
-            "RandomTjNorm",
-            f"randomTjNorm_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
-        )
+    # Define and create the directory
+    directory_path = os.path.join(
+        "statistical_analysis",
+        "RandomTjNorm",
+    )
+    os.makedirs(directory_path, exist_ok=True)
+
+    f = os.path.join(
+        directory_path,
+        f"randomTjNorm_{permutation_tests.tests[conf.stat.distribution_test_index].name}.csv",
     )
     t = time.process_time()
     C0, C1 = counters_random_TjNorm(conf)
@@ -402,21 +385,13 @@ def Random_TjNorm(conf: utils.config.Config, S):
     utils.useful_functions.save_counters(conf, C0, C1, elapsed_time, "Shuffle_from_file", f)
 
     # Plot results
-    # Define directory path
-    plot_dir = "results/plots/counters_Random_TjNorm"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_plot_run = os.path.join(
-        plot_dir, current_run_date, str(utils.useful_functions.get_next_run_number(plot_dir, current_run_date))
-    )
-    # Ensure the directory exists
-    os.makedirs(dir_plot_run, exist_ok=True)
     utils.plot.counters_distribution_Tj(
         C0,
         conf.stat.n_sequences,
         conf.stat.n_iterations_c,
         conf.stat.distribution_test_index,
         "Random_TjNorm",
-        dir_plot_run,
+        directory_path,
     )
 
 
@@ -440,38 +415,26 @@ def get_data(ref_numbers, Tj_norm):
     C0_random = []
     for ref in ref_numbers:
         if Tj_norm:
-            fy = os.path.abspath(
-                os.path.join(
-                    "results",
-                    "counters_distribution",
-                    "FYShuffleTjNorm",
-                    f"fyShuffleTjNorm_{permutation_tests.tests[ref].name}.csv",
-                )
+            fy = os.path.join(
+                "statistical_analysis",
+                "FYShuffleTjNorm",
+                f"fyShuffleTjNorm_{permutation_tests.tests[ref].name}.csv",
             )
-            rand = os.path.abspath(
-                os.path.join(
-                    "results",
-                    "counters_distribution",
-                    "RandomTjNorm",
-                    f"randomTjNorm_{permutation_tests.tests[ref].name}.csv",
-                )
+            rand = os.path.join(
+                "statistical_analysis",
+                "RandomTjNorm",
+                f"randomTjNorm_{permutation_tests.tests[ref].name}.csv",
             )
         else:
-            fy = os.path.abspath(
-                os.path.join(
-                    "results",
-                    "counters_distribution",
-                    "FYShuffleTx",
-                    f"fyShuffleTx_{permutation_tests.tests[ref].name}.csv",
-                )
+            fy = os.path.join(
+                "statistical_analysis",
+                "FYShuffleTx",
+                f"fyShuffleTx_{permutation_tests.tests[ref].name}.csv",
             )
-            rand = os.path.abspath(
-                os.path.join(
-                    "results",
-                    "counters_distribution",
-                    "RandomTx",
-                    f"randomTx_{permutation_tests.tests[ref].name}.csv",
-                )
+            rand = os.path.join(
+                "statistical_analysis",
+                "RandomTx",
+                f"randomTx_{permutation_tests.tests[ref].name}.csv",
             )
         if not os.path.exists(fy):
             logger.error("Results file for test number %s does not exist: %s", ref, fy)
@@ -511,24 +474,11 @@ def comparison_scatterplot(conf: utils.config.Config):
     Cfy_tjNorm, Crand_TjNorm = get_data(test_indexes, True)
 
     # Define directory where to save the plot
-    comparison_dir = "results/plots/comparison_RvsFY"
-    comparison_TjNorm_dir = "results/plots/comparison_RvsFY_TjNorm"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_comparison_run = os.path.join(
-        comparison_dir,
-        current_run_date,
-        str(utils.useful_functions.get_next_run_number(comparison_dir, current_run_date)),
-    )
-    dir_comparison_TjNorm_run = os.path.join(
-        comparison_TjNorm_dir,
-        current_run_date,
-        str(utils.useful_functions.get_next_run_number(comparison_TjNorm_dir, current_run_date)),
-    )
+    directory_path = os.path.join("statistical_analysis", "comparison_FYvsRandom")
 
     # Ensure the directory exists
-    os.makedirs(dir_comparison_run, exist_ok=True)
-    os.makedirs(dir_comparison_TjNorm_run, exist_ok=True)
+    os.makedirs(directory_path, exist_ok=True)
 
     # Plot the results
-    utils.plot.scatterplot_RvsFY(test_names, Crand, Cfy, dir_comparison_run)
-    utils.plot.scatterplot_RvsFY_TjNorm(conf, test_names, Crand_TjNorm, Cfy_tjNorm, dir_comparison_TjNorm_run)
+    utils.plot.scatterplot_RvsFY(test_names, Crand, Cfy, directory_path)
+    utils.plot.scatterplot_RvsFY_TjNorm(conf, test_names, Crand_TjNorm, Cfy_tjNorm, directory_path)

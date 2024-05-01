@@ -1,5 +1,6 @@
 import argparse
 import concurrent.futures
+import contextlib
 import datetime
 import logging
 import os
@@ -123,19 +124,11 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
     Ti : list of int
         test values calculated on shuffled sequences
     """
-    sc_dir = "results/plots/scatterplot_TxTi"
-    hist_dir = "results/plots/histogram_TxTi"
-    current_run_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    dir_sc_run = os.path.join(
-        sc_dir, current_run_date, str(utils.useful_functions.get_next_run_number(sc_dir, current_run_date))
-    )
-    dir_hist_run = os.path.join(
-        hist_dir, current_run_date, str(utils.useful_functions.get_next_run_number(hist_dir, current_run_date))
-    )
-
+    scatterplot_dir = os.path.join("IID_validation", "scatterplot_TxTi")
+    histo_dir = os.path.join("IID_validation", "histogram_TxTi")
     # Ensure the directory exists
-    os.makedirs(dir_sc_run, exist_ok=True)
-    os.makedirs(dir_hist_run, exist_ok=True)
+    os.makedirs(scatterplot_dir, exist_ok=True)
+    os.makedirs(histo_dir, exist_ok=True)
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
@@ -154,11 +147,13 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
             else:
                 # Direct mapping for other tests
                 test_name = permutation_tests.tests[t].name
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, dir_hist_run)
-            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], test_name, dir_sc_run)
+            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, histo_dir)
+            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], test_name, scatterplot_dir)
         elif len(conf.nist.pvalues) == 1:
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_hist_run)
-            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, dir_sc_run)
+            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, histo_dir)
+            utils.plot.scatterplot_TxTi(
+                conf, Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, scatterplot_dir
+            )
         else:
             raise Exception("Support for arbitrary p values not implemented yet")
 
@@ -299,11 +294,15 @@ def main():
 
     utils.config.file_info(conf)
     utils.config.config_info(conf)
-    if conf.nist_test:
-        iid_test_function(conf)
-
-    if conf.statistical_analysis:
-        statistical_analysis_function(conf)
+    # Create results folder and move into it
+    current_run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    results_dir = os.path.join("results", current_run_date)
+    os.makedirs(results_dir, exist_ok=True)
+    with contextlib.chdir(results_dir):
+        if conf.nist_test:
+            iid_test_function(conf)
+        if conf.statistical_analysis:
+            statistical_analysis_function(conf)
 
 
 # Configure application logger
