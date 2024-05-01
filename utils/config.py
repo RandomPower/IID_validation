@@ -154,6 +154,8 @@ class Config:
                     logger.error(
                         "%s: invalid configuration parameter %s (expected %s)", filename, "input_file", "binary file"
                     )
+                if not os.path.isfile(self._input_file):
+                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
 
             if "test_nist" in conf["global"]:
                 self._nist_test = conf["global"]["test_nist"]
@@ -315,7 +317,11 @@ class Config:
         Check type and sanity of parameter values."""
         # Global
         # An input file is required
-        if (not self._input_file) or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))):
+        if (
+            (not self._input_file)
+            or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT")))
+            or (not os.path.isfile(self._input_file))
+        ):
             raise ValueError(f'Invalid or missing configuration parameter: "input_file" ({self._input_file})')
 
         if not isinstance(self._nist_test, bool):
