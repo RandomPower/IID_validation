@@ -66,26 +66,28 @@ class Config:
             return self._pvalues
 
     class StatConfig:
+        DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000
         DEFAULT_N_SEQUENCES = 200
         DEFAULT_N_ITERATIONS_C = 500
-        DEFAULT_DISTRIBUTION_TEST_INDEX = 6
         DEFAULT_SHUFFLE = True
         DEFAULT_P_VALUE = 2
-        DEFAULT_REF_NUMBERS = [1, 3, 4]
 
         def __init__(self) -> None:
             self._set_defaults()
 
         def _set_defaults(self) -> None:
             """Initialise member variables to default values."""
+            self._selected_tests = self.DEFAULT_SELECTED_TESTS
             self._n_sequences = self.DEFAULT_N_SEQUENCES
             self._n_symbols = self.DEFAULT_N_SYMBOLS
             self._n_iterations_c = self.DEFAULT_N_ITERATIONS_C
-            self._distribution_test_index = self.DEFAULT_DISTRIBUTION_TEST_INDEX
             self._shuffle = self.DEFAULT_SHUFFLE
             self._p_value = self.DEFAULT_P_VALUE
-            self._ref_numbers = self.DEFAULT_REF_NUMBERS
+
+        @property
+        def selected_tests(self):
+            return self._selected_tests
 
         @property
         def n_sequences(self):
@@ -100,20 +102,12 @@ class Config:
             return self._n_iterations_c
 
         @property
-        def distribution_test_index(self):
-            return self._distribution_test_index
-
-        @property
         def shuffle(self):
             return self._shuffle
 
         @property
         def p_value(self):
             return self._p_value
-
-        @property
-        def ref_numbers(self):
-            return self._ref_numbers
 
     def __init__(self, args: argparse.Namespace) -> None:
         self._set_defaults()
@@ -221,6 +215,18 @@ class Config:
 
         # statistical_analysis section
         if "statistical_analysis" in conf:
+            if "selected_tests" in conf["statistical_analysis"]:
+                self.stat._selected_tests = conf["statistical_analysis"]["selected_tests"]
+                if (not isinstance(self.stat._selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in self.stat._selected_tests)
+                ):
+                    logger.error(
+                        "%s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "selected_tests",
+                        "list of integers",
+                    )
+
             if "n_sequences" in conf["statistical_analysis"]:
                 self.stat._n_sequences = conf["statistical_analysis"]["n_sequences"]
                 if not isinstance(self.stat._n_sequences, int):
@@ -240,16 +246,6 @@ class Config:
                         "%s: invalid configuration parameter %s (expected %s)", filename, "n_iterations_c", "int"
                     )
 
-            if "distribution_test_index" in conf["statistical_analysis"]:
-                self.stat._distribution_test_index = conf["statistical_analysis"]["distribution_test_index"]
-                if not isinstance(self.stat._distribution_test_index, int):
-                    logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)",
-                        filename,
-                        "distribution_test_index",
-                        "int",
-                    )
-
             if "shuffle" in conf["statistical_analysis"]:
                 self.stat._shuffle = conf["statistical_analysis"]["shuffle"]
                 if not isinstance(self.stat._shuffle, bool):
@@ -259,13 +255,6 @@ class Config:
                 self.stat._p_value = conf["statistical_analysis"]["p_value"]
                 if not isinstance(self.stat._p_value, int):
                     logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "p_value", "int")
-
-            if "ref_numbers" in conf["statistical_analysis"]:
-                self.stat._ref_numbers = conf["statistical_analysis"]["ref_numbers"]
-                if not isinstance(self.stat._ref_numbers, list):
-                    logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "ref_numbers", "list"
-                    )
 
     def _parse_args(self, args: argparse.Namespace) -> None:
         """Parse the command-line arguments.
@@ -295,20 +284,18 @@ class Config:
         if args.pvalues:
             self.nist._pvalues = args.pvalues
         # Statistical analysis
+        if args.stat_selected_tests:
+            self.stat._selected_tests = args.stat_selected_tests
         if args.stat_n_sequences:
             self.stat._n_sequences = args.stat_n_sequences
         if args.stat_n_symbols:
             self.stat._n_symbols = args.stat_n_symbols
         if args.stat_n_iter_c:
             self.stat._n_iterations_c = args.stat_n_iter_c
-        if args.distr_test_idx:
-            self.stat._distribution_test_index = args.distr_test_idx
         if args.stat_shuffle:
             self.stat._shuffle = args.stat_shuffle
         if args.stat_pvalue:
             self.stat._p_value = args.stat_pvalue
-        if args.ref_nums:
-            self.stat._ref_numbers = args.ref_nums
 
     def _validate(self) -> None:
         """Validate parameters.
@@ -353,6 +340,9 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "pvalues" ({self.nist._pvalues})')
 
         # Statistical analysis
+        if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
+            raise ValueError(f'Invalid configuration parameter: "stat_selected_tests" ({self.stat._selected_tests})')
+
         if (not self.stat._n_sequences) or (not isinstance(self.stat._n_sequences, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_n_sequences" ({self.stat._n_sequences})')
 
@@ -362,19 +352,11 @@ class Config:
         if (not self.stat._n_iterations_c) or (not isinstance(self.stat._n_iterations_c, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_n_iter_c" ({self.stat._n_iterations_c})')
 
-        if (not self.stat._distribution_test_index) or (not isinstance(self.stat._distribution_test_index, int)):
-            raise ValueError(
-                f'Invalid configuration parameter: "distr_test_idx" ({self.stat._distribution_test_index})'
-            )
-
         if not isinstance(self.stat._shuffle, bool):
             raise ValueError(f'Invalid configuration parameter: "shuffle" ({self.stat._shuffle})')
 
         if (not self.stat._p_value) or (not isinstance(self.stat._p_value, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_pvalue" ({self.stat._p_value})')
-
-        if (not self.stat._ref_numbers) or (not isinstance(self.stat._ref_numbers, list)):
-            raise ValueError(f'Invalid configuration parameter: "ref_nums" ({self.stat._ref_numbers})')
 
     @property
     def nist(self):
@@ -465,11 +447,7 @@ def config_info(conf: Config):
     logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
     logger.debug("Number of shuffled sequences = %s", conf.stat.n_sequences)
     logger.debug("Number of iterations for counter: %s", conf.stat.n_iterations_c)
-    logger.debug(
-        "Test selected for counter distribution analysis: %s",
-        permutation_tests.tests[conf.stat.distribution_test_index].name,
-    )
-    comp = [permutation_tests.tests[i].name for i in conf.stat.ref_numbers]
-    logger.debug("Tests selected test for shuffle/random comparison: %s", comp)
+    stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
+    logger.debug("Test selected for counter distribution analysis: %s", stat_tests)
     logger.debug("p parameter used: user value: %s", conf.stat.p_value)
     logger.debug("----------------------------------------------------------------\n \nMAIN")
