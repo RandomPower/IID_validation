@@ -9,6 +9,8 @@ def shuffle_from_file(file, ind, n_symb, n_seq):
 
     Parameters
     ----------
+    file : str
+        the input binary file
     ind : int
         position where to read in the file
     n_symb : int
