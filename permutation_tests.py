@@ -410,3 +410,29 @@ def run_tests(S, p, test_list=[i.id for i in tests]):
             result = tests[test_index].run(S)
             T.append(result)
     return T
+
+
+def get_C0_C1_Tx(Tx, Ti):
+    """Compute the counters C0 and C1 for a given reference value Tx and a given list of values Ti: for each element of
+    Ti, C0 is incremented if the latter is bigger than that Tx, C1 is incremented if they are equal.
+
+    Parameters
+    ----------
+    Tx : float
+        reference value
+    Ti : list of float
+        list of values to compare with Tx
+
+    Returns
+    -------
+    int, int
+        counter 0 and counter 1
+    """
+    C0 = 0
+    C1 = 0
+    for z in range(len(Ti)):
+        if Tx > Ti[z]:
+            C0 += 1
+        if Tx == Ti[z]:
+            C1 += 1
+    return C0, C1

@@ -14,6 +14,32 @@ import utils.useful_functions
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
+def get_C0_C1_TjNorm(Ti):
+    """Compute the counters C0 and C1 for a given reference list of values Ti with the TjNorm method: the elements of Ti
+    are considered in non-overlapping pairs: if the first element of the couple is bigger that the following one, C0 is
+    incremented; if they are equal C1 is.
+
+    Parameters
+    ----------
+    Ti : list of float
+        list of values to compare
+
+    Returns
+    -------
+    int, int
+        counter 0 and counter 1
+    """
+    C0 = 0
+    C1 = 0
+    for z in range(0, len(Ti) - 1, 2):
+        if Ti[z] > Ti[z + 1]:
+            C0 += 1
+        if Ti[z] == Ti[z + 1]:
+            C1 += 1
+
+    return C0, C1
+
+
 def calculate_counters_Tx(conf: utils.config.Config, S: list[int], test: int) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. The given test is performed on the first sequence to obtain the reference value:
@@ -44,8 +70,6 @@ def calculate_counters_Tx(conf: utils.config.Config, S: list[int], test: int) ->
 
     # S_shuffled will move by a P_pointer for every n_sequences
     for i in tqdm(range(conf.stat.n_iterations)):
-        C0 = 0
-        C1 = 0
         Ti = []
         for k in range(conf.stat.n_sequences):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
@@ -54,11 +78,7 @@ def calculate_counters_Tx(conf: utils.config.Config, S: list[int], test: int) ->
             else:
                 Ti.append(permutation_tests.tests[test].run(s_shuffled))
 
-        for z in range(len(Ti)):
-            if Tx > Ti[z]:
-                C0 += 1
-            if Tx == Ti[z]:
-                C1 += 1
+        C0, C1 = permutation_tests.get_C0_C1_Tx(Tx, Ti)
         counters_0.append(C0)
         counters_1.append(C1)
 
@@ -134,8 +154,6 @@ def calculate_counters_TjNorm(conf: utils.config.Config, S: list[int], test: int
     for k in tqdm(range(conf.stat.n_iterations)):
         Ti = []
         seq = permutation_tests.FY_shuffle(S.copy())
-        C0 = 0
-        C1 = 0
         if test in [8, 9]:
             Ti.append(permutation_tests.tests[test].run(seq, conf.stat.p))
         else:
@@ -153,12 +171,7 @@ def calculate_counters_TjNorm(conf: utils.config.Config, S: list[int], test: int
                 Ti.append(t)
                 j += 1
 
-        for z in range(0, len(Ti) - 1, 2):
-            if Ti[z] > Ti[z + 1]:
-                C0 += 1
-            if Ti[z] == Ti[z + 1]:
-                C1 += 1
-
+        C0, C1 = get_C0_C1_TjNorm(Ti)
         counters_0.append(C0)
         counters_1.append(C1)
 

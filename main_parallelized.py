@@ -37,11 +37,7 @@ def calculate_counters(Tx, Ti):
     C1 = [0 for k in range(len(Tx))]
 
     for u in range(len(Tx)):
-        for t in range(len(Ti)):
-            if Tx[u] > Ti[t][u]:
-                C0[u] += 1
-            if Tx[u] == Ti[t][u]:
-                C1[u] += 1
+        C0[u], C1[u] = permutation_tests.get_C0_C1_Tx(Tx[u], [Ti[t][u] for t in range(len(Ti))])
 
     return C0, C1
 
