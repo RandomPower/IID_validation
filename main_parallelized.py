@@ -230,26 +230,34 @@ def main():
 
     # Global
     global_args = parser.add_argument_group("[global]", "global settings")
-    global_args.add_argument("-c", "--config", type=str, help="Configuration file")
-    global_args.add_argument("-i", "--input_file", type=str, help="Random bit file.")
-    global_args.add_argument("-t", "--nist_test", action="store_true", help="IID validation test.")
-    global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
+    global_args.add_argument("-c", "--config", type=str, help="Path to the configuration file.")
+    global_args.add_argument("-i", "--input_file", type=str, help="Path to the random bit file.")
+    global_args.add_argument("-t", "--nist_test", action="store_true",
+                             help="Perform the NIST IID test on the input sequence.")
+    global_args.add_argument("-a", "--stat_analysis", action="store_true",
+                             help="Perform a statistical analysis of the counters for program consistency.")
 
     # Nist test
     nist_args = parser.add_argument_group("[nist_test]", "nist IID test suite configuration")
     nist_args.add_argument(
-        "--nist_selected_tests", metavar="INDEX", nargs="+", type=int, help="Selection of test numbers to execute."
+        "--nist_selected_tests", metavar="INDEX", nargs="+", type=int,
+        help="Selection of the test numbers to execute. Refer to the NIST SP 800-90B recommendation (Section 5.1)."
     )
-    nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the random-bit sequence.")
+    nist_args.add_argument("--nist_n_symbols", type=int,
+                           help="Number of symbols in the input sequence.")
     nist_args.add_argument(
-        "--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out."
+        "--nist_n_sequences", type=int, help="Number of permutations of the input sequence to generate."
     )
-    nist_args.add_argument("--nist_shuffle", action="store_true", help="Fisher-Yates shuffle.")
+    nist_args.add_argument("--nist_shuffle", action="store_true",
+                           help="Enable Fisher-Yates shuffle to generate permutations.")
     nist_args.add_argument(
-        "--first_seq", action="store_true", help="Read the sequence from the start of the input file."
+        "--first_seq", action="store_true",
+        help="Read the entire sequence from the input file. Otherwise, use only the last [nist_n_symbols] symbols."
     )
-    nist_args.add_argument("--plot", action="store_true", help="See plots.")
-    nist_args.add_argument("--pvalues", metavar="P", nargs="+", type=int, help="User-defined p-value.")
+    nist_args.add_argument("--plot", action="store_true",
+                           help="Generate a histogram plot for each of the executed tests.")
+    nist_args.add_argument("--pvalues", metavar="P", nargs="+", type=int,
+                        help="Custom p-value(s) for periodicity and covariance tests. Must be less than [n_symbols].")
 
     # Statistical analysis
     stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
@@ -265,11 +273,12 @@ def main():
         "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
     )
     stat_args.add_argument(
-        "--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis."
+        "--stat_n_iter_c", type=int,
+        help="Number of repetitions of the entire IID test to obtain the statistical distribution of counter C0."
     )
-    stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
+    stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce the sequences using Fisher-Yates.")
     stat_args.add_argument(
-        "--stat_pvalue", metavar="P", type=int, help="User-defined p-value for the statistical analysis."
+        "--stat_pvalue", metavar="P", type=int, help="Single user-defined p-value for the statistical analysis."
     )
 
     args = parser.parse_args()
