@@ -232,7 +232,7 @@ def main():
     global_args = parser.add_argument_group("[global]", "global settings")
     global_args.add_argument("-c", "--config", type=str, help="Configuration file")
     global_args.add_argument("-i", "--input_file", type=str, help="Random bit file.")
-    global_args.add_argument("-t", "--test_nist", action="store_true", help="IID validation test.")
+    global_args.add_argument("-t", "--nist_test", action="store_true", help="IID validation test.")
     global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
 
     # Nist test
@@ -244,7 +244,7 @@ def main():
     nist_args.add_argument(
         "--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out."
     )
-    nist_args.add_argument("--shuffle", action="store_true", help="Fisher-Yates shuffle.")
+    nist_args.add_argument("--nist_shuffle", action="store_true", help="Fisher-Yates shuffle.")
     nist_args.add_argument(
         "--first_seq", action="store_true", help="Read the sequence from the start of the input file."
     )

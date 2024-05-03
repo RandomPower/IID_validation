@@ -151,10 +151,10 @@ class Config:
                 if not os.path.isfile(self._input_file):
                     logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
 
-            if "test_nist" in conf["global"]:
-                self._nist_test = conf["global"]["test_nist"]
+            if "nist_test" in conf["global"]:
+                self._nist_test = conf["global"]["nist_test"]
                 if not isinstance(self._nist_test, bool):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "test_nist", "bool")
+                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "nist_test", "bool")
 
             if "stat_analysis" in conf["global"]:
                 self._statistical_analysis = conf["global"]["stat_analysis"]
@@ -264,8 +264,8 @@ class Config:
         # Global
         if args.input_file:
             self._input_file = os.path.abspath(os.path.expanduser(args.input_file))
-        if args.test_nist:
-            self._nist_test = args.test_nist
+        if args.nist_test:
+            self._nist_test = args.nist_test
         if args.stat_analysis:
             self._statistical_analysis = args.stat_analysis
         # NIST IID tests
@@ -275,8 +275,8 @@ class Config:
             self.nist._n_symbols = args.nist_n_symbols
         if args.nist_n_sequences:
             self.nist._n_sequences = args.nist_n_sequences
-        if args.shuffle:
-            self.nist._shuffle = args.shuffle
+        if args.nist_shuffle:
+            self.nist._shuffle = args.nist_shuffle
         if args.first_seq:
             self.nist._first_seq = args.first_seq
         if args.plot:
@@ -312,7 +312,7 @@ class Config:
             raise ValueError(f'Invalid or missing configuration parameter: "input_file" ({self._input_file})')
 
         if not isinstance(self._nist_test, bool):
-            raise ValueError(f'Invalid configuration parameter: "test_nist" ({self._nist_test})')
+            raise ValueError(f'Invalid configuration parameter: "nist_test" ({self._nist_test})')
 
         if not isinstance(self._statistical_analysis, bool):
             raise ValueError(f'Invalid configuration parameter: "stat_analysis" ({self._statistical_analysis})')
