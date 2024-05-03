@@ -2,7 +2,7 @@
 # The input file
 # If you don't specify a full path, it will be interpreted as relative to the executable program directory
 input_file = "getbits_20230401_195315_RAW_BITS.BIN"
-test_nist = true
+nist_test = true
 stat_analysis = false
 
 [nist_test]
