@@ -16,7 +16,7 @@ import utils.useful_functions
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
-def counters_FYShuffle_Tx(conf: utils.config.Config, S, test):
+def counters_FYShuffle_Tx(conf: utils.config.Config, S: list[int], test: int) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. The given test is performed on the first sequence to obtain the reference value:
     C0 is incremented if the result of the test T computed on a sequence is bigger than that it,
@@ -70,7 +70,7 @@ def counters_FYShuffle_Tx(conf: utils.config.Config, S, test):
     return counters_0, counters_1
 
 
-def FY_Tx(conf: utils.config.Config, S, test):
+def FY_Tx(conf: utils.config.Config, S: list[int], test: int):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
@@ -110,7 +110,7 @@ def FY_Tx(conf: utils.config.Config, S, test):
     )
 
 
-def counters_Random_Tx(conf: utils.config.Config, S, test):
+def counters_Random_Tx(conf: utils.config.Config, S: list[int], test: int) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     The given test is performed on the first sequence to obtain the reference value: C0 is incremented if the result
     of the test T computed on a sequence is bigger than that it, C1 is incremented if they are equal.
@@ -166,7 +166,7 @@ def counters_Random_Tx(conf: utils.config.Config, S, test):
     return counters_0, counters_1
 
 
-def Random_Tx(conf: utils.config.Config, S, test):
+def Random_Tx(conf: utils.config.Config, S: list[int], test: int):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
@@ -209,7 +209,7 @@ def Random_Tx(conf: utils.config.Config, S, test):
     )
 
 
-def counters_FY_TjNorm(conf: utils.config.Config, S, test):
+def counters_FY_TjNorm(conf: utils.config.Config, S: list[int], test: int) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for a given test on a series of sequences obtained via FY-shuffle from a starting
     one. C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence; if
     the results of the test are equal the second sequence is ignored.
@@ -269,7 +269,7 @@ def counters_FY_TjNorm(conf: utils.config.Config, S, test):
     return counters_0, counters_1
 
 
-def FY_TjNorm(conf: utils.config.Config, S, test):
+def FY_TjNorm(conf: utils.config.Config, S: list[int], test: int):
     """Calculates counter 0 and counter 1 list of values considering a series of sequences obtained via FY-shuffle from
     a starting one, save the values in a file and plot the distribution
 
@@ -312,7 +312,7 @@ def FY_TjNorm(conf: utils.config.Config, S, test):
     )
 
 
-def counters_random_TjNorm(conf: utils.config.Config, test):
+def counters_random_TjNorm(conf: utils.config.Config, test: int) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for a given test on a series of random sequences read from file.
     C0 is incremented if the result of the test T on a sequence is bigger than that on the following sequence;
     if the results of the test are equal the second sequence is ignored.
@@ -362,7 +362,7 @@ def counters_random_TjNorm(conf: utils.config.Config, test):
     return counters_0, counters_1
 
 
-def Random_TjNorm(conf: utils.config.Config, S, test):
+def Random_TjNorm(conf: utils.config.Config, S: list[int], test: int):
     """Calculates counter 0 and counter 1 list of values considering a series of random sequences read from file,
     save the values in a file and plot the distribution
 
@@ -405,7 +405,7 @@ def Random_TjNorm(conf: utils.config.Config, S, test):
     )
 
 
-def get_data(ref_numbers, Tj_norm):
+def get_data(ref_numbers: list[int], Tj_norm: bool) -> tuple[list[int], list[int]]:
     """Reads the files corresponding to the reference test numbers and returns the counters values
 
     Parameters
