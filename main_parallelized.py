@@ -332,31 +332,32 @@ def main():
     args = parser.parse_args()
     conf = utils.config.Config(args)
 
-    # Configure logging
-    # Write all loggers to file, each with their own level, from DEBUG up
-    f_handler = logging.FileHandler("IID_validation.log", mode="w")
-    f_handler.setLevel(logging.DEBUG)
-    f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s"))
-    logging.getLogger().addHandler(f_handler)
-
-    # Write the application-specific logger to stderr, from INFO up
-    s_handler = logging.StreamHandler()
-    s_handler.setLevel(logging.INFO)
-    s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
-    logger.addHandler(s_handler)
-
-    # Set application-specific logger level from DEBUG up
-    logger.setLevel(logging.DEBUG)
-
-    np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
-
-    utils.config.file_info(conf)
-    utils.config.config_info(conf)
     # Create results folder and move into it
     current_run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     results_dir = os.path.join("results", current_run_date)
     os.makedirs(results_dir, exist_ok=True)
     with contextlib.chdir(results_dir):
+        # Configure logging
+        # Write all loggers to file, each with their own level, from DEBUG up
+        f_handler = logging.FileHandler("IID_validation.log", mode="w")
+        f_handler.setLevel(logging.DEBUG)
+        f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s"))
+        logging.getLogger().addHandler(f_handler)
+
+        # Write the application-specific logger to stderr, from INFO up
+        s_handler = logging.StreamHandler()
+        s_handler.setLevel(logging.INFO)
+        s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
+        logger.addHandler(s_handler)
+
+        # Set application-specific logger level from DEBUG up
+        logger.setLevel(logging.DEBUG)
+
+        np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
+
+        utils.config.file_info(conf)
+        utils.config.config_info(conf)
+
         if conf.nist_test:
             iid_test_function(conf)
         if conf.statistical_analysis:
