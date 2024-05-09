@@ -253,7 +253,7 @@ def main():
 
     # Statistical analysis
     stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
-    nist_args.add_argument(
+    stat_args.add_argument(
         "--stat_selected_tests",
         metavar="INDEX",
         nargs="+",
