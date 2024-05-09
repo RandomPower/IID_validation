@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import permutation_tests
-import utils.config
 
 
 def histogram_TxTi(Tx, Ti, t, plot_dir_h):
@@ -49,90 +48,6 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
 
     plot_filename = f"{t.replace(' ', '_')}.pdf"
     plot_path = os.path.join(plot_dir_h, plot_filename)
-
-    plt.savefig(plot_path)
-    plt.close()
-
-
-def scatterplot_RvsFY(test, C0r, C0fy, plot_dir):
-    """Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with
-    the one obtained through FY shuffling.
-    For each test, the mean value of C0 is represented as a dot with error bars and one standard deviation long.
-    The two sets of results (random and shuffled) should overlap, hinting towards the IID hypotesis.
-    The function computes the mean and std for each list making up C0r and C0fy and uses the results for the plot.
-
-
-    Parameters
-    ----------
-    test : str
-        test executed
-    C0r : list of lists of int
-        list containing the values of counters C0 using sequences read from file
-    C0fy : list of lists of int
-        list containing the results of counters C0 using FY shuffled sequence
-    plot_dir : str
-        directory where to save the plot
-    """
-    data_1 = [np.mean(i) for i in C0r]
-    err_1 = [np.std(i) for i in C0r]
-
-    data_2 = [np.mean(i) for i in C0fy]
-    err_2 = [np.std(i) for i in C0fy]
-
-    fig, ax = plt.subplots()
-
-    ax.errorbar(test, data_1, err_1, fmt="o", capsize=3, label="randomized sequences")
-    ax.errorbar(test, data_2, err_2, fmt="o", capsize=3, label="shuffled FY sequences")
-    plt.xlabel("Test")
-    plt.ylabel("Values of the counter C0")
-    ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
-
-    plt.legend()
-
-    plot_filename = "scatterplot_RvsFY.pdf"
-    plot_path = os.path.join(plot_dir, plot_filename)
-
-    plt.savefig(plot_path)
-    plt.close()
-
-
-def scatterplot_RvsFY_TjNorm(conf: utils.config.Config, test, C0r, C0fy, plot_dir):
-    """
-    Plots the graph that compares the distribution of counters C0 computed considering sequences read from file with
-    the one obtained through FY shuffling.
-    Modified version for TjNorm: adds a reference dashed orizontal line in n_sequences/4
-
-    Parameters
-    ----------
-    conf : utils.config.Config
-        application configuration parameters
-    test : str
-        test executed
-    C0r : list of lists of int
-        list containing the values of counters C0 using sequences read from file
-    C0fy : list of lists of int
-        list containing the results of counters C0 using FY shuffled sequence
-    plot_dir : str
-        directory where to save the plot
-    """
-    data_1 = [np.mean(i) for i in C0r]
-    err_1 = [np.std(i) for i in C0r]
-
-    data_2 = [np.mean(i) for i in C0fy]
-    err_2 = [np.std(i) for i in C0fy]
-
-    fig, ax = plt.subplots()
-    ax.errorbar(test, data_1, err_1, fmt="o", capsize=3, label="randomized sequences")
-    ax.errorbar(test, data_2, err_2, fmt="o", capsize=3, label="shuffled FY sequences")
-    ax.axhline(conf.stat.n_sequences / 4, color="red", linestyle="dashed")
-    plt.xlabel("Test")
-    plt.ylabel("Values of the counter C0")
-    ax.set_title("Comparison of the counters C0 for the randomized vs shuffled sequences", size=11)
-
-    plt.legend()
-
-    plot_filename = "scatterplot_RvsFY_TjNorm.pdf"
-    plot_path = os.path.join(plot_dir, plot_filename)
 
     plt.savefig(plot_path)
     plt.close()

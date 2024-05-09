@@ -9,9 +9,7 @@ import permutation_tests
 import utils.config
 
 
-def save_counters(
-    conf: utils.config.Config, c0: list[int], c1: list[int], elapsed_time: float, shuffle_type: str, f: str, test: int
-):
+def save_counters(conf: utils.config.Config, c0: list[int], c1: list[int], elapsed_time: float, f: str, test: int):
     """Saves counters values obtained in the statistical analysis
 
     Parameters
@@ -24,8 +22,6 @@ def save_counters(
         counter C1
     elapsed_time : float
         time to execute a test
-    shuffle_type : str
-        type of shuffle selected
     f : str
         path to csv file
     """
@@ -33,7 +29,6 @@ def save_counters(
         "n_iterations",
         "n_symbols",
         "n_sequences",
-        "shuffle",
         "test",
         "COUNTER_0",
         "COUNTER_1",
@@ -45,7 +40,6 @@ def save_counters(
         conf.stat.n_iterations,
         conf.stat.n_symbols,
         conf.stat.n_sequences,
-        shuffle_type,
         permutation_tests.tests[test].name,
         c0,
         c1,

@@ -1,8 +1,8 @@
 import argparse
 import logging
+import os
 import pathlib
 import tomllib
-import os
 
 import permutation_tests
 
@@ -65,7 +65,6 @@ class Config:
         DEFAULT_N_SYMBOLS = 1000
         DEFAULT_N_SEQUENCES = 200
         DEFAULT_N_ITERATIONS = 500
-        DEFAULT_SHUFFLE = True
         DEFAULT_P = 2
 
         def __init__(self) -> None:
@@ -77,7 +76,6 @@ class Config:
             self._n_sequences = self.DEFAULT_N_SEQUENCES
             self._n_symbols = self.DEFAULT_N_SYMBOLS
             self._n_iterations = self.DEFAULT_N_ITERATIONS
-            self._shuffle = self.DEFAULT_SHUFFLE
             self._p = self.DEFAULT_P
 
         @property
@@ -95,10 +93,6 @@ class Config:
         @property
         def n_iterations(self):
             return self._n_iterations
-
-        @property
-        def shuffle(self):
-            return self._shuffle
 
         @property
         def p(self):
@@ -237,11 +231,6 @@ class Config:
                         "int",
                     )
 
-            if "shuffle" in conf["statistical_analysis"]:
-                self.stat._shuffle = conf["statistical_analysis"]["shuffle"]
-                if not isinstance(self.stat._shuffle, bool):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "shuffle", "bool")
-
             if "p" in conf["statistical_analysis"]:
                 self.stat._p = conf["statistical_analysis"]["p"]
                 if not isinstance(self.stat._p, int):
@@ -281,8 +270,6 @@ class Config:
             self.stat._n_symbols = args.stat_n_symbols
         if args.stat_n_iterations:
             self.stat._n_iterations = args.stat_n_iterations
-        if args.stat_shuffle:
-            self.stat._shuffle = args.stat_shuffle
         if args.stat_p:
             self.stat._p = args.stat_p
 
@@ -337,9 +324,6 @@ class Config:
 
         if (not self.stat._n_iterations) or (not isinstance(self.stat._n_iterations, int)):
             raise ValueError(f'Invalid configuration parameter: "n_iterations" ({self.stat._n_iterations})')
-
-        if not isinstance(self.stat._shuffle, bool):
-            raise ValueError(f'Invalid configuration parameter: "stat_shuffle" ({self.stat._shuffle})')
 
         if (not self.stat._p) or (not isinstance(self.stat._p, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_p" ({self.stat._p})')
@@ -403,14 +387,6 @@ def file_info(conf: Config):
     logger.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
     tot_seqs = conf.stat._n_iterations * conf.stat.n_sequences
     logger.debug("Total sequences necessary = %s", tot_seqs)
-    if not conf.stat.shuffle:
-        if tot_seqs <= max_sequences:
-            logger.debug("SHUFFLE FROM FILE ALLOWED WITH THIS FILE")
-        else:
-            logger.error("SHUFFLE FROM FILE NOT ALLOWED WITH THIS FILE")
-            raise Exception(
-                f"Insufficient sequences (provided {max_sequences}, required {tot_seqs}) in {conf.input_file}"
-            )
     logger.debug("----------------------------------------------------------------\n")
 
 
