@@ -71,21 +71,21 @@ def scatterplot_TxTi(conf: utils.config.Config, Tx, Ti, t: str, plot_dir_s: str)
     plot_dir_s : str
         directory where to save the plot
     """
-    x = [k for k in range(conf.nist.n_sequences)]
+    x = [k for k in range(conf.nist.n_permutations)]
 
     fig, ax = plt.subplots(figsize=(11, 7))
     ax.scatter(x, Ti, s=10)
     plt.xticks(
         np.arange(
             0,
-            conf.nist.n_sequences,
-            conf.nist.n_sequences / 10,
+            conf.nist.n_permutations,
+            conf.nist.n_permutations / 10,
         )
     )
     plt.axhline(y=Tx, color="r", linestyle="-", label="axvline - full height")
     ax.text(Tx, 0.5, f"Tx={Tx}")
 
-    my_text = f"n_simbols={conf.nist.n_symbols}\n" + f"n_iterations={conf.nist.n_sequences}\n" + f"Tx={Tx}"
+    my_text = f"n_simbols={conf.nist.n_symbols}\n" + f"n_iterations={conf.nist.n_permutations}\n" + f"Tx={Tx}"
     props = dict(boxstyle="square", facecolor="grey", alpha=0.15)
     ax.text(0.93, 1.13, my_text, transform=ax.transAxes, fontsize=12, verticalalignment="top", bbox=props)
 

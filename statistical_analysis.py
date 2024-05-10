@@ -40,19 +40,19 @@ def counters_FYShuffle_Tx(conf: utils.config.Config, S: list[int], test: int) ->
     counters_1 = []
     # Calculate reference statistics
     if test in [8, 9]:
-        Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
+        Tx = permutation_tests.tests[test].run(S, conf.stat.p)
     else:
         Tx = permutation_tests.tests[test].run(S)
 
     # S_shuffled will move by a P_pointer for every n_sequences
-    for i in tqdm(range(conf.stat.n_iterations_c)):
+    for i in tqdm(range(conf.stat.n_iterations)):
         C0 = 0
         C1 = 0
         Ti = []
         for k in range(conf.stat.n_sequences):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
             if test in [8, 9]:
-                Ti.append(permutation_tests.tests[test].run(s_shuffled, conf.stat.p_value))
+                Ti.append(permutation_tests.tests[test].run(s_shuffled, conf.stat.p))
             else:
                 Ti.append(permutation_tests.tests[test].run(s_shuffled))
 
@@ -103,7 +103,7 @@ def FY_Tx(conf: utils.config.Config, S: list[int], test: int):
     utils.plot.counters_distribution_Tx(
         C0,
         conf.stat.n_sequences,
-        conf.stat.n_iterations_c,
+        conf.stat.n_iterations,
         test,
         "FY_Tx",
         directory_path,
@@ -130,14 +130,14 @@ def counters_Random_Tx(conf: utils.config.Config, S: list[int], test: int) -> tu
         counter 0 and counter 1 lists of values
     """
     if test in [8, 9]:
-        Tx = permutation_tests.tests[test].run(S, conf.stat.p_value)
+        Tx = permutation_tests.tests[test].run(S, conf.stat.p)
     else:
         Tx = permutation_tests.tests[test].run(S)
     counters_0 = []
     counters_1 = []
     index = conf.stat.n_symbols / 2
 
-    for i in tqdm(range(conf.stat.n_iterations_c)):
+    for i in tqdm(range(conf.stat.n_iterations)):
         C0 = 0
         C1 = 0
         S_shuffled = utils.shuffles.shuffle_from_file(
@@ -146,7 +146,7 @@ def counters_Random_Tx(conf: utils.config.Config, S: list[int], test: int) -> tu
         Ti = []
         for k in S_shuffled:
             if test in [8, 9]:
-                Ti.append(permutation_tests.tests[test].run(k, conf.stat.p_value))
+                Ti.append(permutation_tests.tests[test].run(k, conf.stat.p))
             else:
                 Ti.append(permutation_tests.tests[test].run(k))
 
@@ -202,7 +202,7 @@ def Random_Tx(conf: utils.config.Config, S: list[int], test: int):
     utils.plot.counters_distribution_Tx(
         C0,
         conf.stat.n_sequences,
-        conf.stat.n_iterations_c,
+        conf.stat.n_iterations,
         test,
         "Random_Tx",
         directory_path,
@@ -232,20 +232,20 @@ def counters_FY_TjNorm(conf: utils.config.Config, S: list[int], test: int) -> tu
     """
     counters_0 = []
     counters_1 = []
-    for k in tqdm(range(conf.stat.n_iterations_c)):
+    for k in tqdm(range(conf.stat.n_iterations)):
         Ti = []
         seq = permutation_tests.FY_shuffle(S.copy())
         C0 = 0
         C1 = 0
         if test in [8, 9]:
-            Ti.append(permutation_tests.tests[test].run(seq, conf.stat.p_value))
+            Ti.append(permutation_tests.tests[test].run(seq, conf.stat.p))
         else:
             Ti.append(permutation_tests.tests[test].run(seq))
         j = 1
         while j < conf.stat.n_sequences:
             seq = permutation_tests.FY_shuffle(S.copy())
             if test in [8, 9]:
-                t = permutation_tests.tests[test].run(seq, conf.stat.p_value)
+                t = permutation_tests.tests[test].run(seq, conf.stat.p)
             else:
                 t = permutation_tests.tests[test].run(seq)
             if t == Ti[j - 1]:
@@ -305,7 +305,7 @@ def FY_TjNorm(conf: utils.config.Config, S: list[int], test: int):
     utils.plot.counters_distribution_Tj(
         C0,
         conf.stat.n_sequences,
-        conf.stat.n_iterations_c,
+        conf.stat.n_iterations,
         test,
         "FY_TjNorm",
         directory_path,
@@ -334,7 +334,7 @@ def counters_random_TjNorm(conf: utils.config.Config, test: int) -> tuple[list[i
     counters_1 = []
     index = 0
 
-    for k in tqdm(range(conf.stat.n_iterations_c)):
+    for k in tqdm(range(conf.stat.n_iterations)):
         C0 = 0
         C1 = 0
         s_sequences, Ti = utils.shuffles.shuffle_from_file_Norm(
@@ -398,7 +398,7 @@ def Random_TjNorm(conf: utils.config.Config, S: list[int], test: int):
     utils.plot.counters_distribution_Tj(
         C0,
         conf.stat.n_sequences,
-        conf.stat.n_iterations_c,
+        conf.stat.n_iterations,
         test,
         "Random_TjNorm",
         directory_path,

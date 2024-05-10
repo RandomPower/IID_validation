@@ -98,7 +98,7 @@ def shuffle_from_file_Norm(file, index, n_symb, n_seq, test: int, conf: utils.co
         index += n_symb / 2
 
         if test in [8, 9]:
-            t = permutation_tests.tests[test].run(S, conf.stat.p_value)
+            t = permutation_tests.tests[test].run(S, conf.stat.p)
             Ti.append(t)
         else:
             t = permutation_tests.tests[test].run(S)
@@ -121,7 +121,7 @@ def shuffle_from_file_Norm(file, index, n_symb, n_seq, test: int, conf: utils.co
             index += n_symb / 2
 
             if test in [8, 9]:
-                t = permutation_tests.tests[test].run(S, conf.stat.p_value)
+                t = permutation_tests.tests[test].run(S, conf.stat.p)
             else:
                 t = permutation_tests.tests[test].run(S)
 

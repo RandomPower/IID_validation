@@ -74,7 +74,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int):
 
 
 def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
-    """Executes NIST test suite on shuffled sequence in parallel along n_sequences iterations
+    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
 
     Parameters
     ----------
@@ -91,12 +91,12 @@ def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
     Ti = []
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
-        for iteration in range(conf.nist.n_sequences):
+        for iteration in range(conf.nist.n_permutations):
             s_shuffled = permutation_tests.FY_shuffle(S.copy())
             future = executor.submit(
                 permutation_tests.run_tests,
                 s_shuffled,
-                conf.nist.pvalues,
+                conf.nist.p,
                 conf.nist.selected_tests,
             )
             futures.append(future)
@@ -132,15 +132,15 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
 
     Ti_transposed = np.transpose(Ti)
     for t in range(len(Tx)):
-        if conf.nist.pvalues == conf.nist.DEFAULT_PVALUES:
+        if conf.nist.p == conf.nist.DEFAULT_P:
             # Handle the special case for test 8 ('periodicity')
             if 8 <= t <= 12:
                 p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[8].name} (p={conf.nist.pvalues[p_index]})"
+                test_name = f"{permutation_tests.tests[8].name} (p={conf.nist.p[p_index]})"
             # Handle the special case for test 9 ('covariance')
             elif 13 <= t <= 17:
                 p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[9].name} (p={conf.nist.pvalues[p_index]})"
+                test_name = f"{permutation_tests.tests[9].name} (p={conf.nist.p[p_index]})"
             # For the values that should correspond to test 10 ('compression')
             elif t == 18:
                 test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
@@ -149,7 +149,7 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
                 test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, histo_dir)
             utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], test_name, scatterplot_dir)
-        elif len(conf.nist.pvalues) == 1:
+        elif len(conf.nist.p) == 1:
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, histo_dir)
             utils.plot.scatterplot_TxTi(
                 conf, Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, scatterplot_dir
@@ -172,7 +172,7 @@ def iid_test_function(conf: utils.config.Config):
     logger.debug("Sequence calculated: S")
 
     logger.debug("Calculating for each test the reference statistic: Tx")
-    Tx = permutation_tests.run_tests(S, conf.nist.pvalues, conf.nist.selected_tests)
+    Tx = permutation_tests.run_tests(S, conf.nist.p, conf.nist.selected_tests)
     logger.debug("Reference statistics calculated!")
 
     logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
@@ -185,7 +185,7 @@ def iid_test_function(conf: utils.config.Config):
     logger.debug("C0 = %s", C0)
     logger.debug("C1 = %s", C1)
 
-    IID_assumption = iid_result(C0, C1, conf.nist.n_sequences)
+    IID_assumption = iid_result(C0, C1, conf.nist.n_permutations)
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
@@ -229,47 +229,104 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Global
-    global_args = parser.add_argument_group("[global]", "global settings")
-    global_args.add_argument("-c", "--config", type=str, help="Configuration file")
-    global_args.add_argument("-i", "--input_file", type=str, help="Random bit file.")
-    global_args.add_argument("-t", "--test_nist", action="store_true", help="IID validation test.")
-    global_args.add_argument("-a", "--stat_analysis", action="store_true", help="Statistical analysis.")
+    global_args = parser.add_argument_group("[global]", "Global settings")
+    global_args.add_argument("-c", "--config", type=str, help="Path to the TOML configuration file.")
+    global_args.add_argument("-i", "--input_file", type=str, help="Path to the random bit file.")
+    global_args.add_argument(
+        "-t",
+        "--nist_test",
+        action="store_true",
+        help="Run the NIST IID test suite on a sequence obtained from the input file.",
+    )
+    global_args.add_argument(
+        "-a", "--stat_analysis", action="store_true", help="Run the RaP statistical analysis on the input file."
+    )
 
     # Nist test
-    nist_args = parser.add_argument_group("[nist_test]", "nist IID test suite configuration")
+    nist_args = parser.add_argument_group("[nist_test]", "NIST IID test suite configuration")
     nist_args.add_argument(
-        "--nist_selected_tests", metavar="INDEX", nargs="+", type=int, help="Selection of test numbers to execute."
+        "--nist_selected_tests",
+        metavar="INDEX",
+        nargs="+",
+        type=int,
+        help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
-    nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the random-bit sequence.")
     nist_args.add_argument(
-        "--nist_n_sequences", type=int, help="Number of sequences on which the test will be carried out."
+        "--nist_n_symbols",
+        type=int,
+        help=f"Number of symbols in the input sequence [Default: {utils.config.Config.NISTConfig.DEFAULT_N_SYMBOLS}].",
     )
-    nist_args.add_argument("--shuffle", action="store_true", help="Fisher-Yates shuffle.")
     nist_args.add_argument(
-        "--first_seq", action="store_true", help="Read the sequence from the start of the input file."
+        "--nist_n_permutations",
+        type=int,
+        help="Number of permutations of the input sequence "
+        f"[Default: {utils.config.Config.NISTConfig.DEFAULT_N_PERMUTATIONS}].",
     )
-    nist_args.add_argument("--plot", action="store_true", help="See plots.")
-    nist_args.add_argument("--pvalues", metavar="P", nargs="+", type=int, help="User-defined p-value.")
+    nist_args.add_argument(
+        "--first_seq",
+        action="store_true",
+        help=(
+            "Test the first sequence of [nist_n_symbols] symbols from the input file "
+            f"[Default: {utils.config.Config.NISTConfig.DEFAULT_FIRST_SEQ}]."
+        ),
+    )
+    nist_args.add_argument(
+        "--plot",
+        action="store_true",
+        help=(
+            "Generate a histogram plot for each of the executed tests. "
+            f"[Default: {utils.config.Config.NISTConfig.DEFAULT_PLOT}]"
+        ),
+    )
+    nist_args.add_argument(
+        "--nist_p",
+        metavar="P",
+        nargs="+",
+        type=int,
+        help=(
+            "Lag parameters p used for periodicity and covariance tests "
+            f"[Default: {utils.config.Config.NISTConfig.DEFAULT_P}]"
+        ),
+    )
 
     # Statistical analysis
-    stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
+    stat_args = parser.add_argument_group("[statistical_analysis]", "Statistical analysis options")
     stat_args.add_argument(
         "--stat_selected_tests",
         metavar="INDEX",
         nargs="+",
         type=int,
-        help="Selection of test numbers to execute for the statistical analysis.",
-    )
-    stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
-    stat_args.add_argument(
-        "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
+        help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
     stat_args.add_argument(
-        "--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis."
+        "--stat_n_sequences",
+        type=int,
+        help=f"Number of sequences [Default: {utils.config.Config.StatConfig.DEFAULT_N_SEQUENCES}].",
     )
-    stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
     stat_args.add_argument(
-        "--stat_pvalue", metavar="P", type=int, help="User-defined p-value for the statistical analysis."
+        "--stat_n_symbols",
+        type=int,
+        help=f"Number of symbols in a sequence [Default: {utils.config.Config.StatConfig.DEFAULT_N_SYMBOLS}].",
+    )
+    stat_args.add_argument(
+        "--stat_n_iterations",
+        type=int,
+        help=(
+            "Number of iterations of the IID test suite to obtain the statistical distribution of counter C0 "
+            f"[Default: {utils.config.Config.StatConfig.DEFAULT_N_ITERATIONS}]."
+        ),
+    )
+    stat_args.add_argument(
+        "--stat_shuffle",
+        action="store_true",
+        help=f"Produce the sequences using Fisher-Yates [Default: {utils.config.Config.StatConfig.DEFAULT_SHUFFLE}].",
+    )
+    stat_args.add_argument(
+        "--stat_p",
+        metavar="P",
+        type=int,
+        help="Single lag parameter p used for periodicity and covariance tests "
+        f"[Default: {utils.config.Config.StatConfig.DEFAULT_P}]",
     )
 
     args = parser.parse_args()

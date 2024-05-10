@@ -35,3 +35,23 @@ $ source .venv/bin/activate
 ```
 
 The main dependencies of the IID_Validation test suite are `numpy`, `matplotlib` and the `tqdm` utility library.
+
+## NIST IID test suite indexes
+
+The following is the list of test indexes used in the software, specifically for the **NIST IID test suite**. On the left, there are the indexes used in the program, while, on the right, the associated references.
+
+| Index | NIST SP 800-90B reference                      |
+|:-----:|:-----------------------------------------------|
+|  0    | **5.1.1** - Excursion Test Statistic           |
+|  1    | **5.1.2** - Number of Directional Runs         |
+|  2    | **5.1.3** - Length of Directional Runs         |
+|  3    | **5.1.4** - Number of Increases and Decreases  |
+|  4    | **5.1.5** - Number of Runs Based on the Median |
+|  5    | **5.1.6** - Length of Runs Based on Median     |
+|  6    | **5.1.7** - Average Collision Test Statistic   |
+|  7    | **5.1.8** - Maximum Collision Test Statistic   |
+|  8    | **5.1.9** - Periodicity Test Statistic         |
+|  9    | **5.1.10** - Covariance Test Statistic         |
+| 10    | **5.1.11** - Compression Test Statistic        |
+
+For more, refer to the **NIST SP 800-90B Recommendation**.

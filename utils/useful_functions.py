@@ -30,7 +30,7 @@ def save_counters(
         path to csv file
     """
     header = [
-        "n_iterations_c",
+        "n_iterations",
         "n_symbols",
         "n_sequences",
         "shuffle",
@@ -42,7 +42,7 @@ def save_counters(
     ]
     elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
     data = [
-        conf.stat.n_iterations_c,
+        conf.stat.n_iterations,
         conf.stat.n_symbols,
         conf.stat.n_sequences,
         shuffle_type,
@@ -76,10 +76,10 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
     test_time : float
         total process time
     """
-    header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
+    header = ["n_symbols", "n_permutations", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
     d = [
         conf.nist.n_symbols,
-        conf.nist.n_sequences,
+        conf.nist.n_permutations,
         [permutation_tests.tests[i].name for i in conf.nist.selected_tests],
         C0,
         C1,
@@ -107,7 +107,7 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
     Ti : list of float
         Ti test values calculated on the shuffled sequences
     """
-    if conf.nist.pvalues == conf.nist.DEFAULT_PVALUES:
+    if conf.nist.p == conf.nist.DEFAULT_P:
         header = [
             "excursion_test",
             "n_directional_runs",
@@ -129,7 +129,7 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
             "covariance_p4",
             "compression",
         ]
-    elif len(conf.nist.pvalues) == 1:
+    elif len(conf.nist.p) == 1:
         header = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
     else:
         raise Exception("Support for arbitrary p values not implemented yet")
