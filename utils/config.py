@@ -17,10 +17,11 @@ class Config:
 
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
-        DEFAULT_N_SYMBOLS = 100
-        DEFAULT_N_PERMUTATIONS = 100000
+        DEFAULT_N_SYMBOLS = 1000000
+        DEFAULT_N_PERMUTATIONS = 10000
         DEFAULT_FIRST_SEQ = True
         DEFAULT_PLOT = False
+        # Default NIST values for lag parameter p
         DEFAULT_P = [1, 2, 8, 16, 32]
 
         def __init__(self) -> None:
