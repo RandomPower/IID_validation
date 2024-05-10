@@ -310,10 +310,10 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "nist_selected_tests" ({self.nist._selected_tests})')
 
         if (not self.nist._n_symbols) or (not isinstance(self.nist._n_symbols, int)):
-            raise ValueError(f'Invalid configuration parameter: "n_symbols" ({self.nist._n_symbols})')
+            raise ValueError(f'Invalid configuration parameter: "nist_n_symbols" ({self.nist._n_symbols})')
 
         if (not self.nist._n_permutations) or (not isinstance(self.nist._n_permutations, int)):
-            raise ValueError(f'Invalid configuration parameter: "n_permutations" ({self.nist._n_permutations})')
+            raise ValueError(f'Invalid configuration parameter: "nist_n_permutations" ({self.nist._n_permutations})')
 
         if not isinstance(self.nist._first_seq, bool):
             raise ValueError(f'Invalid configuration parameter: "first_seq" ({self.nist._first_seq})')
@@ -322,7 +322,7 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "plot" ({self.nist._plot})')
 
         if (not self.nist._p) or (not isinstance(self.nist._p, list)):
-            raise ValueError(f'Invalid configuration parameter: "p" ({self.nist._p})')
+            raise ValueError(f'Invalid configuration parameter: "nist_p" ({self.nist._p})')
 
         # Statistical analysis
         if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
@@ -338,10 +338,10 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "n_iterations" ({self.stat._n_iterations})')
 
         if not isinstance(self.stat._shuffle, bool):
-            raise ValueError(f'Invalid configuration parameter: "shuffle" ({self.stat._shuffle})')
+            raise ValueError(f'Invalid configuration parameter: "stat_shuffle" ({self.stat._shuffle})')
 
         if (not self.stat._p) or (not isinstance(self.stat._p, int)):
-            raise ValueError(f'Invalid configuration parameter: "stat_pvalue" ({self.stat._p})')
+            raise ValueError(f'Invalid configuration parameter: "stat_p" ({self.stat._p})')
 
     @property
     def nist(self):
