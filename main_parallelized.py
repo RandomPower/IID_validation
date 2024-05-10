@@ -205,19 +205,21 @@ def statistical_analysis_function(conf: utils.config.Config):
         application configuration parameters
     """
     logger.debug("----------------------------------------------------------------\n \n")
-    logger.debug("STATISTICAL ANALYSIS FOR TEST %s", permutation_tests.tests[conf.stat.distribution_test_index].name)
+    stat_tests_names = [permutation_tests.tests[t].name for t in conf.stat.selected_tests]
+    logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
     S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
     logger.debug("Sequence calculated: S")
-    with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-        tasks = [
-            executor.submit(statistical_analysis.FY_Tx, conf, S),
-            executor.submit(statistical_analysis.FY_TjNorm, conf, S),
-            executor.submit(statistical_analysis.Random_Tx, conf, S),
-            executor.submit(statistical_analysis.Random_TjNorm, conf, S),
-        ]
-        # Wait for all tasks to complete
-        for task in tasks:
-            task.result()
+    for test in conf.stat.selected_tests:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+            tasks = [
+                executor.submit(statistical_analysis.FY_Tx, conf, S, test),
+                executor.submit(statistical_analysis.FY_TjNorm, conf, S, test),
+                executor.submit(statistical_analysis.Random_Tx, conf, S, test),
+                executor.submit(statistical_analysis.Random_TjNorm, conf, S, test),
+            ]
+            # Wait for all tasks to complete
+            for task in tasks:
+                task.result()
 
     statistical_analysis.comparison_scatterplot(conf)
     logger.debug("Statistical analysis completed.")
@@ -251,6 +253,13 @@ def main():
 
     # Statistical analysis
     stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
+    stat_args.add_argument(
+        "--stat_selected_tests",
+        metavar="INDEX",
+        nargs="+",
+        type=int,
+        help="Selection of test numbers to execute for the statistical analysis.",
+    )
     stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
     stat_args.add_argument(
         "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
@@ -258,17 +267,9 @@ def main():
     stat_args.add_argument(
         "--stat_n_iter_c", type=int, help="Number of iterations to do on sequences for the stat analysis."
     )
-    stat_args.add_argument("--distr_test_idx", metavar="INDEX", type=int, help="Test to execute.")
     stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce sequences using Fisher-Yates.")
     stat_args.add_argument(
         "--stat_pvalue", metavar="P", type=int, help="User-defined p-value for the statistical analysis."
-    )
-    stat_args.add_argument(
-        "--ref_nums",
-        metavar="INDEX",
-        nargs="+",
-        type=int,
-        help="Tests to consider for comparing the stat results.",
     )
 
     args = parser.parse_args()
