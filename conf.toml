@@ -13,9 +13,6 @@ n_permutations = 100000
 # if True: reference sequence read from beginning
 # if False: reference sequence from the end
 first_seq = true
-# if True: the NIST values are set
-# if False: the user chooses value
-bool_pvalue = false
 plot = false
 p = [2]
 
