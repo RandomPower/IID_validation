@@ -74,7 +74,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int):
 
 
 def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
-    """Executes NIST test suite on shuffled sequence in parallel along n_sequences iterations
+    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
 
     Parameters
     ----------

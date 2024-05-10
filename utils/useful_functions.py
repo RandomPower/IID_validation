@@ -76,7 +76,7 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
     test_time : float
         total process time
     """
-    header = ["n_symbols", "n_sequences", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
+    header = ["n_symbols", "n_permutations", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
     d = [
         conf.nist.n_symbols,
         conf.nist.n_permutations,

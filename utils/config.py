@@ -18,7 +18,7 @@ class Config:
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 100
-        DEFAULT_N_SEQUENCES = 100000
+        DEFAULT_N_PERMUTATIONS = 100000
         DEFAULT_SHUFFLE = True
         DEFAULT_FIRST_SEQ = True
         DEFAULT_PLOT = False
@@ -31,7 +31,7 @@ class Config:
             """Initialise member variables to default values."""
             self._selected_tests = self.DEFAULT_SELECTED_TESTS
             self._n_symbols = self.DEFAULT_N_SYMBOLS
-            self._n_permutations = self.DEFAULT_N_SEQUENCES
+            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._shuffle = self.DEFAULT_SHUFFLE
             self._first_seq = self.DEFAULT_FIRST_SEQ
             self._plot = self.DEFAULT_PLOT
@@ -182,11 +182,11 @@ class Config:
                 if not isinstance(self.nist._n_symbols, int):
                     logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_symbols", "int")
 
-            if "n_sequences" in conf["nist_test"]:
-                self.nist._n_permutations = conf["nist_test"]["n_sequences"]
-                if not isinstance(self.nist.n_permutations, int):
+            if "n_permutations" in conf["nist_test"]:
+                self.nist._n_permutations = conf["nist_test"]["n_permutations"]
+                if not isinstance(self.nist._n_permutations, int):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int"
+                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_permutations", "int"
                     )
 
             if "shuffle" in conf["nist_test"]:
@@ -325,8 +325,8 @@ class Config:
         if (not self.nist._n_symbols) or (not isinstance(self.nist._n_symbols, int)):
             raise ValueError(f'Invalid configuration parameter: "n_symbols" ({self.nist._n_symbols})')
 
-        if (not self.nist.n_permutations) or (not isinstance(self.nist.n_permutations, int)):
-            raise ValueError(f'Invalid configuration parameter: "n_sequences" ({self.nist.n_permutations})')
+        if (not self.nist._n_permutations) or (not isinstance(self.nist._n_permutations, int)):
+            raise ValueError(f'Invalid configuration parameter: "n_permutations" ({self.nist._n_permutations})')
 
         if not isinstance(self.nist._shuffle, bool):
             raise ValueError(f'Invalid configuration parameter: "shuffle" ({self.nist._shuffle})')
