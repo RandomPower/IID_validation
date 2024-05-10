@@ -229,7 +229,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Global
-    global_args = parser.add_argument_group("[global]", "global settings")
+    global_args = parser.add_argument_group("[global]", "Global settings")
     global_args.add_argument("-c", "--config", type=str, help="Path to the TOML configuration file.")
     global_args.add_argument("-i", "--input_file", type=str, help="Path to the random bit file.")
     global_args.add_argument(
@@ -243,7 +243,7 @@ def main():
     )
 
     # Nist test
-    nist_args = parser.add_argument_group("[nist_test]", "nist IID test suite configuration")
+    nist_args = parser.add_argument_group("[nist_test]", "NIST IID test suite configuration")
     nist_args.add_argument(
         "--nist_selected_tests",
         metavar="INDEX",
@@ -281,18 +281,16 @@ def main():
     )
 
     # Statistical analysis
-    stat_args = parser.add_argument_group("[statistical_analysis]", "statistical analysis options")
+    stat_args = parser.add_argument_group("[statistical_analysis]", "Statistical analysis options")
     stat_args.add_argument(
         "--stat_selected_tests",
         metavar="INDEX",
         nargs="+",
         type=int,
-        help="Selection of test numbers to execute for the statistical analysis.",
+        help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
-    stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences for the statistical analysis.")
-    stat_args.add_argument(
-        "--stat_n_symbols", type=int, help="Number of symbols in a sequence for the statistical analysis."
-    )
+    stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences.")
+    stat_args.add_argument("--stat_n_symbols", type=int, help="Number of symbols in a sequence.")
     stat_args.add_argument(
         "--stat_n_iterations",
         type=int,
@@ -303,7 +301,11 @@ def main():
     )
     stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce the sequences using Fisher-Yates.")
     stat_args.add_argument(
-        "--stat_pvalue", metavar="P", type=int, help="Single user-defined p-value for the statistical analysis."
+        "--stat_p",
+        metavar="P",
+        type=int,
+        help="Single lag parameter p used for periodicity and covariance tests "
+        f"[Default {utils.config.Config.StatConfig.DEFAULT_P}]",
     )
 
     args = parser.parse_args()
