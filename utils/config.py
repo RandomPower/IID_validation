@@ -135,7 +135,11 @@ class Config:
                     not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
                 ):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "input_file", "binary file"
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "input_file",
+                        "binary file",
                     )
                 if not os.path.isfile(self._input_file):
                     logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
@@ -143,13 +147,23 @@ class Config:
             if "nist_test" in conf["global"]:
                 self._nist_test = conf["global"]["nist_test"]
                 if not isinstance(self._nist_test, bool):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "nist_test", "bool")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "nist_test",
+                        "bool",
+                    )
 
             if "stat_analysis" in conf["global"]:
                 self._statistical_analysis = conf["global"]["stat_analysis"]
                 if not isinstance(self._statistical_analysis, bool):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "stat_analysis", "bool"
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "stat_analysis",
+                        "bool",
                     )
 
         # nist_test section
@@ -160,8 +174,9 @@ class Config:
                     not all(isinstance(i, int) for i in self.nist._selected_tests)
                 ):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)",
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
+                        "nist_test",
                         "selected_tests",
                         "list of integers",
                     )
@@ -169,30 +184,56 @@ class Config:
             if "n_symbols" in conf["nist_test"]:
                 self.nist._n_symbols = conf["nist_test"]["n_symbols"]
                 if not isinstance(self.nist._n_symbols, int):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_symbols", "int")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "nist_test",
+                        "n_symbols",
+                        "int",
+                    )
 
             if "n_permutations" in conf["nist_test"]:
                 self.nist._n_permutations = conf["nist_test"]["n_permutations"]
                 if not isinstance(self.nist._n_permutations, int):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_permutations", "int"
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "nist_test",
+                        "n_permutations",
+                        "int",
                     )
 
             if "first_seq" in conf["nist_test"]:
                 self.nist._first_seq = conf["nist_test"]["first_seq"]
                 if not isinstance(self.nist._first_seq, bool):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "first_seq", "bool")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "nist_test",
+                        "first_seq",
+                        "bool",
+                    )
 
             if "plot" in conf["nist_test"]:
                 self.nist._plot = conf["nist_test"]["plot"]
                 if not isinstance(self.nist._plot, bool):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "plot", "bool")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "nist_test",
+                        "plot",
+                        "bool",
+                    )
 
             if "p" in conf["nist_test"]:
                 self.nist._p = conf["nist_test"]["p"]
                 if (not isinstance(self.nist._p, list)) or (not all(isinstance(i, int) for i in self.nist._p)):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "p", "list of integers"
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "nist_test",
+                        "p",
+                        "list of integers",
                     )
 
         # statistical_analysis section
@@ -203,8 +244,9 @@ class Config:
                     not all(isinstance(i, int) for i in self.stat._selected_tests)
                 ):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)",
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
+                        "statistical_analysis",
                         "selected_tests",
                         "list of integers",
                     )
@@ -213,20 +255,31 @@ class Config:
                 self.stat._n_sequences = conf["statistical_analysis"]["n_sequences"]
                 if not isinstance(self.stat._n_sequences, int):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)", filename, "n_sequences", "int"
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "statistical_analysis",
+                        "n_sequences",
+                        "int",
                     )
 
             if "n_symbols" in conf["statistical_analysis"]:
                 self.stat._n_symbols = conf["statistical_analysis"]["n_symbols"]
                 if not isinstance(self.stat._n_symbols, int):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "n_symbols", "int")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "statistical_analysis",
+                        "n_symbols",
+                        "int",
+                    )
 
             if "n_iterations" in conf["statistical_analysis"]:
                 self.stat._n_iterations = conf["statistical_analysis"]["n_iterations"]
                 if not isinstance(self.stat._n_iterations, int):
                     logger.error(
-                        "%s: invalid configuration parameter %s (expected %s)",
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
+                        "statistical_analysis",
                         "n_iterations",
                         "int",
                     )
@@ -234,7 +287,13 @@ class Config:
             if "p" in conf["statistical_analysis"]:
                 self.stat._p = conf["statistical_analysis"]["p"]
                 if not isinstance(self.stat._p, int):
-                    logger.error("%s: invalid configuration parameter %s (expected %s)", filename, "p", "int")
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "statistical_analysis",
+                        "p",
+                        "int",
+                    )
 
     def _parse_args(self, args: argparse.Namespace) -> None:
         """Parse the command-line arguments.
