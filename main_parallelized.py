@@ -254,9 +254,6 @@ def main():
     nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the input sequence.")
     nist_args.add_argument("--nist_n_permutations", type=int, help="Number of permutations of the input sequence.")
     nist_args.add_argument(
-        "--nist_shuffle", action="store_true", help="Enable Fisher-Yates shuffle to generate permutations."
-    )
-    nist_args.add_argument(
         "--first_seq",
         action="store_true",
         help=(
