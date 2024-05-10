@@ -251,8 +251,17 @@ def main():
         type=int,
         help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
-    nist_args.add_argument("--nist_n_symbols", type=int, help="Number of symbols in the input sequence.")
-    nist_args.add_argument("--nist_n_permutations", type=int, help="Number of permutations of the input sequence.")
+    nist_args.add_argument(
+        "--nist_n_symbols",
+        type=int,
+        help=f"Number of symbols in the input sequence [Default: {utils.config.Config.NISTConfig.DEFAULT_N_SYMBOLS}].",
+    )
+    nist_args.add_argument(
+        "--nist_n_permutations",
+        type=int,
+        help="Number of permutations of the input sequence "
+        f"[Default: {utils.config.Config.NISTConfig.DEFAULT_N_PERMUTATIONS}].",
+    )
     nist_args.add_argument(
         "--first_seq",
         action="store_true",
@@ -276,7 +285,7 @@ def main():
         type=int,
         help=(
             "Lag parameters p used for periodicity and covariance tests "
-            f"[Default {utils.config.Config.NISTConfig.DEFAULT_P}]"
+            f"[Default: {utils.config.Config.NISTConfig.DEFAULT_P}]"
         ),
     )
 
@@ -289,8 +298,16 @@ def main():
         type=int,
         help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
-    stat_args.add_argument("--stat_n_sequences", type=int, help="Number of sequences.")
-    stat_args.add_argument("--stat_n_symbols", type=int, help="Number of symbols in a sequence.")
+    stat_args.add_argument(
+        "--stat_n_sequences",
+        type=int,
+        help=f"Number of sequences [Default: {utils.config.Config.StatConfig.DEFAULT_N_SEQUENCES}].",
+    )
+    stat_args.add_argument(
+        "--stat_n_symbols",
+        type=int,
+        help=f"Number of symbols in a sequence [Default: {utils.config.Config.StatConfig.DEFAULT_N_SYMBOLS}].",
+    )
     stat_args.add_argument(
         "--stat_n_iterations",
         type=int,
@@ -299,13 +316,17 @@ def main():
             f"[Default: {utils.config.Config.StatConfig.DEFAULT_N_ITERATIONS}]."
         ),
     )
-    stat_args.add_argument("--stat_shuffle", action="store_true", help="Produce the sequences using Fisher-Yates.")
+    stat_args.add_argument(
+        "--stat_shuffle",
+        action="store_true",
+        help=f"Produce the sequences using Fisher-Yates [Default: {utils.config.Config.StatConfig.DEFAULT_SHUFFLE}].",
+    )
     stat_args.add_argument(
         "--stat_p",
         metavar="P",
         type=int,
         help="Single lag parameter p used for periodicity and covariance tests "
-        f"[Default {utils.config.Config.StatConfig.DEFAULT_P}]",
+        f"[Default: {utils.config.Config.StatConfig.DEFAULT_P}]",
     )
 
     args = parser.parse_args()
