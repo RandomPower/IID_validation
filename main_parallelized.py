@@ -339,7 +339,7 @@ def main():
     with contextlib.chdir(results_dir):
         # Configure logging
         # Write all loggers to file, each with their own level, from DEBUG up
-        f_handler = logging.FileHandler("IID_validation.log", mode="w")
+        f_handler = logging.FileHandler(f"{current_run_date}.log", mode="w")
         f_handler.setLevel(logging.DEBUG)
         f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s"))
         logging.getLogger().addHandler(f_handler)
