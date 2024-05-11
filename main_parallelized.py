@@ -14,7 +14,6 @@ import statistical_analysis
 import utils.config
 import utils.plot
 import utils.read
-import utils.shuffles
 import utils.useful_functions
 
 
@@ -206,16 +205,13 @@ def statistical_analysis_function(conf: utils.config.Config):
     for test in conf.stat.selected_tests:
         with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
             tasks = [
-                executor.submit(statistical_analysis.FY_Tx, conf, S, test),
-                executor.submit(statistical_analysis.FY_TjNorm, conf, S, test),
-                executor.submit(statistical_analysis.Random_Tx, conf, S, test),
-                executor.submit(statistical_analysis.Random_TjNorm, conf, S, test),
+                executor.submit(statistical_analysis.counters_Tx, conf, S, test),
+                executor.submit(statistical_analysis.counters_TjNorm, conf, S, test),
             ]
             # Wait for all tasks to complete
             for task in tasks:
                 task.result()
 
-    statistical_analysis.comparison_scatterplot(conf)
     logger.debug("Statistical analysis completed.")
 
 
@@ -309,11 +305,6 @@ def main():
             "Number of iterations of the IID test suite to obtain the statistical distribution of counter C0 "
             f"[Default: {utils.config.Config.StatConfig.DEFAULT_N_ITERATIONS}]."
         ),
-    )
-    stat_args.add_argument(
-        "--stat_shuffle",
-        action="store_true",
-        help=f"Produce the sequences using Fisher-Yates [Default: {utils.config.Config.StatConfig.DEFAULT_SHUFFLE}].",
     )
     stat_args.add_argument(
         "--stat_p",
