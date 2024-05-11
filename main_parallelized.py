@@ -113,7 +113,7 @@ def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
 
 
 def iid_plots(conf: utils.config.Config, Tx, Ti):
-    """Plot histogram and scatterplot of Ti values with respect to the Tx test value
+    """Plot histogram of Ti values with respect to the Tx test value
 
     Parameters
     ----------
@@ -124,10 +124,8 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
     Ti : list of int
         test values calculated on shuffled sequences
     """
-    scatterplot_dir = os.path.join("IID_validation", "scatterplot_TxTi")
     histo_dir = os.path.join("IID_validation", "histogram_TxTi")
     # Ensure the directory exists
-    os.makedirs(scatterplot_dir, exist_ok=True)
     os.makedirs(histo_dir, exist_ok=True)
 
     Ti_transposed = np.transpose(Ti)
@@ -148,12 +146,8 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
                 # Direct mapping for other tests
                 test_name = permutation_tests.tests[t].name
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, histo_dir)
-            utils.plot.scatterplot_TxTi(conf, Tx[t], Ti_transposed[t], test_name, scatterplot_dir)
         elif len(conf.nist.p) == 1:
             utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, histo_dir)
-            utils.plot.scatterplot_TxTi(
-                conf, Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, scatterplot_dir
-            )
         else:
             raise Exception("Support for arbitrary p values not implemented yet")
 
