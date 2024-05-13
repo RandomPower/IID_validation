@@ -225,11 +225,16 @@ def main():
     global_args.add_argument(
         "-t",
         "--nist_test",
-        action="store_true",
-        help="Run the NIST IID test suite on a sequence obtained from the input file.",
+        action=argparse.BooleanOptionalAction,
+        help="Run the NIST IID test suite on a sequence obtained from the input file "
+        f"[Default: {utils.config.Config.DEFAULT_NIST_TEST}].",
     )
     global_args.add_argument(
-        "-a", "--stat_analysis", action="store_true", help="Run the RaP statistical analysis on the input file."
+        "-a",
+        "--stat_analysis",
+        action=argparse.BooleanOptionalAction,
+        help="Run the RaP statistical analysis on the input file "
+        f"[Default: {utils.config.Config.DEFAULT_STATISTICAL_ANALYSIS}].",
     )
 
     # Nist test
@@ -252,17 +257,28 @@ def main():
         help="Number of permutations of the input sequence "
         f"[Default: {utils.config.Config.NISTConfig.DEFAULT_N_PERMUTATIONS}].",
     )
-    nist_args.add_argument(
+
+    # Mutual exclusion between 'first_seq' and 'last_seq'
+    first_seq_args = nist_args.add_mutually_exclusive_group()
+
+    first_seq_args.add_argument(
         "--first_seq",
+        default=None,
         action="store_true",
-        help=(
-            "Test the first sequence of [nist_n_symbols] symbols from the input file "
-            f"[Default: {utils.config.Config.NISTConfig.DEFAULT_FIRST_SEQ}]."
-        ),
+        help="Test the first sequence of [nist_n_symbols] symbols from the input file "
+        f"[Default: {utils.config.Config.NISTConfig.DEFAULT_FIRST_SEQ}].",
+    )
+    first_seq_args.add_argument(
+        "--last_seq",
+        default=None,
+        action="store_false",
+        dest="first_seq",
+        help="Test the last sequence of [nist_n_symbols] symbols from the input file "
+        f"[Default: {not utils.config.Config.NISTConfig.DEFAULT_FIRST_SEQ}].",
     )
     nist_args.add_argument(
         "--plot",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
         help=(
             "Generate a histogram plot for each of the executed tests. "
             f"[Default: {utils.config.Config.NISTConfig.DEFAULT_PLOT}]"
