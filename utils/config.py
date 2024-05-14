@@ -13,14 +13,14 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 class Config:
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_NIST_TEST = True
-    DEFAULT_STATISTICAL_ANALYSIS = False
+    DEFAULT_STATISTICAL_ANALYSIS = True
 
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000000
         DEFAULT_N_PERMUTATIONS = 10000
         DEFAULT_FIRST_SEQ = True
-        DEFAULT_PLOT = False
+        DEFAULT_PLOT = True
         # Default NIST values for lag parameter p
         DEFAULT_P = [1, 2, 8, 16, 32]
 
