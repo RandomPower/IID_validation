@@ -13,14 +13,14 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 class Config:
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_NIST_TEST = True
-    DEFAULT_STATISTICAL_ANALYSIS = False
+    DEFAULT_STATISTICAL_ANALYSIS = True
 
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000000
         DEFAULT_N_PERMUTATIONS = 10000
         DEFAULT_FIRST_SEQ = True
-        DEFAULT_PLOT = False
+        DEFAULT_PLOT = True
         # Default NIST values for lag parameter p
         DEFAULT_P = [1, 2, 8, 16, 32]
 
@@ -303,9 +303,9 @@ class Config:
         # Global
         if args.input_file:
             self._input_file = os.path.abspath(os.path.expanduser(args.input_file))
-        if args.nist_test:
+        if args.nist_test is not None:
             self._nist_test = args.nist_test
-        if args.stat_analysis:
+        if args.stat_analysis is not None:
             self._statistical_analysis = args.stat_analysis
         # NIST IID tests
         if args.nist_selected_tests:
@@ -314,9 +314,9 @@ class Config:
             self.nist._n_symbols = args.nist_n_symbols
         if args.nist_n_permutations:
             self.nist._n_permutations = args.nist_n_permutations
-        if args.first_seq:
+        if args.first_seq is not None:
             self.nist._first_seq = args.first_seq
-        if args.plot:
+        if args.plot is not None:
             self.nist._plot = args.plot
         if args.nist_p:
             self.nist._p = args.nist_p
