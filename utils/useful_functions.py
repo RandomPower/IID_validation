@@ -1,11 +1,39 @@
+import csv
+import logging
 import os
+import pathlib
 from datetime import datetime
-
-import numpy as np
-import pandas as pd
 
 import permutation_tests
 import utils.config
+
+# Configure per-module logger
+logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
+
+
+def _save_data_helper(file: str, headers: list[str], data: list[list]) -> None:
+    """Save headers and data to the specified file.
+
+    If the file does not exist, it will be created, the headers will be written at the top, and the data appended.
+    If the file exists, only the data will be appended without rewriting the headers.
+
+    Args:
+        file (str): The file path where the data has to be saved.
+        headers (list[str]): The list header strings to write on top of the file.
+        data (list[list]): The list of data rows to save in the file. Each row should be a list of values.
+    """
+    try:
+        file_exists = os.path.exists(file)
+        with open(file, "a", newline="") as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(headers)
+            for d in data:
+                writer.writerow(d)
+    except IOError as e:
+        logger.error("Unable to create or write to file (%s): %s", file, e)
+    except Exception as e:
+        logger.error("An unexpected error occurred: %s", e)
 
 
 def save_counters(
@@ -50,12 +78,10 @@ def save_counters(
         test_time,
         str(datetime.now()),
     ]
-    dt = pd.DataFrame(d, index=header).T
     # Check if the directory exists
     os.makedirs(dir_path, exist_ok=True)
     f = os.path.join(dir_path, "counter_values.csv")
-    h = not os.path.exists(f)
-    dt.to_csv(f, mode="a", header=h, index=False)
+    _save_data_helper(f, header, [d])
 
 
 def save_test_values(conf: utils.config.Config, Tx, Ti):
@@ -97,12 +123,5 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
     else:
         raise Exception("Support for arbitrary p values not implemented yet")
 
-    df2 = pd.DataFrame(np.array(Ti), columns=header)
-    a = pd.DataFrame([Tx], columns=header)
-    df = pd.concat([a, df2]).reset_index(drop=True)
-    # df.insert("time Ti", tf, True)
     file_path = os.path.join("results", "save_test_values.csv")
-    write_header = not os.path.isfile(file_path)
-
-    # Save the DataFrame to CSV, without the index and with headers only if writing for the first time
-    df.to_csv(file_path, mode="a", header=write_header, index=False)
+    _save_data_helper(file_path, header, [Tx, Ti])
