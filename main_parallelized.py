@@ -116,15 +116,60 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
     S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
     logger.debug("Sequence calculated: S")
-    for test in conf.stat.selected_tests:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-            tasks = [
-                executor.submit(statistical_analysis.counters_Tx, conf, S, test),
-                executor.submit(statistical_analysis.counters_TjNorm, conf, S, test),
-            ]
-            # Wait for all tasks to complete
-            for task in tasks:
-                task.result()
+    logger.debug("Calculating for each test the reference statistic: Tx")
+    Tx = permutation_tests.run_tests(S, [conf.stat.p], conf.stat.selected_tests)
+    logger.debug("Reference statistics calculated!")
+
+    logger.debug("Building the counter's population")
+    counters_C0_Tx = [[0 for i in conf.stat.selected_tests]for i in range(conf.stat.n_iterations)]
+    counters_C0_TjNorm = [[0 for i in conf.stat.selected_tests]for i in range(conf.stat.n_iterations)]
+    for i in tqdm(range(conf.stat.n_iterations)):
+        # Calculate counters for Tx and TjNorm methods
+        t0 = time.process_time()
+        Ti = permutation_tests.FY_test_mode_parallel(S, conf.stat.n_sequences, conf.stat.selected_tests, [conf.stat.p])
+        ti = time.process_time() - t0
+        C0_Tx, C1_Tx = permutation_tests.calculate_counters(Tx, Ti)
+        C0_TjNorm, C1_TjNorm = statistical_analysis.calculate_counters_TjNorm(conf, S, Ti)
+        IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_sequences)
+        IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_sequences / 2))
+        # Save the values of the counters
+        utils.useful_functions.save_counters(
+            conf.stat.n_symbols,
+            conf.stat.n_sequences,
+            conf.stat.selected_tests,
+            C0_Tx,
+            C1_Tx,
+            IID_assumption_Tx,
+            ti,
+            os.path.join("statistical_analysis", "countersTx_distribution"),
+        )
+        utils.useful_functions.save_counters(
+            conf.stat.n_symbols,
+            conf.stat.n_sequences,
+            conf.stat.selected_tests,
+            C0_TjNorm,
+            C1_TjNorm,
+            IID_assumption_TjNorm,
+            ti,
+            os.path.join("statistical_analysis", "countersTjNorm_distribution"),
+        )
+
+        counters_C0_Tx[i] = C0_Tx
+        counters_C0_TjNorm[i] = C0_TjNorm
+
+    logger.info("Counters population built!")
+
+    # Plot the distributions of the counters
+    for t in range(len(conf.stat.selected_tests)):
+        utils.plot.counters_distribution_Tx(
+            [i[t] for i in counters_C0_Tx], conf.stat.n_sequences, conf.stat.n_iterations, conf.stat.selected_tests[t]
+        )
+        utils.plot.counters_distribution_Tj(
+            [i[t] for i in counters_C0_TjNorm],
+            conf.stat.n_sequences,
+            conf.stat.n_iterations,
+            conf.stat.selected_tests[t],
+        )
 
     logger.debug("Statistical analysis completed.")
 
