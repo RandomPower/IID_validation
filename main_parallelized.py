@@ -75,19 +75,28 @@ def iid_test_function(conf: utils.config.Config):
 
     logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
     t0 = time.process_time()
-    Ti = FY_test_mode_parallel(conf, S)
+    Ti = permutation_tests.FY_test_mode_parallel(S, conf.nist.n_permutations, conf.nist.selected_tests, conf.nist.p)
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
 
-    C0, C1 = calculate_counters(Tx, Ti)
+    C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
     logger.debug("C1 = %s", C1)
 
-    IID_assumption = iid_result(C0, C1, conf.nist.n_permutations)
+    IID_assumption = permutation_tests.iid_result(C0, C1, conf.nist.n_permutations)
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
-    utils.useful_functions.save_IID_validation(conf, C0, C1, IID_assumption, ti)
+    utils.useful_functions.save_counters(
+        conf.nist.n_symbols,
+        conf.nist.n_permutations,
+        conf.nist.selected_tests,
+        C0,
+        C1,
+        IID_assumption,
+        ti,
+        "IID_validation",
+    )
 
     # plots
     if conf.nist.plot:
