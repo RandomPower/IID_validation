@@ -1,110 +1,19 @@
 import argparse
-import concurrent.futures
 import contextlib
 import datetime
 import logging
 import os
-import sys
 import time
 
 import numpy as np
+from tqdm import tqdm
 
 import permutation_tests
-import statistical_analysis
 import utils.config
 import utils.plot
 import utils.read
 import utils.useful_functions
-
-
-def calculate_counters(Tx, Ti):
-    """Calculate counters values on a given sequence based on the condition provided by NIST
-
-    Parameters
-    ----------
-    Tx : list of int
-        reference test values
-    Ti : list of int
-        test values calculated on shuffled sequences
-
-    Returns
-    -------
-    list of int, list of int
-        counters lists
-    """
-
-    C0 = [0 for k in range(len(Tx))]
-    C1 = [0 for k in range(len(Tx))]
-
-    for u in range(len(Tx)):
-        C0[u], C1[u] = permutation_tests.get_C0_C1_Tx(Tx[u], [Ti[t][u] for t in range(len(Ti))])
-
-    return C0, C1
-
-
-def iid_result(C0: list[int], C1: list[int], n_sequences: int):
-    """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
-    99.95% of the results Ti for the rest of the population of n_sequences sequences.
-
-    Parameters
-    ----------
-    C0 : list of int
-        counter 0
-    C1 : list of int
-        counter 1
-    n_sequences : int
-        number of sequences in the population
-
-    Returns
-    -------
-    bool
-        iid result
-    """
-    if len(C0) != len(C1):
-        raise Exception(f"Counter lengths must match: C0 ({len(C0)}), C1 ({len(C1)})")
-    for b in range(len(C0)):
-        if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
-            return False
-    return True
-
-
-def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
-    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
-
-    Parameters
-    ----------
-    conf : utils.config.Config
-        application configuration parameters
-    S : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    list of float
-        list of test outputs
-    """
-    Ti = []
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = []
-        for iteration in range(conf.nist.n_permutations):
-            s_shuffled = permutation_tests.FY_shuffle(S.copy())
-            future = executor.submit(
-                permutation_tests.run_tests,
-                s_shuffled,
-                conf.nist.p,
-                conf.nist.selected_tests,
-            )
-            futures.append(future)
-
-        completed = 0
-        total_futures = len(futures)
-        for future in concurrent.futures.as_completed(futures):
-            Ti.append(future.result())
-            completed += 1
-            percentage_complete = (completed / total_futures) * 100
-            sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
-            sys.stdout.flush()
-    return Ti
+import statistical_analysis
 
 
 def iid_plots(conf: utils.config.Config, Tx, Ti):

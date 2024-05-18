@@ -412,27 +412,98 @@ def run_tests(S, p, test_list=[i.id for i in tests]):
     return T
 
 
-def get_C0_C1_Tx(Tx, Ti):
-    """Compute the counters C0 and C1 for a given reference value Tx and a given list of values Ti: for each element of
-    Ti, C0 is incremented if the latter is bigger than that Tx, C1 is incremented if they are equal.
+def calculate_counters(Tx, Ti):
+    """Compute the counters C0 and C1 for the selected tests based on the condition provided by NIST. For each of the
+    latter a given reference value Tx and a given list of values Ti is given: for each element of Ti, C0 is incremented
+    if the latter is bigger than that Tx, C1 is incremented if they are equal.
 
     Parameters
     ----------
-    Tx : float
-        reference value
-    Ti : list of float
-        list of values to compare with Tx
+    Tx : list of float
+        reference test values
+    Ti : list of lists of float
+        test values calculated on shuffled sequences
 
     Returns
     -------
-    int, int
-        counter 0 and counter 1
+    list of int, list of int
+        list of counters C0, list of counters C1
     """
-    C0 = 0
-    C1 = 0
-    for z in range(len(Ti)):
-        if Tx > Ti[z]:
-            C0 += 1
-        if Tx == Ti[z]:
-            C1 += 1
+
+    C0 = [0 for k in range(len(Tx))]
+    C1 = [0 for k in range(len(Tx))]
+
+    for u in range(len(Tx)):
+        for t in range(len(Ti)):
+            if Tx[u] > Ti[t][u]:
+                C0[u] += 1
+            if Tx[u] == Ti[t][u]:
+                C1[u] += 1
+
     return C0, C1
+
+
+def iid_result(C0: list[int], C1: list[int], n_sequences: int):
+    """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
+    99.95% of the results Ti for the rest of the population of n_sequences sequences.
+
+    Parameters
+    ----------
+    C0 : list of int
+        counter 0
+    C1 : list of int
+        counter 1
+    n_sequences : int
+        number of sequences in the population
+
+    Returns
+    -------
+    bool
+        iid result
+    """
+    if len(C0) != len(C1):
+        raise Exception(f"Counter lengths must match: C0 ({len(C0)}), C1 ({len(C1)})")
+    for b in range(len(C0)):
+        if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
+            return False
+    return True
+
+
+def FY_test_mode_parallel(S: list[int], n_permutations: int, selected_tests: list[int], p: list[int]):
+    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    n_permutations: int
+    selected_tests : list of
+    p : list of int
+
+    Returns
+    -------
+    list of float
+        list of test outputs
+    """
+    Ti = []
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = []
+        for iteration in range(n_permutations):
+            s_shuffled = permutation_tests.FY_shuffle(S.copy())
+            future = executor.submit(
+                permutation_tests.run_tests,
+                s_shuffled,
+                p,
+                selected_tests,
+            )
+            futures.append(future)
+
+        completed = 0
+        total_futures = len(futures)
+        for future in concurrent.futures.as_completed(futures):
+            Ti.append(future.result())
+            completed += 1
+            percentage_complete = (completed / total_futures) * 100
+            sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
+            sys.stdout.flush()
+    return Ti
