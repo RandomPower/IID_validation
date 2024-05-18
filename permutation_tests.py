@@ -384,7 +384,7 @@ tests = [
 ]
 
 
-def run_tests(S, p, test_list=[i.id for i in tests]):
+def run_tests(S: list[int], p: list[int], test_list: list[int] = [i.id for i in tests]) -> list[float]:
     """Run tests on a specified sequence, using a specified p value.
     If no tests are specified, all tests are run.
 
@@ -416,7 +416,7 @@ def run_tests(S, p, test_list=[i.id for i in tests]):
     return T
 
 
-def calculate_counters(Tx, Ti):
+def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int], list[int]]:
     """Compute the counters C0 and C1 for the selected tests based on the condition provided by NIST. For each of the
     latter a given reference value Tx and a given list of values Ti is given: for each element of Ti, C0 is incremented
     if the latter is bigger than that Tx, C1 is incremented if they are equal.
@@ -447,7 +447,7 @@ def calculate_counters(Tx, Ti):
     return C0, C1
 
 
-def iid_result(C0: list[int], C1: list[int], n_sequences: int):
+def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
     """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
     99.95% of the results Ti for the rest of the population of n_sequences sequences.
 
@@ -473,7 +473,9 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int):
     return True
 
 
-def FY_test_mode_parallel(S: list[int], n_permutations: int, selected_tests: list[int], p: list[int]):
+def FY_test_mode_parallel(
+    S: list[int], n_permutations: int, selected_tests: list[int], p: list[int]
+) -> list[list[float]]:
     """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
 
     Parameters
@@ -481,8 +483,11 @@ def FY_test_mode_parallel(S: list[int], n_permutations: int, selected_tests: lis
     S : list of int
         sequence of sample values
     n_permutations: int
-    selected_tests : list of
+        number of permutations
+    selected_tests : list of int
+        indexes of the selected tests
     p : list of int
+        parameter p
 
     Returns
     -------
