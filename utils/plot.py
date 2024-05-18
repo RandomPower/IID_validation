@@ -171,8 +171,6 @@ def counters_distribution_Tj(c, n_seq, n_iter, test):
     # calculate the parameters of the distribution
     p = 0.5
     n_seq_norm = n_seq / 2
-    mean_teor = n_seq_norm * p
-    std_teor = np.sqrt(n_seq_norm * p * (1 - p))
 
     # create histo of results to extract binning
     fig, ax = plt.subplots()

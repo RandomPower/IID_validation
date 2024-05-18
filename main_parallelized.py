@@ -121,8 +121,8 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("Reference statistics calculated!")
 
     logger.debug("Building the counter's population")
-    counters_C0_Tx = [[0 for i in conf.stat.selected_tests]for i in range(conf.stat.n_iterations)]
-    counters_C0_TjNorm = [[0 for i in conf.stat.selected_tests]for i in range(conf.stat.n_iterations)]
+    counters_C0_Tx = [[0 for i in conf.stat.selected_tests] for i in range(conf.stat.n_iterations)]
+    counters_C0_TjNorm = [[0 for i in conf.stat.selected_tests] for i in range(conf.stat.n_iterations)]
     for i in tqdm(range(conf.stat.n_iterations)):
         # Calculate counters for Tx and TjNorm methods
         t0 = time.process_time()
