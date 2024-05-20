@@ -1,5 +1,6 @@
 import math
 import os
+import statistics
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -74,7 +75,7 @@ def binomial_function(n, v, p):
     return f
 
 
-def counters_distribution_Tx(c, n_seq, n_iter, test, t, plot_dir):
+def counters_distribution_Tx(c, n_seq, n_iter, test):
     """Plots a histogram of distribution of the counter C0 for a given test with the measured mean
     and standard deviation
 
@@ -88,10 +89,6 @@ def counters_distribution_Tx(c, n_seq, n_iter, test, t, plot_dir):
         number of iterations
     test : int
         index of the executed permutation test
-    t : str
-        test executed
-    plot_dir : str
-        directory where to save the plot
     """
     # Calculate the parameters of the distribution
     p = sum(c) / (n_seq * n_iter)
@@ -137,17 +134,21 @@ def counters_distribution_Tx(c, n_seq, n_iter, test, t, plot_dir):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[test].name}", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, Tx method", size=14)
     plt.legend(loc="upper right")
 
-    plot_filename = f"{t}_{permutation_tests.tests[test].name}.pdf"
-    plot_path = os.path.join(plot_dir, plot_filename)
+    # Define and create the directory
+    directory_path = os.path.join("countersTx_distribution")
+    os.makedirs(directory_path, exist_ok=True)
+
+    plot_filename = f"countersTx_{permutation_tests.tests[test].name}.pdf"
+    plot_path = os.path.join(directory_path, plot_filename)
 
     plt.savefig(plot_path)
     plt.close()
 
 
-def counters_distribution_Tj(c, n_seq, n_iter, test, t, plot_dir):
+def counters_distribution_Tj(c, n_seq, n_iter, test):
     """Plots a histogram of distribution of the counter C0 for a given test adjusted for Tj normalized
 
     Parameters
@@ -168,8 +169,6 @@ def counters_distribution_Tj(c, n_seq, n_iter, test, t, plot_dir):
     # calculate the parameters of the distribution
     p = 0.5
     n_seq_norm = n_seq / 2
-    mean_teor = n_seq_norm * p
-    std_teor = np.sqrt(n_seq_norm * p * (1 - p))
 
     # create histo of results to extract binning
     fig, ax = plt.subplots()
@@ -218,16 +217,25 @@ def counters_distribution_Tj(c, n_seq, n_iter, test, t, plot_dir):
 
     # Box with parameters of the distribution
     textstr = "\n".join(
-        (f"$mean={mean_teor:.2f}$", f"$std={std_teor:.2f}$", f"p={p}", rf"$\chi^2/ndf={chi_square_red:.2f}$")
+        (
+            f"$mean={statistics.mean(c):.2f}$",
+            f"$std={statistics.stdev(c):.2f}$",
+            f"p={p}",
+            rf"$\chi^2/ndf={chi_square_red:.2f}$",
+        )
     )
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    ax.set_title(f"Distribution {t} of the counter for test {permutation_tests.tests[test].name}", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, TjNorm method", size=14)
     plt.legend()
 
-    plot_filename = f"{t}_{permutation_tests.tests[test].name}.pdf"
-    plot_path = os.path.join(plot_dir, plot_filename)
+    # Define and create the directory
+    directory_path = os.path.join("countersTjNorm_distribution")
+    os.makedirs(directory_path, exist_ok=True)
+
+    plot_filename = f"countersTjNorm_{permutation_tests.tests[test].name}.pdf"
+    plot_path = os.path.join(directory_path, plot_filename)
 
     plt.savefig(plot_path)
     plt.close()

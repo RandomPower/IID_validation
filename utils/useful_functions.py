@@ -1,5 +1,4 @@
 import os
-import time
 from datetime import datetime
 
 import numpy as np
@@ -9,58 +8,26 @@ import permutation_tests
 import utils.config
 
 
-def save_counters(conf: utils.config.Config, c0: list[int], c1: list[int], elapsed_time: float, f: str, test: int):
-    """Saves counters values obtained in the statistical analysis
+def save_counters(
+    n_symbols: int,
+    n_permutations: int,
+    selected_tests: list[int],
+    C0: list[int],
+    C1: list[int],
+    b: bool,
+    test_time: float,
+    dir_path: str,
+):
+    """Saves the outcome on the IID assumption and the counters values in a specified directory
 
     Parameters
     ----------
-    conf : utils.config.Config
-        application configuration parameters
-    c0 : list of int
-        counter C0
-    c1 : list of int
-        counter C1
-    elapsed_time : float
-        time to execute a test
-    f : str
-        path to csv file
-    """
-    header = [
-        "n_iterations",
-        "n_symbols",
-        "n_sequences",
-        "test",
-        "COUNTER_0",
-        "COUNTER_1",
-        "PROCESS_TIME",
-        "DATE",
-    ]
-    elapsed = time.strftime("%H:%M:%S.{}".format(str(elapsed_time % 1)[2:])[:11], time.gmtime(elapsed_time))
-    data = [
-        conf.stat.n_iterations,
-        conf.stat.n_symbols,
-        conf.stat.n_sequences,
-        permutation_tests.tests[test].name,
-        c0,
-        c1,
-        str(elapsed),
-        str(datetime.now().strftime("%d/%m/%Y %H:%M:%S")),
-    ]
-
-    # Convert the dictionary to a DataFrame and export it to a csv file
-    df = pd.DataFrame(data, index=header).T
-
-    h = not os.path.exists(f)
-    df.to_csv(f, mode="a", header=h, index=False)
-
-
-def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int], b: bool, test_time: float):
-    """Saves IID failure and the counters values generated in the NIST test part
-
-    Parameters
-    ----------
-    conf : utils.config.Config
-        application configuration parameters
+    n_symbols : int
+        number of symbols
+    n_permutations : int
+        number of permutations
+    selected_tests: list of int
+        the indexes of the selected tests
     C0 : list of int
         counter C0
     C1 : list of int
@@ -69,12 +36,14 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
         IID assumption
     test_time : float
         total process time
+    dir_path: str
+        path of the directory
     """
     header = ["n_symbols", "n_permutations", "test_list", "COUNTER_0", "COUNTER_1", "IID", "process_time", "date"]
     d = [
-        conf.nist.n_symbols,
-        conf.nist.n_permutations,
-        [permutation_tests.tests[i].name for i in conf.nist.selected_tests],
+        n_symbols,
+        n_permutations,
+        [permutation_tests.tests[i].name for i in selected_tests],
         C0,
         C1,
         b,
@@ -83,8 +52,8 @@ def save_IID_validation(conf: utils.config.Config, C0: list[int], C1: list[int],
     ]
     dt = pd.DataFrame(d, index=header).T
     # Check if the directory exists
-    os.makedirs("IID_validation", exist_ok=True)
-    f = os.path.join("IID_validation", "IID_validation.csv")
+    os.makedirs(dir_path, exist_ok=True)
+    f = os.path.join(dir_path, "counter_values.csv")
     h = not os.path.exists(f)
     dt.to_csv(f, mode="a", header=h, index=False)
 

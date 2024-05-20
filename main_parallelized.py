@@ -1,13 +1,12 @@
 import argparse
-import concurrent.futures
 import contextlib
 import datetime
 import logging
 import os
-import sys
 import time
 
 import numpy as np
+from tqdm import tqdm
 
 import permutation_tests
 import statistical_analysis
@@ -15,100 +14,6 @@ import utils.config
 import utils.plot
 import utils.read
 import utils.useful_functions
-
-
-def calculate_counters(Tx, Ti):
-    """Calculate counters values on a given sequence based on the condition provided by NIST
-
-    Parameters
-    ----------
-    Tx : list of int
-        reference test values
-    Ti : list of int
-        test values calculated on shuffled sequences
-
-    Returns
-    -------
-    list of int, list of int
-        counters lists
-    """
-
-    C0 = [0 for k in range(len(Tx))]
-    C1 = [0 for k in range(len(Tx))]
-
-    for u in range(len(Tx)):
-        for t in range(len(Ti)):
-            if Tx[u] > Ti[t][u]:
-                C0[u] += 1
-            if Tx[u] == Ti[t][u]:
-                C1[u] += 1
-
-    return C0, C1
-
-
-def iid_result(C0: list[int], C1: list[int], n_sequences: int):
-    """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
-    99.95% of the results Ti for the rest of the population of n_sequences sequences.
-
-    Parameters
-    ----------
-    C0 : list of int
-        counter 0
-    C1 : list of int
-        counter 1
-    n_sequences : int
-        number of sequences in the population
-
-    Returns
-    -------
-    bool
-        iid result
-    """
-    if len(C0) != len(C1):
-        raise Exception(f"Counter lengths must match: C0 ({len(C0)}), C1 ({len(C1)})")
-    for b in range(len(C0)):
-        if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
-            return False
-    return True
-
-
-def FY_test_mode_parallel(conf: utils.config.Config, S: list[int]):
-    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
-
-    Parameters
-    ----------
-    conf : utils.config.Config
-        application configuration parameters
-    S : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    list of float
-        list of test outputs
-    """
-    Ti = []
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = []
-        for iteration in range(conf.nist.n_permutations):
-            s_shuffled = permutation_tests.FY_shuffle(S.copy())
-            future = executor.submit(
-                permutation_tests.run_tests,
-                s_shuffled,
-                conf.nist.p,
-                conf.nist.selected_tests,
-            )
-            futures.append(future)
-
-        completed = 0
-        total_futures = len(futures)
-        for future in concurrent.futures.as_completed(futures):
-            Ti.append(future.result())
-            completed += 1
-            percentage_complete = (completed / total_futures) * 100
-            sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
-            sys.stdout.flush()
-    return Ti
 
 
 def iid_plots(conf: utils.config.Config, Tx, Ti):
@@ -170,19 +75,28 @@ def iid_test_function(conf: utils.config.Config):
 
     logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
     t0 = time.process_time()
-    Ti = FY_test_mode_parallel(conf, S)
+    Ti = permutation_tests.run_tests_permutations(S, conf.nist.n_permutations, conf.nist.selected_tests, conf.nist.p)
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
 
-    C0, C1 = calculate_counters(Tx, Ti)
+    C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
     logger.debug("C1 = %s", C1)
 
-    IID_assumption = iid_result(C0, C1, conf.nist.n_permutations)
+    IID_assumption = permutation_tests.iid_result(C0, C1, conf.nist.n_permutations)
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
-    utils.useful_functions.save_IID_validation(conf, C0, C1, IID_assumption, ti)
+    utils.useful_functions.save_counters(
+        conf.nist.n_symbols,
+        conf.nist.n_permutations,
+        conf.nist.selected_tests,
+        C0,
+        C1,
+        IID_assumption,
+        ti,
+        "IID_validation",
+    )
 
     # plots
     if conf.nist.plot:
@@ -202,15 +116,64 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
     S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
     logger.debug("Sequence calculated: S")
-    for test in conf.stat.selected_tests:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-            tasks = [
-                executor.submit(statistical_analysis.counters_Tx, conf, S, test),
-                executor.submit(statistical_analysis.counters_TjNorm, conf, S, test),
-            ]
-            # Wait for all tasks to complete
-            for task in tasks:
-                task.result()
+    logger.debug("Calculating for each test the reference statistic: Tx")
+    Tx = permutation_tests.run_tests(S, [conf.stat.p], conf.stat.selected_tests)
+    logger.debug("Reference statistics calculated!")
+
+    logger.debug("Building the counter's population")
+    counters_C0_Tx = [[]] * conf.stat.n_iterations
+    counters_C0_TjNorm = [[]] * conf.stat.n_iterations
+    for i in tqdm(range(conf.stat.n_iterations)):
+        # Calculate counters for Tx and TjNorm methods
+        t0 = time.process_time()
+        Ti = permutation_tests.run_tests_permutations(
+            S, conf.stat.n_sequences, conf.stat.selected_tests, [conf.stat.p]
+        )
+        t1 = time.process_time()
+        C0_Tx, C1_Tx = permutation_tests.calculate_counters(Tx, Ti)
+        t2 = time.process_time()
+        C0_TjNorm, C1_TjNorm = statistical_analysis.calculate_counters_TjNorm(conf, S, Ti)
+        t3 = time.process_time()
+        IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_sequences)
+        IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_sequences / 2))
+        # Save the values of the counters
+        utils.useful_functions.save_counters(
+            conf.stat.n_symbols,
+            conf.stat.n_sequences,
+            conf.stat.selected_tests,
+            C0_Tx,
+            C1_Tx,
+            IID_assumption_Tx,
+            t2 - t0,
+            "countersTx_distribution",
+        )
+        utils.useful_functions.save_counters(
+            conf.stat.n_symbols,
+            conf.stat.n_sequences,
+            conf.stat.selected_tests,
+            C0_TjNorm,
+            C1_TjNorm,
+            IID_assumption_TjNorm,
+            t3 - t2 + t1 - t0,
+            "countersTjNorm_distribution",
+        )
+
+        counters_C0_Tx[i] = C0_Tx
+        counters_C0_TjNorm[i] = C0_TjNorm
+
+    logger.info("Counters population built!")
+
+    # Plot the distributions of the counters
+    for t in range(len(conf.stat.selected_tests)):
+        utils.plot.counters_distribution_Tx(
+            [i[t] for i in counters_C0_Tx], conf.stat.n_sequences, conf.stat.n_iterations, conf.stat.selected_tests[t]
+        )
+        utils.plot.counters_distribution_Tj(
+            [i[t] for i in counters_C0_TjNorm],
+            conf.stat.n_sequences,
+            conf.stat.n_iterations,
+            conf.stat.selected_tests[t],
+        )
 
     logger.debug("Statistical analysis completed.")
 
@@ -362,7 +325,9 @@ def main():
         if conf.nist_test:
             iid_test_function(conf)
         if conf.statistical_analysis:
-            statistical_analysis_function(conf)
+            os.makedirs("statistical_analysis", exist_ok=True)
+            with contextlib.chdir("statistical_analysis"):
+                statistical_analysis_function(conf)
 
 
 # Configure application logger
