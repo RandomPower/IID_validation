@@ -5,8 +5,6 @@ import statistics
 import sys
 import typing
 
-import permutation_tests
-
 
 def FY_shuffle(S):
     """Generates a shuffled sequence using Fisher-Yates algorithm
@@ -434,8 +432,8 @@ def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int
         list of counters C0, list of counters C1
     """
 
-    C0 = [0 for k in range(len(Tx))]
-    C1 = [0 for k in range(len(Tx))]
+    C0 = [0] * len(Tx)
+    C1 = [0] * len(Tx)
 
     for u in range(len(Tx)):
         for t in range(len(Ti)):
@@ -473,7 +471,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
     return True
 
 
-def FY_test_mode_parallel(
+def run_tests_permutations(
     S: list[int], n_permutations: int, selected_tests: list[int], p: list[int]
 ) -> list[list[float]]:
     """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
@@ -498,9 +496,9 @@ def FY_test_mode_parallel(
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
         for iteration in range(n_permutations):
-            s_shuffled = permutation_tests.FY_shuffle(S.copy())
+            s_shuffled = FY_shuffle(S.copy())
             future = executor.submit(
-                permutation_tests.run_tests,
+                run_tests,
                 s_shuffled,
                 p,
                 selected_tests,

@@ -1,7 +1,8 @@
 import logging
 import pathlib
-import utils.config
+
 import permutation_tests
+import utils.config
 
 # Configure per-module logger
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
@@ -28,8 +29,8 @@ def calculate_counters_TjNorm(
     list of int, list of int
         counter 0 and counter 1
     """
-    C0 = [0 for k in range(len(conf.stat.selected_tests))]
-    C1 = [0 for k in range(len(conf.stat.selected_tests))]
+    C0 = [0] * len(conf.stat.selected_tests)
+    C1 = [0] * len(conf.stat.selected_tests)
 
     for u in range(len(conf.stat.selected_tests)):
         for z in range(0, len(Ti) - 1, 2):

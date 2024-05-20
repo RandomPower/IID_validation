@@ -1,5 +1,6 @@
 import math
 import os
+import statistics
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -133,14 +134,11 @@ def counters_distribution_Tx(c, n_seq, n_iter, test):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    ax.set_title(f"Distribution of the counter for test {permutation_tests.tests[test].name}_Tx method", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, Tx method", size=14)
     plt.legend(loc="upper right")
 
     # Define and create the directory
-    directory_path = os.path.join(
-        "statistical_analysis",
-        "countersTx_distribution",
-    )
+    directory_path = os.path.join("countersTx_distribution")
     os.makedirs(directory_path, exist_ok=True)
 
     plot_filename = f"countersTx_{permutation_tests.tests[test].name}.pdf"
@@ -219,19 +217,21 @@ def counters_distribution_Tj(c, n_seq, n_iter, test):
 
     # Box with parameters of the distribution
     textstr = "\n".join(
-        (f"$mean={np.mean(c):.2f}$", f"$std={np.std(c):.2f}$", f"p={p}", rf"$\chi^2/ndf={chi_square_red:.2f}$")
+        (
+            f"$mean={statistics.mean(c):.2f}$",
+            f"$std={statistics.stdev(c):.2f}$",
+            f"p={p}",
+            rf"$\chi^2/ndf={chi_square_red:.2f}$",
+        )
     )
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
-    ax.set_title(f"Distribution of the counter for test {permutation_tests.tests[test].name}_TjNorm method", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, TjNorm method", size=14)
     plt.legend()
 
     # Define and create the directory
-    directory_path = os.path.join(
-        "statistical_analysis",
-        "countersTjNorm_distribution",
-    )
+    directory_path = os.path.join("countersTjNorm_distribution")
     os.makedirs(directory_path, exist_ok=True)
 
     plot_filename = f"countersTjNorm_{permutation_tests.tests[test].name}.pdf"
