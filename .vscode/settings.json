@@ -1,12 +1,16 @@
 {
     "autoDocstring.docstringFormat": "numpy",
-    "isort.check": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
+    "isort.check": true,
     "isort.args": [
         "--profile",
         "black"
     ],
+    "isort.severity": {
+        "W": "Warning",
+        "E": "Error"
+    },
     "flake8.args": [
         "--max-line-length=120",
         "--ignore=E203,E701,W503"
