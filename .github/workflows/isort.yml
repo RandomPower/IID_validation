@@ -1,0 +1,24 @@
+name: isort
+
+on:
+  pull_request:
+    paths:
+      - "**.py"
+      - ".github/workflows/isort.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "**.py"
+      - ".github/workflows/isort.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v3
+      - name: isort check
+        uses: isort/isort-action@v1
+        with:
+          configuration: "--check-only --diff --profile black"
