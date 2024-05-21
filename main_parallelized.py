@@ -15,7 +15,7 @@ import utils.plot
 import utils.useful_functions
 
 
-def read_file(file: str, n_symbols: int, first_seq: bool):
+def read_file(file: str, n_symbols: int, first_seq: bool = True):
     """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process
 
@@ -146,7 +146,7 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("----------------------------------------------------------------\n \n")
     stat_tests_names = [permutation_tests.tests[t].name for t in conf.stat.selected_tests]
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
-    S = read_file(conf.input_file, conf.stat.n_symbols, True)
+    S = read_file(conf.input_file, conf.stat.n_symbols)
     logger.debug("Sequence calculated: S")
     logger.debug("Calculating for each test the reference statistic: Tx")
     Tx = permutation_tests.run_tests(S, [conf.stat.p], conf.stat.selected_tests)
