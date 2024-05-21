@@ -231,6 +231,11 @@ def main():
         help="Run the RaP statistical analysis on the input file "
         f"[Default: {utils.config.Config.DEFAULT_STATISTICAL_ANALYSIS}].",
     )
+    global_args.add_argument(
+        "--parallel",
+        action=argparse.BooleanOptionalAction,
+        help=f"Run the program in parallel mode [Default: {utils.config.Config.DEFAULT_PARALLEL}].",
+    )
 
     # Nist test
     nist_args = parser.add_argument_group("[nist_test]", "NIST IID test suite configuration")
