@@ -12,8 +12,40 @@ import permutation_tests
 import statistical_analysis
 import utils.config
 import utils.plot
-import utils.read
 import utils.useful_functions
+
+
+def read_file(file: str, n_symbols: int, first_seq: bool):
+    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
+    applying a masking process
+
+    Parameters
+    ----------
+    file : str
+        path to file
+    n_symbols : int
+        number of symbols
+
+    Returns
+    -------
+    list of int
+        sequence of symbols
+    """
+    with open(file, "rb") as f:
+        tot_bytes = int(n_symbols / 2)
+        if first_seq:
+            my_bytes = f.read(tot_bytes)
+        else:
+            f.seek(-tot_bytes, os.SEEK_END)
+            my_bytes = f.read(tot_bytes)
+    S = []
+    for i in my_bytes:
+        symbol1 = i >> 4
+        S.append(symbol1)
+        symbol2 = i & 0b00001111
+        S.append(symbol2)
+
+    return S
 
 
 def iid_plots(conf: utils.config.Config, Tx, Ti):
@@ -66,7 +98,7 @@ def iid_test_function(conf: utils.config.Config):
     """
     logger.debug("NIST TEST")
     logger.debug("Process started")
-    S = utils.read.read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
+    S = read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
     logger.debug("Sequence calculated: S")
 
     logger.debug("Calculating for each test the reference statistic: Tx")
@@ -114,7 +146,7 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("----------------------------------------------------------------\n \n")
     stat_tests_names = [permutation_tests.tests[t].name for t in conf.stat.selected_tests]
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
-    S = utils.read.read_file(conf.input_file, conf.stat.n_symbols, True)
+    S = read_file(conf.input_file, conf.stat.n_symbols, True)
     logger.debug("Sequence calculated: S")
     logger.debug("Calculating for each test the reference statistic: Tx")
     Tx = permutation_tests.run_tests(S, [conf.stat.p], conf.stat.selected_tests)
