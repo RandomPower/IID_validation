@@ -5,6 +5,8 @@ import statistics
 import sys
 import typing
 
+from tqdm import tqdm
+
 
 def FY_shuffle(S):
     """Generates a shuffled sequence using Fisher-Yates algorithm
@@ -472,7 +474,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
 
 
 def run_tests_permutations(
-    S: list[int], n_permutations: int, selected_tests: list[int], p: list[int]
+    S: list[int], n_permutations: int, selected_tests: list[int], p: list[int], parallel: bool = True
 ) -> list[list[float]]:
     """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
 
@@ -486,6 +488,8 @@ def run_tests_permutations(
         indexes of the selected tests
     p : list of int
         parameter p
+    parallel: bool
+        parallelized execution option
 
     Returns
     -------
@@ -493,24 +497,31 @@ def run_tests_permutations(
         list of test outputs
     """
     Ti = []
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = []
-        for iteration in range(n_permutations):
-            s_shuffled = FY_shuffle(S.copy())
-            future = executor.submit(
-                run_tests,
-                s_shuffled,
-                p,
-                selected_tests,
-            )
-            futures.append(future)
 
-        completed = 0
-        total_futures = len(futures)
-        for future in concurrent.futures.as_completed(futures):
-            Ti.append(future.result())
-            completed += 1
-            percentage_complete = (completed / total_futures) * 100
-            sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
-            sys.stdout.flush()
+    if parallel:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = []
+            for _ in range(n_permutations):
+                s_shuffled = FY_shuffle(S.copy())
+                future = executor.submit(
+                    run_tests,
+                    s_shuffled,
+                    p,
+                    selected_tests,
+                )
+                futures.append(future)
+
+            completed = 0
+            total_futures = len(futures)
+            for future in concurrent.futures.as_completed(futures):
+                Ti.append(future.result())
+                completed += 1
+                percentage_complete = (completed / total_futures) * 100
+                sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
+                sys.stdout.flush()
+    else:
+        for _ in tqdm(range(n_permutations)):
+            s_shuffled = FY_shuffle(S.copy())
+            result = run_tests(s_shuffled, p, selected_tests)
+            Ti.append(result)
     return Ti

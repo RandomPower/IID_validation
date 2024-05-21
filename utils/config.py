@@ -14,6 +14,7 @@ class Config:
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_NIST_TEST = True
     DEFAULT_STATISTICAL_ANALYSIS = True
+    DEFAULT_PARALLEL = True
 
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
@@ -118,6 +119,7 @@ class Config:
         """Initialise member variables to default values."""
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
+        self._parallel = self.DEFAULT_PARALLEL
 
     def _read_conf(self, filename: str) -> None:
         """Read configuration file and set the parameters.
@@ -163,6 +165,17 @@ class Config:
                         filename,
                         "global",
                         "stat_analysis",
+                        "bool",
+                    )
+
+            if "parallel" in conf["global"]:
+                self._parallel = conf["global"]["parallel"]
+                if not isinstance(self._parallel, bool):
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "parallel",
                         "bool",
                     )
 
@@ -307,6 +320,8 @@ class Config:
             self._nist_test = args.nist_test
         if args.stat_analysis is not None:
             self._statistical_analysis = args.stat_analysis
+        if args.parallel is not None:
+            self._parallel = args.parallel
         # NIST IID tests
         if args.nist_selected_tests:
             self.nist._selected_tests = args.nist_selected_tests
@@ -351,6 +366,9 @@ class Config:
 
         if not isinstance(self._statistical_analysis, bool):
             raise ValueError(f'Invalid configuration parameter: "stat_analysis" ({self._statistical_analysis})')
+
+        if not isinstance(self._parallel, bool):
+            raise ValueError(f'Invalid configuration parameter: "parallel" ({self._parallel})')
 
         # NIST IID tests
         if (not self.nist._selected_tests) or (not isinstance(self.nist._selected_tests, list)):
@@ -406,6 +424,10 @@ class Config:
     @property
     def statistical_analysis(self):
         return self._statistical_analysis
+
+    @property
+    def parallel(self):
+        return self._parallel
 
 
 def parse_config_file(file_path: str) -> dict:
