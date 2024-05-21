@@ -60,7 +60,7 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
     Ti : list of int
         test values calculated on shuffled sequences
     """
-    histo_dir = os.path.join("IID_validation", "histogram_TxTi")
+    histo_dir = "histogram_TxTi"
     # Ensure the directory exists
     os.makedirs(histo_dir, exist_ok=True)
 
@@ -112,6 +112,7 @@ def iid_test_function(conf: utils.config.Config):
     )
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
+    utils.useful_functions.save_test_values(conf, Tx, Ti)
 
     C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
@@ -129,7 +130,6 @@ def iid_test_function(conf: utils.config.Config):
         C1,
         IID_assumption,
         ti,
-        "IID_validation",
     )
 
     # plots
@@ -362,7 +362,9 @@ def main():
         utils.config.config_info(conf)
 
         if conf.nist_test:
-            iid_test_function(conf)
+            os.makedirs("IID_validation", exist_ok=True)
+            with contextlib.chdir("IID_validation"):
+                iid_test_function(conf)
         if conf.statistical_analysis:
             os.makedirs("statistical_analysis", exist_ok=True)
             with contextlib.chdir("statistical_analysis"):

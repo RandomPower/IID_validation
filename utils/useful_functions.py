@@ -44,7 +44,7 @@ def save_counters(
     C1: list[int],
     b: bool,
     test_time: float,
-    dir_path: str,
+    dir_path=None,
 ):
     """Saves the outcome on the IID assumption and the counters values in a specified directory
 
@@ -79,12 +79,15 @@ def save_counters(
         str(datetime.now()),
     ]
     # Check if the directory exists
-    os.makedirs(dir_path, exist_ok=True)
-    f = os.path.join(dir_path, "counter_values.csv")
+    if dir_path:
+        os.makedirs(dir_path, exist_ok=True)
+        f = os.path.join(dir_path, "counter_values.csv")
+    else:
+        f = ("counter_values.csv")
     _save_data_helper(f, header, [d])
 
 
-def save_test_values(conf: utils.config.Config, Tx, Ti):
+def save_test_values(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]]):
     """Saves Tx test values and Ti test values in a csv file
 
     Parameters
@@ -93,7 +96,7 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
         application configuration parameters
     Tx : list of float
         Tx test values calculated on one sequence
-    Ti : list of float
+    Ti : list of list of float
         Ti test values calculated on the shuffled sequences
     """
     if conf.nist.p == conf.nist.DEFAULT_P:
@@ -123,5 +126,4 @@ def save_test_values(conf: utils.config.Config, Tx, Ti):
     else:
         raise Exception("Support for arbitrary p values not implemented yet")
 
-    file_path = os.path.join("results", "save_test_values.csv")
-    _save_data_helper(file_path, header, [Tx, Ti])
+    _save_data_helper("test_values.csv", header, [Tx, Ti])
