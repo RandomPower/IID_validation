@@ -107,7 +107,9 @@ def iid_test_function(conf: utils.config.Config):
 
     logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
     t0 = time.process_time()
-    Ti = permutation_tests.run_tests_permutations(S, conf.nist.n_permutations, conf.nist.selected_tests, conf.nist.p)
+    Ti = permutation_tests.run_tests_permutations(
+        S, conf.nist.n_permutations, conf.nist.selected_tests, conf.nist.p, conf.parallel
+    )
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
 
@@ -159,7 +161,7 @@ def statistical_analysis_function(conf: utils.config.Config):
         # Calculate counters for Tx and TjNorm methods
         t0 = time.process_time()
         Ti = permutation_tests.run_tests_permutations(
-            S, conf.stat.n_sequences, conf.stat.selected_tests, [conf.stat.p]
+            S, conf.stat.n_sequences, conf.stat.selected_tests, [conf.stat.p], conf.parallel
         )
         t1 = time.process_time()
         C0_Tx, C1_Tx = permutation_tests.calculate_counters(Tx, Ti)
