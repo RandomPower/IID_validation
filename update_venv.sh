@@ -3,7 +3,7 @@
 set -e
 
 # Add actual high-level dependencies here
-DEPENDENCIES=("matplotlib" "pandas" "numpy" "tqdm")
+DEPENDENCIES=("matplotlib" "numpy" "tqdm")
 
 VENV_DIRECTORY=".venv"
 REQUIREMENTS="requirements.txt"
