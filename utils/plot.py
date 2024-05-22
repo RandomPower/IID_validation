@@ -235,3 +235,57 @@ def counters_distribution_Tj(c: list[int], n_seq: int, n_iter: int, test: int) -
 
     plt.savefig(plot_path)
     plt.close()
+
+
+def min_entropy(
+    symbols_occ: dict[int, int],
+    frequencies: list[float],
+    n_symbols: int,
+    H_min: float,
+    H_min_sigma: float,
+    H_min_NIST: float,
+):
+    """Plot of the frequencies of the symbols
+
+    Parameters
+    ----------
+    symbols_occ : dict of int, int
+        occurrences of the symbols
+    frequencies : list of float
+        frequencies of the symbols
+    n_symbols: int
+        total number of symbols
+    H_min : float
+        min-entropy
+    H_min_sigma: float
+        error on min-entropy
+    H_min_NIST : float
+        NIST min-entropy
+    """
+    # binomial error on frequencies
+    err_y = []
+    for x in symbols_occ:
+        a = symbols_occ[x] * (1 - (symbols_occ[x] / n_symbols))
+        err_y.append(math.sqrt(a) / n_symbols)
+
+    # plot frequencies
+    fig, ax = plt.subplots()
+    ax.errorbar(symbols_occ.keys(), frequencies, err_y, fmt="o", capsize=3)
+    ax.axhline(1 / 16, 0, 1, label="uniform distribution", color="red", linestyle="dashed")
+    ax.set_title("Min-Entropy evaluation")
+    plt.xticks([i for i in range(16)], size=12)
+    textstr = "\n".join(
+        (
+            r"$min-H=%.4f\pm%.4f$" % (H_min, H_min_sigma),
+            r"$min-H_{NIST}=%.4f$" % (H_min_NIST,),
+        )
+    )
+    props = dict(boxstyle="round", facecolor="white", alpha=1)
+    ax.text(0.40, 0.75, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
+
+    ax.set_xlabel("Symbols")
+    ax.set_ylabel("Frequency of the symbols")
+
+    plt.legend(loc="lower right", fancybox=True, framealpha=1)
+    plt.savefig("MinEntropy.pdf", bbox_inches="tight")
+    plt.close()
