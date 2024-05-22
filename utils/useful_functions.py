@@ -44,7 +44,7 @@ def save_counters(
     C1: list[int],
     b: bool,
     test_time: float,
-    dir_path=None,
+    dir_path: str = "",
 ):
     """Saves the outcome on the IID assumption and the counters values in a specified directory
 
@@ -79,11 +79,10 @@ def save_counters(
         str(datetime.now()),
     ]
     # Check if the directory exists
+    f = "counter_values.csv"
     if dir_path:
         os.makedirs(dir_path, exist_ok=True)
-        f = os.path.join(dir_path, "counter_values.csv")
-    else:
-        f = ("counter_values.csv")
+        f = os.path.join(dir_path, f)
     _save_data_helper(f, header, [d])
 
 
