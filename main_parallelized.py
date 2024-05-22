@@ -12,7 +12,7 @@ import permutation_tests
 import statistical_analysis
 import utils.config
 import utils.plot
-import utils.useful_functions
+import utils.save
 
 
 def read_file(file: str, n_symbols: int, first_seq: bool = True):
@@ -112,7 +112,7 @@ def iid_test_function(conf: utils.config.Config):
     )
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
-    utils.useful_functions.save_test_values(conf, Tx, Ti)
+    utils.save.save_test_values(conf, Tx, Ti)
 
     C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
@@ -122,7 +122,7 @@ def iid_test_function(conf: utils.config.Config):
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
-    utils.useful_functions.save_counters(
+    utils.save.save_counters(
         conf.nist.n_symbols,
         conf.nist.n_permutations,
         conf.nist.selected_tests,
@@ -171,7 +171,7 @@ def statistical_analysis_function(conf: utils.config.Config):
         IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_sequences)
         IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_sequences / 2))
         # Save the values of the counters
-        utils.useful_functions.save_counters(
+        utils.save.save_counters(
             conf.stat.n_symbols,
             conf.stat.n_sequences,
             conf.stat.selected_tests,
@@ -181,7 +181,7 @@ def statistical_analysis_function(conf: utils.config.Config):
             t2 - t0,
             "countersTx_distribution",
         )
-        utils.useful_functions.save_counters(
+        utils.save.save_counters(
             conf.stat.n_symbols,
             conf.stat.n_sequences,
             conf.stat.selected_tests,
