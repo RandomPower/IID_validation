@@ -78,31 +78,36 @@ def iid_test_function(conf: utils.config.Config):
     conf : utils.config.Config
         application configuration parameters
     """
-    logger.debug("NIST TEST")
-    logger.debug("Process started")
+    logger.debug("IID validation started")
     S = read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
-    logger.debug("Sequence calculated: S")
+    logger.debug("Read a sequence of %s symbols from file (%s) ", conf.nist.n_symbols, conf.input_file)
 
-    logger.debug("Calculating for each test the reference statistic: Tx")
+    logger.debug("Calculating the selected test reference statistics (Tx) on the input sequence")
     Tx = permutation_tests.run_tests(S, conf.nist.p, conf.nist.selected_tests)
     logger.debug("Reference statistics calculated!")
 
-    logger.debug("Calculating each test statistic for each shuffled sequence: Ti")
+    logger.debug(
+        "Calculating the selected test statistics (Ti) over %s permutations of the input sequence",
+        conf.nist.n_permutations,
+    )
     t0 = time.process_time()
     Ti = permutation_tests.run_tests_permutations(
         S, conf.nist.n_permutations, conf.nist.selected_tests, conf.nist.p, conf.parallel
     )
     ti = time.process_time() - t0
-    logger.debug("Shuffled sequences Ti statistics calculated")
+    logger.debug("Calculated the test statistic (Ti) on each shuffled sequence!")
+
     utils.save.TestResults.to_binary_file("test_values.bin", conf.nist.selected_tests, Tx, Ti, conf.nist.p)
 
+    logger.debug("Calculating the counters, C0 and C1")
     C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
     logger.debug("C1 = %s", C1)
 
+    logger.debug("Validating IID assumption")
     IID_assumption = permutation_tests.iid_result(C0, C1, conf.nist.n_permutations)
 
-    logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
+    logger.info("IID assumption %s\n", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
     utils.save.save_counters(
         conf.nist.n_symbols,
@@ -116,7 +121,9 @@ def iid_test_function(conf: utils.config.Config):
 
     # plots
     if conf.nist.plot:
+        logger.debug("Saving the Tx-Ti plots")
         iid_plots(conf, Tx, Ti)
+        logger.debug("Tx-Ti plots saved!\n")
 
 
 def statistical_analysis_function(conf: utils.config.Config):
@@ -127,12 +134,12 @@ def statistical_analysis_function(conf: utils.config.Config):
     conf : utils.config.Config
         application configuration parameters
     """
-    logger.debug("----------------------------------------------------------------\n \n")
     stat_tests_names = [permutation_tests.tests[t].name for t in conf.stat.selected_tests]
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
     S = read_file(conf.input_file, conf.stat.n_symbols)
-    logger.debug("Sequence calculated: S")
-    logger.debug("Calculating for each test the reference statistic: Tx")
+    logger.debug("Read a sequence of %s symbols from file (%s) ", conf.stat.n_symbols, conf.input_file)
+
+    logger.debug("Calculating the selected test reference statistics (Tx) on the input sequence")
     Tx = permutation_tests.run_tests(S, [conf.stat.p], conf.stat.selected_tests)
     logger.debug("Reference statistics calculated!")
 
@@ -194,7 +201,7 @@ def statistical_analysis_function(conf: utils.config.Config):
             conf.stat.selected_tests[t],
         )
 
-    logger.debug("Statistical analysis completed.")
+    logger.debug("Statistical analysis completed")
 
 
 def main():
