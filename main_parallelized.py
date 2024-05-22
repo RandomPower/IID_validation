@@ -94,7 +94,7 @@ def iid_test_function(conf: utils.config.Config):
     )
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
-    utils.save.TestResults.to_csv_file("test_values.csv", conf.nist.selected_tests, Tx, Ti, conf.nist.p)
+    utils.save.TestResults.to_binary_file("test_values.bin", conf.nist.selected_tests, Tx, Ti, conf.nist.p)
 
     C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
