@@ -14,12 +14,14 @@ class Config:
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_NIST_TEST = True
     DEFAULT_STATISTICAL_ANALYSIS = True
+    DEFAULT_MINIMUM_ENTROPY = True
     DEFAULT_PARALLEL = True
     DEFAULT_DEBUG = False
 
     _input_file: str
     _nist_test: bool
     _statistical_analysis: bool
+    _min_entropy: bool
     _parallel: bool
     _debug: bool
 
@@ -147,6 +149,7 @@ class Config:
         self._input_file = ""
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
+        self._min_entropy = self.DEFAULT_MINIMUM_ENTROPY
         self._parallel = self.DEFAULT_PARALLEL
         self._debug = self.DEFAULT_DEBUG
 
@@ -204,6 +207,18 @@ class Config:
                     )
 
                 self._statistical_analysis = statistical_analysis
+
+            if "min_entropy" in conf["global"]:
+                min_entropy = conf["global"]["min_entropy"]
+                if not isinstance(min_entropy, bool):
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "min_entropy",
+                        "bool",
+                    )
+                self._min_entropy = min_entropy
 
             if "parallel" in conf["global"]:
                 parallel = conf["global"]["parallel"]
@@ -409,6 +424,8 @@ class Config:
             self._nist_test = args.nist_test
         if args.stat_analysis is not None:
             self._statistical_analysis = args.stat_analysis
+        if args.min_entropy is not None:
+            self._min_entropy = args.min_entropy
         if args.parallel is not None:
             self._parallel = args.parallel
         if args.debug is not None:
@@ -458,6 +475,9 @@ class Config:
 
         if not isinstance(self._statistical_analysis, bool):
             raise ValueError(f'Invalid configuration parameter: "stat_analysis" ({self._statistical_analysis})')
+
+        if not isinstance(self._min_entropy, bool):
+            raise ValueError(f'Invalid configuration parameter: "min_entropy" ({self._min_entropy})')
 
         if not isinstance(self._parallel, bool):
             raise ValueError(f'Invalid configuration parameter: "parallel" ({self._parallel})')
@@ -547,6 +567,10 @@ class Config:
     @property
     def statistical_analysis(self) -> bool:
         return self._statistical_analysis
+
+    @property
+    def min_entropy(self) -> bool:
+        return self._min_entropy
 
     @property
     def parallel(self) -> bool:

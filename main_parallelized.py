@@ -277,6 +277,13 @@ def main() -> None:
         f"[Default: {utils.config.Config.DEFAULT_STATISTICAL_ANALYSIS}].",
     )
     global_args.add_argument(
+        "-e",
+        "--min_entropy",
+        action=argparse.BooleanOptionalAction,
+        help="Run the min-entropy calculation on the input file "
+        f"[Default: {utils.config.Config.DEFAULT_MINIMUM_ENTROPY}].",
+    )
+    global_args.add_argument(
         "--parallel",
         action=argparse.BooleanOptionalAction,
         help=f"Run the program in parallel mode [Default: {utils.config.Config.DEFAULT_PARALLEL}].",
@@ -420,6 +427,10 @@ def main() -> None:
             os.makedirs("statistical_analysis", exist_ok=True)
             with contextlib.chdir("statistical_analysis"):
                 statistical_analysis_function(conf)
+        if conf.min_entropy:
+            os.makedirs("min_entropy", exist_ok=True)
+            with contextlib.chdir("min_entropy"):
+                min_entropy_function(conf)
 
 
 # Configure application logger
