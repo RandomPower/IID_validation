@@ -8,7 +8,6 @@ import struct
 from datetime import datetime
 
 import permutation_tests
-import utils.config
 
 # Configure per-module logger
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
@@ -87,48 +86,6 @@ def save_counters(
         os.makedirs(dir_path, exist_ok=True)
         f = os.path.join(dir_path, f)
     _save_data_helper(f, header, [d])
-
-
-def save_test_values(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]]):
-    """Saves Tx test values and Ti test values in a csv file
-
-    Parameters
-    ----------
-    conf : utils.config.Config
-        application configuration parameters
-    Tx : list of float
-        Tx test values calculated on one sequence
-    Ti : list of list of float
-        Ti test values calculated on the shuffled sequences
-    """
-    if conf.nist.p == conf.nist.DEFAULT_P:
-        header = [
-            "excursion_test",
-            "n_directional_runs",
-            "l_directional_runs",
-            "n_median_runs",
-            "l_median_runs",
-            "n_increases_decreases",
-            "avg_collision",
-            "max_collision",
-            "periodicity_p0",
-            "periodicity_p1",
-            "periodicity_p2",
-            "periodicity_p3",
-            "periodicity_p4",
-            "covariance_p0",
-            "covariance_p1",
-            "covariance_p2",
-            "covariance_p3",
-            "covariance_p4",
-            "compression",
-        ]
-    elif len(conf.nist.p) == 1:
-        header = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
-    else:
-        raise Exception("Support for arbitrary p values not implemented yet")
-
-    _save_data_helper("test_values.csv", header, [Tx, Ti])
 
 
 class TestResults:
