@@ -65,27 +65,9 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
     os.makedirs(histo_dir, exist_ok=True)
 
     Ti_transposed = np.transpose(Ti)
+    test_names = utils.save.TestResults.test_labels(conf.nist.selected_tests, conf.nist.p)
     for t in range(len(Tx)):
-        if conf.nist.p == conf.nist.DEFAULT_P:
-            # Handle the special case for test 8 ('periodicity')
-            if 8 <= t <= 12:
-                p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[8].name} (p={conf.nist.p[p_index]})"
-            # Handle the special case for test 9 ('covariance')
-            elif 13 <= t <= 17:
-                p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[9].name} (p={conf.nist.p[p_index]})"
-            # For the values that should correspond to test 10 ('compression')
-            elif t == 18:
-                test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
-            else:
-                # Direct mapping for other tests
-                test_name = permutation_tests.tests[t].name
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, histo_dir)
-        elif len(conf.nist.p) == 1:
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, histo_dir)
-        else:
-            raise Exception("Support for arbitrary p values not implemented yet")
+        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], histo_dir)
 
 
 def iid_test_function(conf: utils.config.Config):
