@@ -447,9 +447,9 @@ def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int
     return C0, C1
 
 
-def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
+def iid_result(C0: list[int], C1: list[int], n_permutations: int) -> bool:
     """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
-    99.95% of the results Ti for the rest of the population of n_sequences sequences.
+    99.95% of the results Ti for the rest of the population of n_permutations sequences.
 
     Parameters
     ----------
@@ -457,7 +457,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
         counter 0
     C1 : list of int
         counter 1
-    n_sequences : int
+    n_permutations : int
         number of sequences in the population
 
     Returns
@@ -468,7 +468,7 @@ def iid_result(C0: list[int], C1: list[int], n_sequences: int) -> bool:
     if len(C0) != len(C1):
         raise Exception(f"Counter lengths must match: C0 ({len(C0)}), C1 ({len(C1)})")
     for b in range(len(C0)):
-        if (C0[b] + C1[b] <= 0.0005 * n_sequences) or (C0[b] >= 0.9995 * n_sequences):
+        if (C0[b] + C1[b] <= 0.0005 * n_permutations) or (C0[b] >= 0.9995 * n_permutations):
             return False
     return True
 

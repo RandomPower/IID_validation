@@ -64,7 +64,7 @@ class Config:
     class StatConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000
-        DEFAULT_N_SEQUENCES = 200
+        DEFAULT_N_PERMUTATIONS = 200
         DEFAULT_N_ITERATIONS = 500
         DEFAULT_P = 2
 
@@ -74,7 +74,7 @@ class Config:
         def _set_defaults(self) -> None:
             """Initialise member variables to default values."""
             self._selected_tests = self.DEFAULT_SELECTED_TESTS
-            self._n_sequences = self.DEFAULT_N_SEQUENCES
+            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._n_symbols = self.DEFAULT_N_SYMBOLS
             self._n_iterations = self.DEFAULT_N_ITERATIONS
             self._p = self.DEFAULT_P
@@ -84,8 +84,8 @@ class Config:
             return self._selected_tests
 
         @property
-        def n_sequences(self):
-            return self._n_sequences
+        def n_permutations(self):
+            return self._n_permutations
 
         @property
         def n_symbols(self):
@@ -268,14 +268,14 @@ class Config:
                         "list of integers",
                     )
 
-            if "n_sequences" in conf["statistical_analysis"]:
-                self.stat._n_sequences = conf["statistical_analysis"]["n_sequences"]
-                if not isinstance(self.stat._n_sequences, int):
+            if "n_permutations" in conf["statistical_analysis"]:
+                self.stat._n_permutations = conf["statistical_analysis"]["n_permutations"]
+                if not isinstance(self.stat._n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
                         "statistical_analysis",
-                        "n_sequences",
+                        "n_permutations",
                         "int",
                     )
 
@@ -350,8 +350,8 @@ class Config:
         # Statistical analysis
         if args.stat_selected_tests:
             self.stat._selected_tests = args.stat_selected_tests
-        if args.stat_n_sequences:
-            self.stat._n_sequences = args.stat_n_sequences
+        if args.stat_n_permutations:
+            self.stat._n_permutations = args.stat_n_permutations
         if args.stat_n_symbols:
             self.stat._n_symbols = args.stat_n_symbols
         if args.stat_n_iterations:
@@ -412,8 +412,8 @@ class Config:
         if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
             raise ValueError(f'Invalid configuration parameter: "stat_selected_tests" ({self.stat._selected_tests})')
 
-        if (not self.stat._n_sequences) or (not isinstance(self.stat._n_sequences, int)):
-            raise ValueError(f'Invalid configuration parameter: "stat_n_sequences" ({self.stat._n_sequences})')
+        if (not self.stat._n_permutations) or (not isinstance(self.stat._n_permutations, int)):
+            raise ValueError(f'Invalid configuration parameter: "stat_n_permutations" ({self.stat._n_permutations})')
 
         if (not self.stat._n_symbols) or (not isinstance(self.stat._n_symbols, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_n_symbols" ({self.stat._n_symbols})')
@@ -483,12 +483,12 @@ def file_info(conf: Config):
     logger.debug("Input file: %s", conf.input_file)
     logger.debug("Size of file is: %s bytes", size)
     logger.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
-    logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_sequences)
+    logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_permutations)
     # total number of symbols in the file
     max_symbols = size * 2
     max_sequences = max_symbols / conf.stat.n_symbols
     logger.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
-    tot_seqs = conf.stat._n_iterations * conf.stat.n_sequences
+    tot_seqs = conf.stat._n_iterations * conf.stat.n_permutations
     logger.debug("Total sequences necessary = %s", tot_seqs)
     logger.debug("----------------------------------------------------------------\n")
 
@@ -510,7 +510,7 @@ def config_info(conf: Config):
 
     logger.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
     logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
-    logger.debug("Number of shuffled sequences = %s", conf.stat.n_sequences)
+    logger.debug("Number of shuffled sequences = %s", conf.stat.n_permutations)
     logger.debug("Number of iterations for counter: %s", conf.stat.n_iterations)
     stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
     logger.debug("Test selected for counter distribution analysis: %s", stat_tests)

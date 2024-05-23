@@ -161,19 +161,19 @@ def statistical_analysis_function(conf: utils.config.Config):
         # Calculate counters for Tx and TjNorm methods
         t0 = time.process_time()
         Ti = permutation_tests.run_tests_permutations(
-            S, conf.stat.n_sequences, conf.stat.selected_tests, [conf.stat.p], conf.parallel
+            S, conf.stat.n_permutations, conf.stat.selected_tests, [conf.stat.p], conf.parallel
         )
         t1 = time.process_time()
         C0_Tx, C1_Tx = permutation_tests.calculate_counters(Tx, Ti)
         t2 = time.process_time()
         C0_TjNorm, C1_TjNorm = statistical_analysis.calculate_counters_TjNorm(conf, S, Ti)
         t3 = time.process_time()
-        IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_sequences)
-        IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_sequences / 2))
+        IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_permutations)
+        IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_permutations / 2))
         # Save the values of the counters
         utils.useful_functions.save_counters(
             conf.stat.n_symbols,
-            conf.stat.n_sequences,
+            conf.stat.n_permutations,
             conf.stat.selected_tests,
             C0_Tx,
             C1_Tx,
@@ -183,7 +183,7 @@ def statistical_analysis_function(conf: utils.config.Config):
         )
         utils.useful_functions.save_counters(
             conf.stat.n_symbols,
-            conf.stat.n_sequences,
+            conf.stat.n_permutations,
             conf.stat.selected_tests,
             C0_TjNorm,
             C1_TjNorm,
@@ -200,11 +200,14 @@ def statistical_analysis_function(conf: utils.config.Config):
     # Plot the distributions of the counters
     for t in range(len(conf.stat.selected_tests)):
         utils.plot.counters_distribution_Tx(
-            [i[t] for i in counters_C0_Tx], conf.stat.n_sequences, conf.stat.n_iterations, conf.stat.selected_tests[t]
+            [i[t] for i in counters_C0_Tx],
+            conf.stat.n_permutations,
+            conf.stat.n_iterations,
+            conf.stat.selected_tests[t],
         )
         utils.plot.counters_distribution_Tj(
             [i[t] for i in counters_C0_TjNorm],
-            conf.stat.n_sequences,
+            conf.stat.n_permutations,
             conf.stat.n_iterations,
             conf.stat.selected_tests[t],
         )
@@ -307,9 +310,9 @@ def main():
         help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
     stat_args.add_argument(
-        "--stat_n_sequences",
+        "--stat_n_permutations",
         type=int,
-        help=f"Number of sequences [Default: {utils.config.Config.StatConfig.DEFAULT_N_SEQUENCES}].",
+        help=f"Number of sequences [Default: {utils.config.Config.StatConfig.DEFAULT_N_PERMUTATIONS}].",
     )
     stat_args.add_argument(
         "--stat_n_symbols",
