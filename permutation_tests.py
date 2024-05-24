@@ -2,7 +2,6 @@ import bz2
 import concurrent.futures
 import random
 import statistics
-import sys
 import typing
 
 from tqdm import tqdm
@@ -511,14 +510,8 @@ def run_tests_permutations(
                 )
                 futures.append(future)
 
-            completed = 0
-            total_futures = len(futures)
             for future in concurrent.futures.as_completed(futures):
                 Ti.append(future.result())
-                completed += 1
-                percentage_complete = (completed / total_futures) * 100
-                sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
-                sys.stdout.flush()
     else:
         for _ in tqdm(range(n_permutations)):
             s_shuffled = FY_shuffle(S.copy())
