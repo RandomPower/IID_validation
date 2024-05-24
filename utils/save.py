@@ -19,10 +19,14 @@ def _save_data_helper(file: str, headers: list[str], data: list[list]) -> None:
     If the file does not exist, it will be created, the headers will be written at the top, and the data appended.
     If the file exists, only the data will be appended without rewriting the headers.
 
-    Args:
-        file (str): The file path where the data has to be saved.
-        headers (list[str]): The list header strings to write on top of the file.
-        data (list[list]): The list of data rows to save in the file. Each row should be a list of values.
+    Parameters
+    ----------
+    file : str
+        The file path where the data has to be saved
+    headers : list of str
+        The list header strings to write on top of the file
+    data : list of list
+        The list of data rows to save in the file. Each row should be a list of values
     """
     try:
         file_exists = os.path.exists(file)
@@ -48,7 +52,7 @@ def save_counters(
     test_time: float,
     dir_path: str = "",
 ):
-    """Saves the outcome on the IID assumption and the counters values in a specified directory
+    """Saves the outcome on the IID assumption and the counters values in a specified directory.
 
     Parameters
     ----------

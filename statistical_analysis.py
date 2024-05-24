@@ -11,9 +11,10 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 def calculate_counters_TjNorm(
     conf: utils.config.Config, S: list[int], Ti: list[list[float]]
 ) -> tuple[list[int], list[int]]:
-    """Compute the counters C0 and C1 for a given reference list of values Ti with the TjNorm method. The elements of Ti
-    are considered in non-overlapping pairs: the couples with the same Ti values are discarded and replaced, then if the
-    first element of the pair is bigger that the following one, C0 is incremented; if they are equal C1 is.
+    """Compute the counters C0 and C1 for a given reference list of values Ti with the TjNorm method.
+    The elements of Ti are considered in non-overlapping pairs: the couples with the same Ti values are discarded and
+    replaced, then if the first element of the pair is bigger that the following one, C0 is incremented; if they are
+    equal C1 is.
 
     Parameters
     ----------

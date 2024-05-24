@@ -100,6 +100,13 @@ class Config:
             return self._p
 
     def __init__(self, args: argparse.Namespace) -> None:
+        """Construct a Config object from the passed command line arguments.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            The application command line arguments
+        """
         self._set_defaults()
 
         self._nist = Config.NISTConfig()
@@ -124,8 +131,10 @@ class Config:
     def _read_conf(self, filename: str) -> None:
         """Read configuration file and set the parameters.
 
-        Args:
-            filename (str): the configuration file.
+        Parameters
+        ----------
+        filename : str
+            the configuration file
         """
         conf = parse_config_file(filename)
 
@@ -323,7 +332,10 @@ class Config:
     def _parse_args(self, args: argparse.Namespace) -> None:
         """Parse the command-line arguments.
 
-        Args: args (argparse.Namespace): the list of arguments.
+        Parameters
+        ----------
+        args : argparse.Namespace
+            the list of arguments
         """
         # Global
         if args.input_file:
@@ -455,13 +467,17 @@ class Config:
 def parse_config_file(file_path: str) -> dict:
     """Parse the specified file into a Python dictionary
 
-    Args:
-        file_path (str): the path of the configuration file.
+    Parameters
+    ----------
+    file_path : str
+        the path of the configuration file
 
-    Returns:
-        dict: a dictionary containing all the configuration values,
-            or an empty dictionary if the configuration file cannot
-            be parsed.
+    Returns
+    -------
+    dict
+        a dictionary containing all the configuration values,
+        or an empty dictionary if the configuration file cannot
+        be parsed
     """
     try:
         with open(file_path, "rb") as f:
