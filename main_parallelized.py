@@ -12,7 +12,7 @@ import permutation_tests
 import statistical_analysis
 import utils.config
 import utils.plot
-import utils.useful_functions
+import utils.save
 
 
 def read_file(file: str, n_symbols: int, first_seq: bool = True):
@@ -65,27 +65,9 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
     os.makedirs(histo_dir, exist_ok=True)
 
     Ti_transposed = np.transpose(Ti)
+    test_names = utils.save.TestResults.test_labels(conf.nist.selected_tests, conf.nist.p)
     for t in range(len(Tx)):
-        if conf.nist.p == conf.nist.DEFAULT_P:
-            # Handle the special case for test 8 ('periodicity')
-            if 8 <= t <= 12:
-                p_index = t - 8  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[8].name} (p={conf.nist.p[p_index]})"
-            # Handle the special case for test 9 ('covariance')
-            elif 13 <= t <= 17:
-                p_index = t - 13  # Adjust index to map to the correct p value
-                test_name = f"{permutation_tests.tests[9].name} (p={conf.nist.p[p_index]})"
-            # For the values that should correspond to test 10 ('compression')
-            elif t == 18:
-                test_name = permutation_tests.tests[10].name  # Direct mapping for 'compression'
-            else:
-                # Direct mapping for other tests
-                test_name = permutation_tests.tests[t].name
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_name, histo_dir)
-        elif len(conf.nist.p) == 1:
-            utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], permutation_tests.tests[t].name, histo_dir)
-        else:
-            raise Exception("Support for arbitrary p values not implemented yet")
+        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], histo_dir)
 
 
 def iid_test_function(conf: utils.config.Config):
@@ -112,7 +94,7 @@ def iid_test_function(conf: utils.config.Config):
     )
     ti = time.process_time() - t0
     logger.debug("Shuffled sequences Ti statistics calculated")
-    utils.useful_functions.save_test_values(conf, Tx, Ti)
+    utils.save.TestResults.to_binary_file("test_values.bin", conf.nist.selected_tests, Tx, Ti, conf.nist.p)
 
     C0, C1 = permutation_tests.calculate_counters(Tx, Ti)
     logger.debug("C0 = %s", C0)
@@ -122,7 +104,7 @@ def iid_test_function(conf: utils.config.Config):
 
     logger.info("IID assumption %s", "validated" if IID_assumption else "rejected")
     # save results of the IID validation
-    utils.useful_functions.save_counters(
+    utils.save.save_counters(
         conf.nist.n_symbols,
         conf.nist.n_permutations,
         conf.nist.selected_tests,
@@ -171,7 +153,7 @@ def statistical_analysis_function(conf: utils.config.Config):
         IID_assumption_Tx = permutation_tests.iid_result(C0_Tx, C1_Tx, conf.stat.n_permutations)
         IID_assumption_TjNorm = permutation_tests.iid_result(C0_TjNorm, C1_TjNorm, int(conf.stat.n_permutations / 2))
         # Save the values of the counters
-        utils.useful_functions.save_counters(
+        utils.save.save_counters(
             conf.stat.n_symbols,
             conf.stat.n_permutations,
             conf.stat.selected_tests,
@@ -181,7 +163,7 @@ def statistical_analysis_function(conf: utils.config.Config):
             t2 - t0,
             "countersTx_distribution",
         )
-        utils.useful_functions.save_counters(
+        utils.save.save_counters(
             conf.stat.n_symbols,
             conf.stat.n_permutations,
             conf.stat.selected_tests,

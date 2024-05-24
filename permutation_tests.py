@@ -249,8 +249,8 @@ def _avg_collision(S):
 
     Returns
     -------
-    int
-    average length of subsequences with unique sample values before encountering a duplicate
+    float
+        average length of subsequences with unique sample values before encountering a duplicate
     """
     seen = set()
     C = []

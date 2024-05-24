@@ -8,7 +8,7 @@ import numpy as np
 import permutation_tests
 
 
-def histogram_TxTi(Tx, Ti, t, plot_dir_h):
+def histogram_TxTi(Tx, Ti, test_label, plot_dir_h):
     """Plots tests values in an histogram (with binning made such that bins are centered on an integer)
     with the red vertical line as the reference value Tx.
 
@@ -18,7 +18,7 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
         Tx test values calculated on one sequence
     Ti : list of float
         Ti test values calculated on the shuffled sequences
-    t : str
+    test_label : str
         test executed
     plot_dir_h : str
         directory where to save the plot
@@ -40,14 +40,14 @@ def histogram_TxTi(Tx, Ti, t, plot_dir_h):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=12, verticalalignment="top", bbox=props)
 
     # Setting title and axis labels
-    ax.set_title(f"Distribution of the Results T for {t} test", size=12)
+    ax.set_title(f"Distribution of the Results T for {test_label} test", size=12)
     ax.set_xlabel("T Values", fontsize=12)
     ax.set_ylabel("Frequency", fontsize=12)
 
     # Displaying the legend
     ax.legend()
 
-    plot_filename = f"{t.replace(' ', '_')}.pdf"
+    plot_filename = f"{test_label}.pdf"
     plot_path = os.path.join(plot_dir_h, plot_filename)
 
     plt.savefig(plot_path)
