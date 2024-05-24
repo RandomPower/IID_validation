@@ -484,35 +484,31 @@ def file_info(conf: Config):
     logger.debug("Size of file is: %s bytes", size)
     logger.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
     logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_permutations)
-    # total number of symbols in the file
-    max_symbols = size * 2
-    max_sequences = max_symbols / conf.stat.n_symbols
-    logger.debug("Maximum sequences that can be generated from the file: %s", max_sequences)
-    tot_seqs = conf.stat._n_iterations * conf.stat.n_permutations
-    logger.debug("Total sequences necessary = %s", tot_seqs)
-    logger.debug("----------------------------------------------------------------\n")
 
 
 def config_info(conf: Config):
     logger.debug("CONFIG INFO - NIST")
-    logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
-    logger.debug("Number of shuffled sequences = %s", conf.nist.n_permutations)
-    ts = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
-    logger.debug("Tests for entropy validation selected: %s", ts)
-    if conf.nist.first_seq:
-        logger.debug("Reference sequence read from the beginning of the file")
+    if conf.nist_test:
+        logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
+        logger.debug("Number of permutations = %s", conf.nist.n_permutations)
+        ts = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
+        logger.debug("Tests selected for IID validation: %s", ts)
+        logger.debug("Reference sequence read from the %s of the file", "beginning" if conf.nist.first_seq else "end")
+        logger.debug(
+            "p parameter used: %s %s\n", "NIST" if conf.nist.p == conf.nist.DEFAULT_P else "custom", conf.nist.p
+        )
     else:
-        logger.debug("Reference sequence read from the end of the file")
-    if conf.nist.p == conf.nist.DEFAULT_P:
-        logger.debug("p parameter used: NIST")
-    else:
-        logger.debug("p parameter used: user value")
+        logger.debug("Nist test disabled\n")
 
-    logger.debug("\nCONFIG INFO - STATISTICAL ANALYSIS")
-    logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
-    logger.debug("Number of shuffled sequences = %s", conf.stat.n_permutations)
-    logger.debug("Number of iterations for counter: %s", conf.stat.n_iterations)
-    stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
-    logger.debug("Test selected for counter distribution analysis: %s", stat_tests)
-    logger.debug("p parameter used: user value: %s", conf.stat.p)
-    logger.debug("----------------------------------------------------------------\n \nMAIN")
+    logger.debug("CONFIG INFO - STATISTICAL ANALYSIS")
+    if conf.statistical_analysis:
+        logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
+        logger.debug("Number of shuffled sequences = %s", conf.stat.n_permutations)
+        logger.debug("Number of iterations: %s", conf.stat.n_iterations)
+        stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
+        logger.debug("Tests selected for statistical analysis: %s", stat_tests)
+        logger.debug(
+            "p parameter used: %s %s\n", "default" if conf.stat.p == conf.stat.DEFAULT_P else "custom", conf.stat.p
+        )
+    else:
+        logger.debug("Statistical analysis disabled\n")
