@@ -52,7 +52,7 @@ def save_counters(
     test_time: float,
     dir_path: str = "",
 ):
-    """Saves the outcome on the IID assumption and the counters values in a specified directory
+    """Saves the outcome on the IID assumption and the counters values in a specified directory.
 
     Parameters
     ----------

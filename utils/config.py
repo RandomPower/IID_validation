@@ -100,6 +100,13 @@ class Config:
             return self._p
 
     def __init__(self, args: argparse.Namespace) -> None:
+        """Construct a Config object from the passed command line arguments.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            The application command line arguments
+        """
         self._set_defaults()
 
         self._nist = Config.NISTConfig()

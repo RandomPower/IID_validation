@@ -55,7 +55,7 @@ def histogram_TxTi(Tx, Ti, test_label, plot_dir_h):
 
 
 def binomial_function(n, v, p):
-    """Calculates the binomial distribution for a given
+    """Calculates the binomial distribution for a given set of parameters.
 
     Parameters
     ----------
@@ -76,8 +76,8 @@ def binomial_function(n, v, p):
 
 
 def counters_distribution_Tx(c, n_seq, n_iter, test):
-    """Plots a histogram of distribution of the counter C0 for a given test with the measured mean
-    and standard deviation
+    """Plots a histogram of the distribution of the counter C0 for a given test with the measured mean and
+    standard deviation.
 
     Parameters
     ----------
@@ -149,7 +149,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, test):
 
 
 def counters_distribution_Tj(c, n_seq, n_iter, test):
-    """Plots a histogram of distribution of the counter C0 for a given test adjusted for Tj normalized
+    """Plots a histogram of the distribution of the counter C0 for a given test adjusted for Tj normalized.
 
     Parameters
     ----------

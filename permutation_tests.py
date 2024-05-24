@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 
 def FY_shuffle(S):
-    """Generates a shuffled sequence using Fisher-Yates algorithm
+    """Generates a shuffled sequence using the Fisher-Yates algorithm.
 
     Parameters
     ----------
@@ -58,8 +58,8 @@ def s_prime(S):
 
 
 def s_prime_median(S):
-    """Generates a transformed sequence where each original value is replaced with -1 if it is
-    less than the median of the original sequence, or 1 if it is greater than or equal to the median
+    """Generates a transformed sequence where each original value is replaced with -1 if it is less than the median of
+    the original sequence, or 1 if it is greater than or equal to the median.
 
     Parameters
     ----------
@@ -85,8 +85,7 @@ def s_prime_median(S):
 
 
 def _excursion(S):
-    """Measures how far the running sum of sample values deviates from its
-    average value at each point in the sequence
+    """Measures how far the running sum of sample values deviates from its average value at each point in the sequence.
 
     Parameters
     ----------
@@ -105,7 +104,7 @@ def _excursion(S):
 
 
 def _n_directional_runs(S):
-    """Measures the number of runs constructed using the relations between consecutive samples
+    """Measures the number of runs constructed using the relations between consecutive samples.
 
     Parameters
     ----------
@@ -127,8 +126,7 @@ def _n_directional_runs(S):
 
 
 def _l_directional_runs(S):
-    """Measures the length of the longest run constructed using the relations between
-    consecutive samples
+    """Measures the length of the longest run constructed using the relations between consecutive samples.
 
     Parameters
     ----------
@@ -160,7 +158,7 @@ def _l_directional_runs(S):
 
 
 def _n_increases_decreases(S):
-    """Measures the maximum number of increases or decreases between consecutive sample values
+    """Measures the maximum number of increases or decreases between consecutive sample values.
 
     Parameters
     ----------
@@ -186,7 +184,7 @@ def _n_increases_decreases(S):
 
 
 def _n_median_runs(S):
-    """Measures the number of runs that are constructed with respect to the median of the sequence
+    """Measures the number of runs that are constructed with respect to the median of the sequence.
 
     Parameters
     ----------
@@ -208,7 +206,7 @@ def _n_median_runs(S):
 
 
 def _l_median_runs(S):
-    """Measures the length of the longest run constructed with respect to the median of the sequence
+    """Measures the length of the longest run constructed with respect to the median of the sequence.
 
     Parameters
     ----------
@@ -240,7 +238,7 @@ def _l_median_runs(S):
 
 
 def _avg_collision(S):
-    """Counts the number of successive sample values until a duplicate is found
+    """Counts the number of successive sample values until a duplicate is found.
 
     Parameters
     ----------
@@ -266,7 +264,7 @@ def _avg_collision(S):
 
 
 def _max_collision(S):
-    """Counts the number of successive sample values until a duplicate is found
+    """Counts the number of successive sample values until a duplicate is found.
 
     Parameters
     ----------
@@ -276,7 +274,7 @@ def _max_collision(S):
     Returns
     -------
     int
-    length of the longest unique subsequence before encountering a duplicate value
+        length of the longest unique subsequence before encountering a duplicate value
     """
     seen = set()
     C = []
@@ -292,7 +290,7 @@ def _max_collision(S):
 
 
 def _periodicity(S, y):
-    """Determines the number of periodic samples in the sequence
+    """Determines the number of periodic samples in the sequence.
 
     Parameters
     ----------
@@ -314,7 +312,7 @@ def _periodicity(S, y):
 
 
 def _covariance(S, p):
-    """Measures the strength of the lagged correlation
+    """Measures the strength of the lagged correlation.
 
     Parameters
     ----------
@@ -335,9 +333,10 @@ def _covariance(S, p):
 
 
 def _compression(S):
-    """Removes redundancy in the sequence, involving commonly recurring subsequences of characters.
-    Encodes input data as a character string containing a list of values separated by a single
-    space. Compresses the character string with the bzip2 compression algorithm
+    """Measures the length of the sequence encoded into a character string and processed by a general-purpose
+    compression algorithm (bzip2).
+
+    The sequence is encoded as a list of its values separated by a single space.
 
     Parameters
     ----------
@@ -385,8 +384,8 @@ tests = [
 
 
 def run_tests(S: list[int], p: list[int], test_list: list[int] = [i.id for i in tests]) -> list[float]:
-    """Run tests on a specified sequence, using a specified p value.
-    If no tests are specified, all tests are run.
+    """Runs a list of tests on a specified sequence, using a specified p value.
+    By default, all tests are run.
 
     Parameters
     ----------
@@ -417,9 +416,10 @@ def run_tests(S: list[int], p: list[int], test_list: list[int] = [i.id for i in 
 
 
 def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int], list[int]]:
-    """Compute the counters C0 and C1 for the selected tests based on the condition provided by NIST. For each of the
-    latter a given reference value Tx and a given list of values Ti is given: for each element of Ti, C0 is incremented
-    if the latter is bigger than that Tx, C1 is incremented if they are equal.
+    """Computes the counters C0 and C1 for the selected tests.
+
+    For each test, the reference value Tx is compared to the list of values Ti: for each element of Ti, C0 is
+    incremented if Ti is bigger than Tx, C1 is incremented if they are equal.
 
     Parameters
     ----------
@@ -448,7 +448,7 @@ def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int
 
 
 def iid_result(C0: list[int], C1: list[int], n_permutations: int) -> bool:
-    """Determine whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
+    """Determines whether the sequence is IID by checking that the value of the reference result Tx is between 0.05% and
     99.95% of the results Ti for the rest of the population of n_permutations sequences.
 
     Parameters
@@ -476,7 +476,11 @@ def iid_result(C0: list[int], C1: list[int], n_permutations: int) -> bool:
 def run_tests_permutations(
     S: list[int], n_permutations: int, selected_tests: list[int], p: list[int], parallel: bool = True
 ) -> list[list[float]]:
-    """Executes NIST test suite on shuffled sequence in parallel along n_permutations iterations
+    """Executes the NIST test suite on n_permutations shuffled sequences.
+
+    The sequences are tested in parallel depending on the parallel parameter (True by default).
+    Parallelization is achieved by multiprocessing, with the number of parallel processes corresponding to the number of
+    available processors.
 
     Parameters
     ----------
@@ -489,7 +493,7 @@ def run_tests_permutations(
     p : list of int
         parameter p
     parallel: bool
-        parallelized execution option
+        Test sequences in parallel or not
 
     Returns
     -------

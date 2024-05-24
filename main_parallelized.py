@@ -49,7 +49,7 @@ def read_file(file: str, n_symbols: int, first_seq: bool = True):
 
 
 def iid_plots(conf: utils.config.Config, Tx, Ti):
-    """Plot histogram of Ti values with respect to the Tx test value
+    """Plots a histogram of Ti values with respect to the Tx test value.
 
     Parameters
     ----------
@@ -71,7 +71,7 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
 
 
 def iid_test_function(conf: utils.config.Config):
-    """IID test function
+    """Performs the IID validation procedure.
 
     Parameters
     ----------
@@ -127,7 +127,7 @@ def iid_test_function(conf: utils.config.Config):
 
 
 def statistical_analysis_function(conf: utils.config.Config):
-    """Statistical analysis function
+    """Performs the statistical analysis procedure.
 
     Parameters
     ----------
