@@ -406,7 +406,7 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "nist_p" ({self.nist._p})')
 
         if (any(i <= 0 for i in self.nist._p)) or (any(i >= self.nist.n_symbols for i in self.nist._p)):
-            raise ValueError(f'Parameter out of range (0 < nist_p < p): "nist_p" ({self.nist._p})')
+            raise ValueError(f'Parameter out of range (0 < nist_p < nist_n_symbols): "nist_p" ({self.nist._p})')
 
         # Statistical analysis
         if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
@@ -425,7 +425,7 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "stat_p" ({self.stat._p})')
 
         if (self.stat._p <= 0) or (self.stat._p >= self.stat.n_symbols):
-            raise ValueError(f'Parameter out of range (0 < stat_p < p): "stat_p" ({self.stat._p})')
+            raise ValueError(f'Parameter out of range (0 < stat_p < stat_n_symbols): "stat_p" ({self.stat._p})')
 
     @property
     def nist(self):
