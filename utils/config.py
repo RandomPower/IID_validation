@@ -16,6 +16,11 @@ class Config:
     DEFAULT_STATISTICAL_ANALYSIS = True
     DEFAULT_PARALLEL = True
 
+    _input_file: str
+    _nist_test: bool
+    _statistical_analysis: bool
+    _parallel: bool
+
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000000
@@ -24,6 +29,13 @@ class Config:
         DEFAULT_PLOT = True
         # Default NIST values for lag parameter p
         DEFAULT_P = [1, 2, 8, 16, 32]
+
+        _selected_tests: list[int]
+        _n_symbols: int
+        _n_permutations: int
+        _first_seq: bool
+        _plot: bool
+        _p: list[int]
 
         def __init__(self) -> None:
             self._set_defaults()
@@ -38,27 +50,27 @@ class Config:
             self._p = self.DEFAULT_P
 
         @property
-        def selected_tests(self):
+        def selected_tests(self) -> list[int]:
             return self._selected_tests
 
         @property
-        def n_symbols(self):
+        def n_symbols(self) -> int:
             return self._n_symbols
 
         @property
-        def n_permutations(self):
+        def n_permutations(self) -> int:
             return self._n_permutations
 
         @property
-        def first_seq(self):
+        def first_seq(self) -> bool:
             return self._first_seq
 
         @property
-        def plot(self):
+        def plot(self) -> bool:
             return self._plot
 
         @property
-        def p(self):
+        def p(self) -> list[int]:
             return self._p
 
     class StatConfig:
@@ -67,6 +79,12 @@ class Config:
         DEFAULT_N_PERMUTATIONS = 200
         DEFAULT_N_ITERATIONS = 500
         DEFAULT_P = 2
+
+        _selected_tests: list[int]
+        _n_permutations: int
+        _n_symbols: int
+        _n_iterations: int
+        _p: int
 
         def __init__(self) -> None:
             self._set_defaults()
@@ -80,23 +98,23 @@ class Config:
             self._p = self.DEFAULT_P
 
         @property
-        def selected_tests(self):
+        def selected_tests(self) -> list[int]:
             return self._selected_tests
 
         @property
-        def n_permutations(self):
+        def n_permutations(self) -> int:
             return self._n_permutations
 
         @property
-        def n_symbols(self):
+        def n_symbols(self) -> int:
             return self._n_symbols
 
         @property
-        def n_iterations(self):
+        def n_iterations(self) -> int:
             return self._n_iterations
 
         @property
-        def p(self):
+        def p(self) -> int:
             return self._p
 
     def __init__(self, args: argparse.Namespace) -> None:
@@ -450,27 +468,27 @@ class Config:
             raise ValueError(f'Parameter out of range (0 < stat_p < stat_n_symbols): "stat_p" ({self.stat._p})')
 
     @property
-    def nist(self):
+    def nist(self) -> NISTConfig:
         return self._nist
 
     @property
-    def stat(self):
+    def stat(self) -> StatConfig:
         return self._stat
 
     @property
-    def input_file(self):
+    def input_file(self) -> str:
         return self._input_file
 
     @property
-    def nist_test(self):
+    def nist_test(self) -> bool:
         return self._nist_test
 
     @property
-    def statistical_analysis(self):
+    def statistical_analysis(self) -> bool:
         return self._statistical_analysis
 
     @property
-    def parallel(self):
+    def parallel(self) -> bool:
         return self._parallel
 
 
@@ -501,7 +519,7 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-def file_info(conf: Config):
+def file_info(conf: Config) -> None:
     f = open(conf.input_file, "rb")
     f.seek(0, 2)
     size = f.tell()
@@ -512,7 +530,7 @@ def file_info(conf: Config):
     logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_permutations)
 
 
-def config_info(conf: Config):
+def config_info(conf: Config) -> None:
     logger.debug("CONFIG INFO - NIST")
     if conf.nist_test:
         logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)

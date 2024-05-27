@@ -51,7 +51,7 @@ def save_counters(
     b: bool,
     test_time: float,
     dir_path: str = "",
-):
+) -> None:
     """Saves the outcome on the IID assumption and the counters values in a specified directory.
 
     Parameters

@@ -8,7 +8,7 @@ import typing
 from tqdm import tqdm
 
 
-def FY_shuffle(S):
+def FY_shuffle(S: list[int]) -> list[int]:
     """Generates a shuffled sequence using the Fisher-Yates algorithm.
 
     Parameters
@@ -27,7 +27,7 @@ def FY_shuffle(S):
     return S
 
 
-def s_prime(S):
+def s_prime(S: list[int]) -> list[int]:
     """Generates a transformed sequence based on the comparison of consecutive elements in the input sequence.
     For each pair of consecutive elements, if the first element is greater than the second, a -1
     is appended to the new sequence; otherwise, a +1 is appended.
@@ -57,7 +57,7 @@ def s_prime(S):
     return S_prime
 
 
-def s_prime_median(S):
+def s_prime_median(S: list[int]) -> list[int]:
     """Generates a transformed sequence where each original value is replaced with -1 if it is less than the median of
     the original sequence, or 1 if it is greater than or equal to the median.
 
@@ -84,7 +84,7 @@ def s_prime_median(S):
     return S_prime
 
 
-def _excursion(S):
+def _excursion(S: list[int]) -> float:
     """Measures how far the running sum of sample values deviates from its average value at each point in the sequence.
 
     Parameters
@@ -103,7 +103,7 @@ def _excursion(S):
     return max(D)
 
 
-def _n_directional_runs(S):
+def _n_directional_runs(S: list[int]) -> int:
     """Measures the number of runs constructed using the relations between consecutive samples.
 
     Parameters
@@ -125,7 +125,7 @@ def _n_directional_runs(S):
     return T
 
 
-def _l_directional_runs(S):
+def _l_directional_runs(S: list[int]) -> int:
     """Measures the length of the longest run constructed using the relations between consecutive samples.
 
     Parameters
@@ -157,7 +157,7 @@ def _l_directional_runs(S):
     return T
 
 
-def _n_increases_decreases(S):
+def _n_increases_decreases(S: list[int]) -> int:
     """Measures the maximum number of increases or decreases between consecutive sample values.
 
     Parameters
@@ -183,7 +183,7 @@ def _n_increases_decreases(S):
     return max(count_minus, count_plus)
 
 
-def _n_median_runs(S):
+def _n_median_runs(S: list[int]) -> int:
     """Measures the number of runs that are constructed with respect to the median of the sequence.
 
     Parameters
@@ -205,7 +205,7 @@ def _n_median_runs(S):
     return T
 
 
-def _l_median_runs(S):
+def _l_median_runs(S: list[int]) -> int:
     """Measures the length of the longest run constructed with respect to the median of the sequence.
 
     Parameters
@@ -237,7 +237,7 @@ def _l_median_runs(S):
     return T
 
 
-def _avg_collision(S):
+def _avg_collision(S: list[int]) -> float:
     """Counts the number of successive sample values until a duplicate is found.
 
     Parameters
@@ -263,7 +263,7 @@ def _avg_collision(S):
     return statistics.mean(C) + 1
 
 
-def _max_collision(S):
+def _max_collision(S: list[int]) -> int:
     """Counts the number of successive sample values until a duplicate is found.
 
     Parameters
@@ -289,7 +289,7 @@ def _max_collision(S):
     return max(C) + 1
 
 
-def _periodicity(S, p):
+def _periodicity(S: list[int], p: int) -> int:
     """Determines the number of periodic samples in the sequence.
 
     Parameters
@@ -311,7 +311,7 @@ def _periodicity(S, p):
     return T
 
 
-def _covariance(S, p):
+def _covariance(S: list[int], p: int) -> int:
     """Measures the strength of the lagged correlation.
 
     Parameters
@@ -332,7 +332,7 @@ def _covariance(S, p):
     return T
 
 
-def _compression(S):
+def _compression(S: list[int]) -> int:
     """Measures the length of the sequence encoded into a character string and processed by a general-purpose
     compression algorithm (bzip2).
 

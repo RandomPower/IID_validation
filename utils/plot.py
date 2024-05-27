@@ -8,7 +8,7 @@ import numpy as np
 import permutation_tests
 
 
-def histogram_TxTi(Tx, Ti, test_label, plot_dir_h):
+def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, plot_dir_h: str) -> None:
     """Plots tests values in an histogram (with binning made such that bins are centered on an integer)
     with the red vertical line as the reference value Tx.
 
@@ -54,7 +54,7 @@ def histogram_TxTi(Tx, Ti, test_label, plot_dir_h):
     plt.close()
 
 
-def binomial_function(n, v, p):
+def binomial_function(n: int, v: int, p: float) -> float:
     """Calculates the binomial distribution for a given set of parameters.
 
     Parameters
@@ -75,7 +75,7 @@ def binomial_function(n, v, p):
     return f
 
 
-def counters_distribution_Tx(c, n_seq, n_iter, test):
+def counters_distribution_Tx(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
     """Plots a histogram of the distribution of the counter C0 for a given test with the measured mean and
     standard deviation.
 
@@ -148,7 +148,7 @@ def counters_distribution_Tx(c, n_seq, n_iter, test):
     plt.close()
 
 
-def counters_distribution_Tj(c, n_seq, n_iter, test):
+def counters_distribution_Tj(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
     """Plots a histogram of the distribution of the counter C0 for a given test adjusted for Tj normalized.
 
     Parameters

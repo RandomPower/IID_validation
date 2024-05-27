@@ -15,7 +15,7 @@ import utils.plot
 import utils.save
 
 
-def read_file(file: str, n_symbols: int, first_seq: bool = True):
+def read_file(file: str, n_symbols: int, first_seq: bool = True) -> list[int]:
     """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
     applying a masking process
 
@@ -48,16 +48,16 @@ def read_file(file: str, n_symbols: int, first_seq: bool = True):
     return S
 
 
-def iid_plots(conf: utils.config.Config, Tx, Ti):
+def iid_plots(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]]) -> None:
     """Plots a histogram of Ti values with respect to the Tx test value.
 
     Parameters
     ----------
     conf : utils.config.Config
         application configuration parameters
-    Tx : list of int
+    Tx : list of float
         reference test values
-    Ti : list of int
+    Ti : list of list of float
         test values calculated on shuffled sequences
     """
     histo_dir = "histogram_TxTi"
@@ -70,7 +70,7 @@ def iid_plots(conf: utils.config.Config, Tx, Ti):
         utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], histo_dir)
 
 
-def iid_test_function(conf: utils.config.Config):
+def iid_test_function(conf: utils.config.Config) -> None:
     """Performs the IID validation procedure.
 
     Parameters
@@ -126,7 +126,7 @@ def iid_test_function(conf: utils.config.Config):
         logger.debug("Tx-Ti plots saved!\n")
 
 
-def statistical_analysis_function(conf: utils.config.Config):
+def statistical_analysis_function(conf: utils.config.Config) -> None:
     """Performs the statistical analysis procedure.
 
     Parameters
@@ -204,7 +204,7 @@ def statistical_analysis_function(conf: utils.config.Config):
     logger.debug("Statistical analysis completed")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
 
     # Global
