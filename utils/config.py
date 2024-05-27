@@ -400,6 +400,9 @@ class Config:
         else:
             self.nist._selected_tests = sorted(set(self.nist._selected_tests))
 
+        if not all(i in [test.id for test in permutation_tests.tests] for i in self.nist._selected_tests):
+            raise ValueError(f'Invalid test ID in "nist_selected_tests": {self.nist._selected_tests}')
+
         if (not self.nist._n_symbols) or (not isinstance(self.nist._n_symbols, int)):
             raise ValueError(f'Invalid configuration parameter: "nist_n_symbols" ({self.nist._n_symbols})')
 
@@ -427,6 +430,9 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "stat_selected_tests" ({self.stat._selected_tests})')
         else:
             self.stat._selected_tests = sorted(set(self.stat._selected_tests))
+
+        if not all(i in [test.id for test in permutation_tests.tests] for i in self.stat._selected_tests):
+            raise ValueError(f'Invalid test ID in "stat_selected_tests": {self.stat._selected_tests}')
 
         if (not self.stat._n_permutations) or (not isinstance(self.stat._n_permutations, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_n_permutations" ({self.stat._n_permutations})')
