@@ -14,7 +14,7 @@ def histogram_TxTi(Tx, Ti, test_label, plot_dir_h):
 
     Parameters
     ----------
-    Tx : list of float
+    Tx : float
         Tx test values calculated on one sequence
     Ti : list of float
         Ti test values calculated on the shuffled sequences
