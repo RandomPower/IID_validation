@@ -160,10 +160,8 @@ class Config:
         # Global section
         if "global" in conf:
             if "input_file" in conf["global"]:
-                self._input_file = os.path.abspath(os.path.expanduser(conf["global"]["input_file"]))
-                if (not isinstance(self._input_file, str)) or (
-                    not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
-                ):
+                input_file = conf["global"]["input_file"]
+                if (not isinstance(input_file, str)) or (not input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -171,12 +169,16 @@ class Config:
                         "input_file",
                         "binary file",
                     )
-                if not os.path.isfile(self._input_file):
-                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
+
+                input_file = os.path.abspath(os.path.expanduser(input_file))
+                if not os.path.isfile(input_file):
+                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", input_file)
+
+                self._input_file = input_file
 
             if "nist_test" in conf["global"]:
-                self._nist_test = conf["global"]["nist_test"]
-                if not isinstance(self._nist_test, bool):
+                nist_test = conf["global"]["nist_test"]
+                if not isinstance(nist_test, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -185,9 +187,11 @@ class Config:
                         "bool",
                     )
 
+                self._nist_test = nist_test
+
             if "stat_analysis" in conf["global"]:
-                self._statistical_analysis = conf["global"]["stat_analysis"]
-                if not isinstance(self._statistical_analysis, bool):
+                statistical_analysis = conf["global"]["stat_analysis"]
+                if not isinstance(statistical_analysis, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -196,9 +200,11 @@ class Config:
                         "bool",
                     )
 
+                self._statistical_analysis = statistical_analysis
+
             if "parallel" in conf["global"]:
-                self._parallel = conf["global"]["parallel"]
-                if not isinstance(self._parallel, bool):
+                parallel = conf["global"]["parallel"]
+                if not isinstance(parallel, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -207,12 +213,14 @@ class Config:
                         "bool",
                     )
 
+                self._parallel = parallel
+
         # nist_test section
         if "nist_test" in conf:
             if "selected_tests" in conf["nist_test"]:
-                self.nist._selected_tests = conf["nist_test"]["selected_tests"]
-                if (not isinstance(self.nist._selected_tests, list)) or (
-                    not all(isinstance(i, int) for i in self.nist._selected_tests)
+                nist_selected_tests = conf["nist_test"]["selected_tests"]
+                if (not isinstance(nist_selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in nist_selected_tests)
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
@@ -222,9 +230,11 @@ class Config:
                         "list of integers",
                     )
 
+                self.nist._selected_tests = nist_selected_tests
+
             if "n_symbols" in conf["nist_test"]:
-                self.nist._n_symbols = conf["nist_test"]["n_symbols"]
-                if not isinstance(self.nist._n_symbols, int):
+                nist_n_symbols = conf["nist_test"]["n_symbols"]
+                if not isinstance(nist_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -233,9 +243,11 @@ class Config:
                         "int",
                     )
 
+                self.nist._n_symbols = nist_n_symbols
+
             if "n_permutations" in conf["nist_test"]:
-                self.nist._n_permutations = conf["nist_test"]["n_permutations"]
-                if not isinstance(self.nist._n_permutations, int):
+                nist_n_permutations = conf["nist_test"]["n_permutations"]
+                if not isinstance(nist_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -244,9 +256,11 @@ class Config:
                         "int",
                     )
 
+                self.nist._n_permutations = nist_n_permutations
+
             if "first_seq" in conf["nist_test"]:
-                self.nist._first_seq = conf["nist_test"]["first_seq"]
-                if not isinstance(self.nist._first_seq, bool):
+                nist_first_seq = conf["nist_test"]["first_seq"]
+                if not isinstance(nist_first_seq, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -255,9 +269,11 @@ class Config:
                         "bool",
                     )
 
+                self.nist._first_seq = nist_first_seq
+
             if "plot" in conf["nist_test"]:
-                self.nist._plot = conf["nist_test"]["plot"]
-                if not isinstance(self.nist._plot, bool):
+                nist_plot = conf["nist_test"]["plot"]
+                if not isinstance(nist_plot, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -266,9 +282,11 @@ class Config:
                         "bool",
                     )
 
+                self.nist._plot = nist_plot
+
             if "p" in conf["nist_test"]:
-                self.nist._p = conf["nist_test"]["p"]
-                if (not isinstance(self.nist._p, list)) or (not all(isinstance(i, int) for i in self.nist._p)):
+                nist_p = conf["nist_test"]["p"]
+                if (not isinstance(nist_p, list)) or (not all(isinstance(i, int) for i in nist_p)):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -276,17 +294,19 @@ class Config:
                         "p",
                         "list of integers",
                     )
-                elif (any(i <= 0 for i in self.nist._p)) or (any(i >= self.nist.n_symbols for i in self.nist._p)):
+                elif (any(i <= 0 for i in nist_p)) or (any(i >= self.nist.n_symbols for i in nist_p)):
                     logger.error(
                         "%s: %s: parameter %s out of range (0 < %s < n_symbols)", filename, "nist_test", "p", "p"
                     )
 
+                self.nist._p = nist_p
+
         # statistical_analysis section
         if "statistical_analysis" in conf:
             if "selected_tests" in conf["statistical_analysis"]:
-                self.stat._selected_tests = conf["statistical_analysis"]["selected_tests"]
-                if (not isinstance(self.stat._selected_tests, list)) or (
-                    not all(isinstance(i, int) for i in self.stat._selected_tests)
+                stat_selected_tests = conf["statistical_analysis"]["selected_tests"]
+                if (not isinstance(stat_selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in stat_selected_tests)
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
@@ -296,9 +316,11 @@ class Config:
                         "list of integers",
                     )
 
+                self.stat._selected_tests = stat_selected_tests
+
             if "n_permutations" in conf["statistical_analysis"]:
-                self.stat._n_permutations = conf["statistical_analysis"]["n_permutations"]
-                if not isinstance(self.stat._n_permutations, int):
+                stat_n_permutations = conf["statistical_analysis"]["n_permutations"]
+                if not isinstance(stat_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -307,9 +329,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_permutations = stat_n_permutations
+
             if "n_symbols" in conf["statistical_analysis"]:
-                self.stat._n_symbols = conf["statistical_analysis"]["n_symbols"]
-                if not isinstance(self.stat._n_symbols, int):
+                stat_n_symbols = conf["statistical_analysis"]["n_symbols"]
+                if not isinstance(stat_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -318,9 +342,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_symbols = stat_n_symbols
+
             if "n_iterations" in conf["statistical_analysis"]:
-                self.stat._n_iterations = conf["statistical_analysis"]["n_iterations"]
-                if not isinstance(self.stat._n_iterations, int):
+                stat_n_iterations = conf["statistical_analysis"]["n_iterations"]
+                if not isinstance(stat_n_iterations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -329,9 +355,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_iterations = stat_n_iterations
+
             if "p" in conf["statistical_analysis"]:
-                self.stat._p = conf["statistical_analysis"]["p"]
-                if not isinstance(self.stat._p, int):
+                stat_p = conf["statistical_analysis"]["p"]
+                if not isinstance(stat_p, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -339,7 +367,7 @@ class Config:
                         "p",
                         "int",
                     )
-                elif (self.stat._p <= 0) or (self.stat._p >= self.stat.n_symbols):
+                elif (stat_p <= 0) or (stat_p >= self.stat.n_symbols):
                     logger.error(
                         "%s: %s: parameter %s out of range (0 < %s < n_symbols)",
                         filename,
@@ -347,6 +375,8 @@ class Config:
                         "p",
                         "p",
                     )
+
+                self.stat._p = stat_p
 
     def _parse_args(self, args: argparse.Namespace) -> None:
         """Parse the command-line arguments.
