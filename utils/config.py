@@ -428,7 +428,8 @@ class Config:
         # Global
         # An input file is required
         if (
-            (not self._input_file)
+            (not isinstance(self._input_file, str))
+            or (not self._input_file)
             or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT")))
             or (not os.path.isfile(self._input_file))
         ):
@@ -444,7 +445,11 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "parallel" ({self._parallel})')
 
         # NIST IID tests
-        if (not self.nist._selected_tests) or (not isinstance(self.nist._selected_tests, list)):
+        if (
+            (not isinstance(self.nist._selected_tests, list))
+            or (not self.nist._selected_tests)
+            or (not all(isinstance(i, int) for i in self.nist._selected_tests))
+        ):
             raise ValueError(f'Invalid configuration parameter: "nist_selected_tests" ({self.nist._selected_tests})')
         else:
             self.nist._selected_tests = sorted(set(self.nist._selected_tests))
@@ -475,7 +480,11 @@ class Config:
             raise ValueError(f'Parameter out of range (0 < nist_p < nist_n_symbols): "nist_p" ({self.nist._p})')
 
         # Statistical analysis
-        if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
+        if (
+            (not isinstance(self.stat._selected_tests, list))
+            or (not self.stat._selected_tests)
+            or (not all(isinstance(i, int) for i in self.stat._selected_tests))
+        ):
             raise ValueError(f'Invalid configuration parameter: "stat_selected_tests" ({self.stat._selected_tests})')
         else:
             self.stat._selected_tests = sorted(set(self.stat._selected_tests))
