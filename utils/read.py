@@ -13,6 +13,9 @@ _mask = {
     4: 0b00001111,
 }
 
+# Read 1MB chunks by default
+DEFAULT_CHUNK_LEN = 1048576
+
 
 def bytes_needed(N: int) -> int:
     """Returns the minimum number of bytes needed to represent N bits.
@@ -94,3 +97,26 @@ def read_file(file: str, n_symbols: int, symbol_len: int = DEFAULT_SYMBOL_LEN, f
         b = f.read(n_bytes)
 
     return symbols_from_bytes(b, symbol_len)
+
+
+def read_file_chunks(file: str, n_bytes: int = DEFAULT_CHUNK_LEN):
+    """Reads a binary file in chunks.
+
+    Returns a bytes object of n_bytes elements. If less than n_bytes are available in the file (e.g. small file, or
+    reading the last chunk), returns between 0 and n_bytes elements.
+
+    Parameters
+    ----------
+    file : str
+        the input file
+    n_bytes : int
+        size in bytes of the chunk to read
+
+    Returns
+    -------
+    bytes generator
+        a generator expression producing the binary file chunk by chunk
+    """
+    with open(file, "rb") as f:
+        while b := f.read(n_bytes):
+            yield b
