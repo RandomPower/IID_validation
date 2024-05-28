@@ -142,6 +142,7 @@ class Config:
 
     def _set_defaults(self) -> None:
         """Initialise member variables to default values."""
+        self._input_file = ""
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
         self._parallel = self.DEFAULT_PARALLEL
