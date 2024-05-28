@@ -289,14 +289,14 @@ def _max_collision(S):
     return max(C) + 1
 
 
-def _periodicity(S, y):
+def _periodicity(S, p):
     """Determines the number of periodic samples in the sequence.
 
     Parameters
     ----------
     S : list of int
         sequence of sample values
-    y : int
+    p : int
         lag parameter
 
     Returns
@@ -305,8 +305,8 @@ def _periodicity(S, y):
         number of instances where an element in the sequence is equal to another element that is y positions ahead
     """
     T = 0
-    for i in range(0, len(S) - y):
-        if S[i] == S[i + y]:
+    for i in range(0, len(S) - p):
+        if S[i] == S[i + p]:
             T += 1
     return T
 
