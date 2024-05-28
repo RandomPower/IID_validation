@@ -16,6 +16,11 @@ class Config:
     DEFAULT_STATISTICAL_ANALYSIS = True
     DEFAULT_PARALLEL = True
 
+    _input_file: str
+    _nist_test: bool
+    _statistical_analysis: bool
+    _parallel: bool
+
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
         DEFAULT_N_SYMBOLS = 1000000
@@ -24,6 +29,13 @@ class Config:
         DEFAULT_PLOT = True
         # Default NIST values for lag parameter p
         DEFAULT_P = [1, 2, 8, 16, 32]
+
+        _selected_tests: list[int]
+        _n_symbols: int
+        _n_permutations: int
+        _first_seq: bool
+        _plot: bool
+        _p: list[int]
 
         def __init__(self) -> None:
             self._set_defaults()
@@ -38,27 +50,27 @@ class Config:
             self._p = self.DEFAULT_P
 
         @property
-        def selected_tests(self):
+        def selected_tests(self) -> list[int]:
             return self._selected_tests
 
         @property
-        def n_symbols(self):
+        def n_symbols(self) -> int:
             return self._n_symbols
 
         @property
-        def n_permutations(self):
+        def n_permutations(self) -> int:
             return self._n_permutations
 
         @property
-        def first_seq(self):
+        def first_seq(self) -> bool:
             return self._first_seq
 
         @property
-        def plot(self):
+        def plot(self) -> bool:
             return self._plot
 
         @property
-        def p(self):
+        def p(self) -> list[int]:
             return self._p
 
     class StatConfig:
@@ -67,6 +79,12 @@ class Config:
         DEFAULT_N_PERMUTATIONS = 200
         DEFAULT_N_ITERATIONS = 500
         DEFAULT_P = 2
+
+        _selected_tests: list[int]
+        _n_permutations: int
+        _n_symbols: int
+        _n_iterations: int
+        _p: int
 
         def __init__(self) -> None:
             self._set_defaults()
@@ -80,23 +98,23 @@ class Config:
             self._p = self.DEFAULT_P
 
         @property
-        def selected_tests(self):
+        def selected_tests(self) -> list[int]:
             return self._selected_tests
 
         @property
-        def n_permutations(self):
+        def n_permutations(self) -> int:
             return self._n_permutations
 
         @property
-        def n_symbols(self):
+        def n_symbols(self) -> int:
             return self._n_symbols
 
         @property
-        def n_iterations(self):
+        def n_iterations(self) -> int:
             return self._n_iterations
 
         @property
-        def p(self):
+        def p(self) -> int:
             return self._p
 
     def __init__(self, args: argparse.Namespace) -> None:
@@ -124,6 +142,7 @@ class Config:
 
     def _set_defaults(self) -> None:
         """Initialise member variables to default values."""
+        self._input_file = ""
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
         self._parallel = self.DEFAULT_PARALLEL
@@ -141,10 +160,8 @@ class Config:
         # Global section
         if "global" in conf:
             if "input_file" in conf["global"]:
-                self._input_file = os.path.abspath(os.path.expanduser(conf["global"]["input_file"]))
-                if (not isinstance(self._input_file, str)) or (
-                    not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))
-                ):
+                input_file = conf["global"]["input_file"]
+                if (not isinstance(input_file, str)) or (not input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -152,12 +169,16 @@ class Config:
                         "input_file",
                         "binary file",
                     )
-                if not os.path.isfile(self._input_file):
-                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", self._input_file)
+
+                input_file = os.path.abspath(os.path.expanduser(input_file))
+                if not os.path.isfile(input_file):
+                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", input_file)
+
+                self._input_file = input_file
 
             if "nist_test" in conf["global"]:
-                self._nist_test = conf["global"]["nist_test"]
-                if not isinstance(self._nist_test, bool):
+                nist_test = conf["global"]["nist_test"]
+                if not isinstance(nist_test, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -166,9 +187,11 @@ class Config:
                         "bool",
                     )
 
+                self._nist_test = nist_test
+
             if "stat_analysis" in conf["global"]:
-                self._statistical_analysis = conf["global"]["stat_analysis"]
-                if not isinstance(self._statistical_analysis, bool):
+                statistical_analysis = conf["global"]["stat_analysis"]
+                if not isinstance(statistical_analysis, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -177,9 +200,11 @@ class Config:
                         "bool",
                     )
 
+                self._statistical_analysis = statistical_analysis
+
             if "parallel" in conf["global"]:
-                self._parallel = conf["global"]["parallel"]
-                if not isinstance(self._parallel, bool):
+                parallel = conf["global"]["parallel"]
+                if not isinstance(parallel, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -188,12 +213,14 @@ class Config:
                         "bool",
                     )
 
+                self._parallel = parallel
+
         # nist_test section
         if "nist_test" in conf:
             if "selected_tests" in conf["nist_test"]:
-                self.nist._selected_tests = conf["nist_test"]["selected_tests"]
-                if (not isinstance(self.nist._selected_tests, list)) or (
-                    not all(isinstance(i, int) for i in self.nist._selected_tests)
+                nist_selected_tests = conf["nist_test"]["selected_tests"]
+                if (not isinstance(nist_selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in nist_selected_tests)
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
@@ -203,9 +230,11 @@ class Config:
                         "list of integers",
                     )
 
+                self.nist._selected_tests = nist_selected_tests
+
             if "n_symbols" in conf["nist_test"]:
-                self.nist._n_symbols = conf["nist_test"]["n_symbols"]
-                if not isinstance(self.nist._n_symbols, int):
+                nist_n_symbols = conf["nist_test"]["n_symbols"]
+                if not isinstance(nist_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -214,9 +243,11 @@ class Config:
                         "int",
                     )
 
+                self.nist._n_symbols = nist_n_symbols
+
             if "n_permutations" in conf["nist_test"]:
-                self.nist._n_permutations = conf["nist_test"]["n_permutations"]
-                if not isinstance(self.nist._n_permutations, int):
+                nist_n_permutations = conf["nist_test"]["n_permutations"]
+                if not isinstance(nist_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -225,9 +256,11 @@ class Config:
                         "int",
                     )
 
+                self.nist._n_permutations = nist_n_permutations
+
             if "first_seq" in conf["nist_test"]:
-                self.nist._first_seq = conf["nist_test"]["first_seq"]
-                if not isinstance(self.nist._first_seq, bool):
+                nist_first_seq = conf["nist_test"]["first_seq"]
+                if not isinstance(nist_first_seq, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -236,9 +269,11 @@ class Config:
                         "bool",
                     )
 
+                self.nist._first_seq = nist_first_seq
+
             if "plot" in conf["nist_test"]:
-                self.nist._plot = conf["nist_test"]["plot"]
-                if not isinstance(self.nist._plot, bool):
+                nist_plot = conf["nist_test"]["plot"]
+                if not isinstance(nist_plot, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -247,9 +282,11 @@ class Config:
                         "bool",
                     )
 
+                self.nist._plot = nist_plot
+
             if "p" in conf["nist_test"]:
-                self.nist._p = conf["nist_test"]["p"]
-                if (not isinstance(self.nist._p, list)) or (not all(isinstance(i, int) for i in self.nist._p)):
+                nist_p = conf["nist_test"]["p"]
+                if (not isinstance(nist_p, list)) or (not all(isinstance(i, int) for i in nist_p)):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -257,17 +294,19 @@ class Config:
                         "p",
                         "list of integers",
                     )
-                elif (any(i <= 0 for i in self.nist._p)) or (any(i >= self.nist.n_symbols for i in self.nist._p)):
+                elif (any(i <= 0 for i in nist_p)) or (any(i >= self.nist.n_symbols for i in nist_p)):
                     logger.error(
                         "%s: %s: parameter %s out of range (0 < %s < n_symbols)", filename, "nist_test", "p", "p"
                     )
 
+                self.nist._p = nist_p
+
         # statistical_analysis section
         if "statistical_analysis" in conf:
             if "selected_tests" in conf["statistical_analysis"]:
-                self.stat._selected_tests = conf["statistical_analysis"]["selected_tests"]
-                if (not isinstance(self.stat._selected_tests, list)) or (
-                    not all(isinstance(i, int) for i in self.stat._selected_tests)
+                stat_selected_tests = conf["statistical_analysis"]["selected_tests"]
+                if (not isinstance(stat_selected_tests, list)) or (
+                    not all(isinstance(i, int) for i in stat_selected_tests)
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
@@ -277,9 +316,11 @@ class Config:
                         "list of integers",
                     )
 
+                self.stat._selected_tests = stat_selected_tests
+
             if "n_permutations" in conf["statistical_analysis"]:
-                self.stat._n_permutations = conf["statistical_analysis"]["n_permutations"]
-                if not isinstance(self.stat._n_permutations, int):
+                stat_n_permutations = conf["statistical_analysis"]["n_permutations"]
+                if not isinstance(stat_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -288,9 +329,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_permutations = stat_n_permutations
+
             if "n_symbols" in conf["statistical_analysis"]:
-                self.stat._n_symbols = conf["statistical_analysis"]["n_symbols"]
-                if not isinstance(self.stat._n_symbols, int):
+                stat_n_symbols = conf["statistical_analysis"]["n_symbols"]
+                if not isinstance(stat_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -299,9 +342,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_symbols = stat_n_symbols
+
             if "n_iterations" in conf["statistical_analysis"]:
-                self.stat._n_iterations = conf["statistical_analysis"]["n_iterations"]
-                if not isinstance(self.stat._n_iterations, int):
+                stat_n_iterations = conf["statistical_analysis"]["n_iterations"]
+                if not isinstance(stat_n_iterations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -310,9 +355,11 @@ class Config:
                         "int",
                     )
 
+                self.stat._n_iterations = stat_n_iterations
+
             if "p" in conf["statistical_analysis"]:
-                self.stat._p = conf["statistical_analysis"]["p"]
-                if not isinstance(self.stat._p, int):
+                stat_p = conf["statistical_analysis"]["p"]
+                if not isinstance(stat_p, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
                         filename,
@@ -320,7 +367,7 @@ class Config:
                         "p",
                         "int",
                     )
-                elif (self.stat._p <= 0) or (self.stat._p >= self.stat.n_symbols):
+                elif (stat_p <= 0) or (stat_p >= self.stat.n_symbols):
                     logger.error(
                         "%s: %s: parameter %s out of range (0 < %s < n_symbols)",
                         filename,
@@ -328,6 +375,8 @@ class Config:
                         "p",
                         "p",
                     )
+
+                self.stat._p = stat_p
 
     def _parse_args(self, args: argparse.Namespace) -> None:
         """Parse the command-line arguments.
@@ -379,7 +428,8 @@ class Config:
         # Global
         # An input file is required
         if (
-            (not self._input_file)
+            (not isinstance(self._input_file, str))
+            or (not self._input_file)
             or (not self._input_file.endswith((".bin", ".BIN", ".dat", ".DAT")))
             or (not os.path.isfile(self._input_file))
         ):
@@ -395,7 +445,11 @@ class Config:
             raise ValueError(f'Invalid configuration parameter: "parallel" ({self._parallel})')
 
         # NIST IID tests
-        if (not self.nist._selected_tests) or (not isinstance(self.nist._selected_tests, list)):
+        if (
+            (not isinstance(self.nist._selected_tests, list))
+            or (not self.nist._selected_tests)
+            or (not all(isinstance(i, int) for i in self.nist._selected_tests))
+        ):
             raise ValueError(f'Invalid configuration parameter: "nist_selected_tests" ({self.nist._selected_tests})')
         else:
             self.nist._selected_tests = sorted(set(self.nist._selected_tests))
@@ -426,7 +480,11 @@ class Config:
             raise ValueError(f'Parameter out of range (0 < nist_p < nist_n_symbols): "nist_p" ({self.nist._p})')
 
         # Statistical analysis
-        if (not self.stat._selected_tests) or (not isinstance(self.stat._selected_tests, list)):
+        if (
+            (not isinstance(self.stat._selected_tests, list))
+            or (not self.stat._selected_tests)
+            or (not all(isinstance(i, int) for i in self.stat._selected_tests))
+        ):
             raise ValueError(f'Invalid configuration parameter: "stat_selected_tests" ({self.stat._selected_tests})')
         else:
             self.stat._selected_tests = sorted(set(self.stat._selected_tests))
@@ -450,27 +508,27 @@ class Config:
             raise ValueError(f'Parameter out of range (0 < stat_p < stat_n_symbols): "stat_p" ({self.stat._p})')
 
     @property
-    def nist(self):
+    def nist(self) -> NISTConfig:
         return self._nist
 
     @property
-    def stat(self):
+    def stat(self) -> StatConfig:
         return self._stat
 
     @property
-    def input_file(self):
+    def input_file(self) -> str:
         return self._input_file
 
     @property
-    def nist_test(self):
+    def nist_test(self) -> bool:
         return self._nist_test
 
     @property
-    def statistical_analysis(self):
+    def statistical_analysis(self) -> bool:
         return self._statistical_analysis
 
     @property
-    def parallel(self):
+    def parallel(self) -> bool:
         return self._parallel
 
 
@@ -501,7 +559,7 @@ def parse_config_file(file_path: str) -> dict:
         return {}
 
 
-def file_info(conf: Config):
+def file_info(conf: Config) -> None:
     f = open(conf.input_file, "rb")
     f.seek(0, 2)
     size = f.tell()
@@ -512,7 +570,7 @@ def file_info(conf: Config):
     logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_permutations)
 
 
-def config_info(conf: Config):
+def config_info(conf: Config) -> None:
     logger.debug("CONFIG INFO - NIST")
     if conf.nist_test:
         logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
