@@ -25,6 +25,8 @@ def read_file(file: str, n_symbols: int, first_seq: bool = True) -> list[int]:
         path to file
     n_symbols : int
         number of symbols
+    first_seq: bool
+        read from the start of the file
 
     Returns
     -------

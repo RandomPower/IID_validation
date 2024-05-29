@@ -560,6 +560,17 @@ def parse_config_file(file_path: str) -> dict:
 
 
 def file_info(conf: Config) -> None:
+    """Logs file info:
+            input file,
+            size of input file in bytes,
+            number of symbols per sequence for counter analysis
+            number of sequences for counter analysis
+
+    Parameters
+    ----------
+    conf : Config
+        the conf object containing configuration values
+    """
     f = open(conf.input_file, "rb")
     f.seek(0, 2)
     size = f.tell()
@@ -571,6 +582,13 @@ def file_info(conf: Config) -> None:
 
 
 def config_info(conf: Config) -> None:
+    """Log configuration info for both nist_test and statistical_analysis
+
+    Parameters
+    ----------
+    conf : Config
+        the conf object containing configuration values
+    """
     logger.debug("CONFIG INFO - NIST")
     if conf.nist_test:
         logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)

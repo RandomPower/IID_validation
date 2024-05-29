@@ -161,10 +161,6 @@ def counters_distribution_Tj(c: list[int], n_seq: int, n_iter: int, test: int) -
         number of iterations
     test : int
         index of the executed permutation test
-    t : str
-        test executed
-    plot_dir : str
-        directory where to save the plot
     """
     # calculate the parameters of the distribution
     p = 0.5
