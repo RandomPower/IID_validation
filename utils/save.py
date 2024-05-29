@@ -274,7 +274,9 @@ class TestResults:
         return bytes(b)
 
     @staticmethod
-    def to_binary_file(file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]):
+    def to_binary_file(
+        file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]
+    ) -> None:
         """Write test results to a binary file.
 
         Parameters
@@ -430,7 +432,9 @@ class TestResults:
         return json.dumps(data, ensure_ascii=False, indent=4)
 
     @staticmethod
-    def to_json_file(file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]):
+    def to_json_file(
+        file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]
+    ) -> None:
         """Dump test results to a JSON file.
 
         Parameters
@@ -450,7 +454,9 @@ class TestResults:
             f.write(__class__.to_json(selected_tests, Tx, Ti, p))
 
     @staticmethod
-    def to_csv_file(file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]):
+    def to_csv_file(
+        file: str, selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]
+    ) -> None:
         """Dump test results to a CSV file.
 
         Parameters
