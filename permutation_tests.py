@@ -497,7 +497,7 @@ def run_tests_permutations(
 
     Returns
     -------
-    list of float
+    list of list of float
         list of test outputs
     """
     Ti = []
