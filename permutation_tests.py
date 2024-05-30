@@ -416,7 +416,8 @@ def _compression(S: list[int]) -> int:
         length of the compressed string
     """
     S_string = " ".join(map(str, S))
-    t = bz2.compress(S_string.encode("utf-8"))
+    # Select compresslevel=5 to make results numerically identical to NIST implementation
+    t = bz2.compress(S_string.encode("utf-8"), compresslevel=5)
     return len(t)
 
 
