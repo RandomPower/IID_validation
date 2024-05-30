@@ -116,6 +116,60 @@ def compute_collisions(S: list[int]) -> list[int]:
     return C
 
 
+def n_runs(S_prime: list[int]) -> int:
+    """Determines the number of runs of identical symbols in a sequence.
+
+    Assumes a sequence of length > 0.
+
+    Parameters
+    ----------
+    S_prime : list of int
+        an input sequence processed with s_prime() or s_prime_median()
+
+    Returns
+    -------
+    int
+        number of runs in the sequence
+    """
+    T = 1
+    for i in range(1, len(S_prime)):
+        if S_prime[i] != S_prime[i - 1]:
+            T += 1
+    return T
+
+
+def l_runs(S_prime: list[int]) -> int:
+    """Determines the length of the longest run of identical symbols in a sequence.
+
+    Assumes a sequence of length > 0.
+
+    Parameters
+    ----------
+    S_prime : list of int
+        an input sequence processed with s_prime() or s_prime_median()
+
+    Returns
+    -------
+    int
+        length of the longest run in the sequence
+    """
+    T = 0
+    current_len = 1
+
+    for i in range(1, len(S_prime)):
+        if S_prime[i] == S_prime[i - 1]:
+            current_len += 1
+        else:
+            if current_len > T:
+                T = current_len
+            current_len = 1
+    # Measure last run
+    if current_len > T:
+        T = current_len
+
+    return T
+
+
 def _excursion(S: list[int], X: float | None = None) -> float:
     """Measures how far the running sum of sample values deviates from its average value at each point in the sequence.
 
@@ -161,11 +215,7 @@ def _n_directional_runs(S: list[int], S_prime: list[int] | None = None) -> int:
     if S_prime is None:
         S_prime = s_prime(S)
 
-    T = 1
-    for k in range(1, len(S_prime)):
-        if S_prime[k] != S_prime[k - 1]:
-            T += 1
-    return T
+    return n_runs(S_prime)
 
 
 def _l_directional_runs(S: list[int], S_prime: list[int] | None = None) -> int:
@@ -188,21 +238,7 @@ def _l_directional_runs(S: list[int], S_prime: list[int] | None = None) -> int:
     if S_prime is None:
         S_prime = s_prime(S)
 
-    T = 0
-    current_count = 1
-
-    for k in range(0, len(S_prime) - 1):
-        if S_prime[k] == S_prime[k + 1]:
-            current_count += 1
-        else:
-            if current_count > T:
-                T = current_count
-                current_count = 1
-
-    if current_count > T:
-        T = current_count
-
-    return T
+    return l_runs(S_prime)
 
 
 def _n_increases_decreases(S: list[int], S_prime: list[int] | None = None) -> int:
@@ -256,11 +292,7 @@ def _n_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int
     if S_prime_median is None:
         S_prime_median = s_prime_median(S)
 
-    T = 1
-    for i in range(1, len(S_prime_median)):
-        if S_prime_median[i] != S_prime_median[i - 1]:
-            T += 1
-    return T
+    return n_runs(S_prime_median)
 
 
 def _l_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int:
@@ -283,21 +315,7 @@ def _l_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int
     if S_prime_median is None:
         S_prime_median = s_prime_median(S)
 
-    T = 0
-    current_count = 1
-
-    for k in range(0, len(S_prime_median) - 1):
-        if S_prime_median[k] == S_prime_median[k + 1]:
-            current_count += 1
-        else:
-            if current_count > T:
-                T = current_count
-                current_count = 1
-
-    if current_count > T:
-        T = current_count
-
-    return T
+    return l_runs(S_prime_median)
 
 
 def _avg_collision(S: list[int], C: list[int] | None = None) -> float:
