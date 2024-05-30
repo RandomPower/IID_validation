@@ -12,42 +12,8 @@ import permutation_tests
 import statistical_analysis
 import utils.config
 import utils.plot
+import utils.read
 import utils.save
-
-
-def read_file(file: str, n_symbols: int, first_seq: bool = True) -> list[int]:
-    """Reads a sequence of bytes from a binary file and transforms it into a sequence of symbols by
-    applying a masking process
-
-    Parameters
-    ----------
-    file : str
-        path to file
-    n_symbols : int
-        number of symbols
-    first_seq: bool
-        read from the start of the file
-
-    Returns
-    -------
-    list of int
-        sequence of symbols
-    """
-    with open(file, "rb") as f:
-        tot_bytes = int(n_symbols / 2)
-        if first_seq:
-            my_bytes = f.read(tot_bytes)
-        else:
-            f.seek(-tot_bytes, os.SEEK_END)
-            my_bytes = f.read(tot_bytes)
-    S = []
-    for i in my_bytes:
-        symbol1 = i >> 4
-        S.append(symbol1)
-        symbol2 = i & 0b00001111
-        S.append(symbol2)
-
-    return S
 
 
 def iid_plots(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]]) -> None:
@@ -81,7 +47,7 @@ def iid_test_function(conf: utils.config.Config) -> None:
         application configuration parameters
     """
     logger.debug("IID validation started")
-    S = read_file(conf.input_file, conf.nist.n_symbols, conf.nist.first_seq)
+    S = utils.read.read_file(conf.input_file, conf.nist.n_symbols, first_seq=conf.nist.first_seq)
     logger.debug("Read a sequence of %s symbols from file (%s) ", conf.nist.n_symbols, conf.input_file)
 
     logger.debug("Calculating the selected test reference statistics (Tx) on the input sequence")
@@ -138,7 +104,7 @@ def statistical_analysis_function(conf: utils.config.Config) -> None:
     """
     stat_tests_names = [permutation_tests.tests[t].name for t in conf.stat.selected_tests]
     logger.debug("STATISTICAL ANALYSIS FOR TESTS %s", stat_tests_names)
-    S = read_file(conf.input_file, conf.stat.n_symbols)
+    S = utils.read.read_file(conf.input_file, conf.stat.n_symbols)
     logger.debug("Read a sequence of %s symbols from file (%s) ", conf.stat.n_symbols, conf.input_file)
 
     logger.debug("Calculating the selected test reference statistics (Tx) on the input sequence")
