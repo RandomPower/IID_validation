@@ -261,15 +261,9 @@ def _n_increases_decreases(S: list[int], S_prime: list[int] | None = None) -> in
     if S_prime is None:
         S_prime = s_prime(S)
 
-    count_plus = 0
-    count_minus = 0
+    count = S_prime.count(1)
 
-    for k in range(len(S_prime)):
-        if S_prime[k] == -1:
-            count_minus += 1
-        else:
-            count_plus += 1
-    return max(count_minus, count_plus)
+    return max(count, len(S_prime) - count)
 
 
 def _n_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int:
