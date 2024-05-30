@@ -57,14 +57,18 @@ def s_prime(S: list[int]) -> list[int]:
     return S_prime
 
 
-def s_prime_median(S: list[int]) -> list[int]:
+def s_prime_median(S: list[int], M: float | None = None) -> list[int]:
     """Generates a transformed sequence where each original value is replaced with -1 if it is less than the median of
     the original sequence, or 1 if it is greater than or equal to the median.
+
+    Accepts a pre-computed median value, if provided.
 
     Parameters
     ----------
     S : list of int
         sequence of sample values
+    M: float
+        the pre-computed median of the sequence
 
     Returns
     -------
@@ -74,7 +78,9 @@ def s_prime_median(S: list[int]) -> list[int]:
     if len(S) == 0:
         raise Exception("Input sequence has length 0")
 
-    M = statistics.median(S)
+    if M is None:
+        M = statistics.median(S)
+
     S_prime = [0] * (len(S))
     for i in range(len(S)):
         if S[i] < M:
@@ -84,120 +90,47 @@ def s_prime_median(S: list[int]) -> list[int]:
     return S_prime
 
 
-def _excursion(S: list[int]) -> float:
-    """Measures how far the running sum of sample values deviates from its average value at each point in the sequence.
+def compute_collisions(S: list[int]) -> list[int]:
+    """Counts the number of successive sample values until a duplicate is found.
 
     Parameters
     ----------
-    S : list of int
+    S : list[int]
         sequence of sample values
 
     Returns
     -------
-    float
-        maximum deviation from the average
+    list[int]
+        list of the numbers of samples observed to find a duplicate in the input sequence
     """
-    X = statistics.mean(S)
-    cumulative_sum = 0
-    D = [abs((cumulative_sum := cumulative_sum + element) - (i * X)) for i, element in enumerate(S, 1)]  # noqa: F841
-    return max(D)
-
-
-def _n_directional_runs(S: list[int]) -> int:
-    """Measures the number of runs constructed using the relations between consecutive samples.
-
-    Parameters
-    ----------
-    S : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    int
-        number of runs
-    """
-    S_prime = s_prime(S)
-
-    T = 1
-    for k in range(1, len(S_prime)):
-        if S_prime[k] != S_prime[k - 1]:
-            T += 1
-    return T
-
-
-def _l_directional_runs(S: list[int]) -> int:
-    """Measures the length of the longest run constructed using the relations between consecutive samples.
-
-    Parameters
-    ----------
-    S : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    int
-        length of the longest run of consecutive samples that are either strictly increasing or strictly decreasing
-    """
-    S_prime = s_prime(S)
-
-    T = 0
-    current_count = 1
-
-    for k in range(0, len(S_prime) - 1):
-        if S_prime[k] == S_prime[k + 1]:
-            current_count += 1
+    seen = set()
+    C = []
+    last_split = 0
+    for i, x in enumerate(S, 1):
+        if x in seen:
+            C.append(i - last_split)
+            last_split = i
+            seen.clear()
         else:
-            if current_count > T:
-                T = current_count
-                current_count = 1
-
-    if current_count > T:
-        T = current_count
-
-    return T
+            seen.add(x)
+    return C
 
 
-def _n_increases_decreases(S: list[int]) -> int:
-    """Measures the maximum number of increases or decreases between consecutive sample values.
+def n_runs(S_prime: list[int]) -> int:
+    """Determines the number of runs of identical symbols in a sequence.
+
+    Assumes a sequence of length > 0.
 
     Parameters
     ----------
-    S : list of int
-        sequence of sample values
+    S_prime : list of int
+        an input sequence processed with s_prime() or s_prime_median()
 
     Returns
     -------
     int
-        greater number between the total counts of increases and decreases among consecutive sample values
+        number of runs in the sequence
     """
-    S_prime = s_prime(S)
-
-    count_plus = 0
-    count_minus = 0
-
-    for k in range(len(S_prime)):
-        if S_prime[k] == -1:
-            count_minus += 1
-        else:
-            count_plus += 1
-    return max(count_minus, count_plus)
-
-
-def _n_median_runs(S: list[int]) -> int:
-    """Measures the number of runs that are constructed with respect to the median of the sequence.
-
-    Parameters
-    ----------
-    S : list of int
-        sequence of sample values
-
-    Returns
-    -------
-    int
-        number of runs
-    """
-    S_prime = s_prime_median(S)
-
     T = 1
     for i in range(1, len(S_prime)):
         if S_prime[i] != S_prime[i - 1]:
@@ -205,88 +138,222 @@ def _n_median_runs(S: list[int]) -> int:
     return T
 
 
-def _l_median_runs(S: list[int]) -> int:
-    """Measures the length of the longest run constructed with respect to the median of the sequence.
+def l_runs(S_prime: list[int]) -> int:
+    """Determines the length of the longest run of identical symbols in a sequence.
+
+    Assumes a sequence of length > 0.
+
+    Parameters
+    ----------
+    S_prime : list of int
+        an input sequence processed with s_prime() or s_prime_median()
+
+    Returns
+    -------
+    int
+        length of the longest run in the sequence
+    """
+    T = 0
+    current_len = 1
+
+    for i in range(1, len(S_prime)):
+        if S_prime[i] == S_prime[i - 1]:
+            current_len += 1
+        else:
+            if current_len > T:
+                T = current_len
+            current_len = 1
+    # Measure last run
+    if current_len > T:
+        T = current_len
+
+    return T
+
+
+def _excursion(S: list[int], X: float | None = None) -> float:
+    """Measures how far the running sum of sample values deviates from its average value at each point in the sequence.
+
+    Accepts a pre-computed average value, if provided.
 
     Parameters
     ----------
     S : list of int
         sequence of sample values
+    X : float
+        the pre-computed average of the sequence
+
+    Returns
+    -------
+    float
+        maximum deviation from the average
+    """
+    if X is None:
+        X = statistics.mean(S)
+
+    cumulative_sum = 0
+    D = [abs((cumulative_sum := cumulative_sum + element) - (i * X)) for i, element in enumerate(S, 1)]  # noqa: F841
+    return max(D)
+
+
+def _n_directional_runs(S: list[int], S_prime: list[int] | None = None) -> int:
+    """Measures the number of runs constructed using the relations between consecutive samples.
+
+    Accepts a pre-computed S_prime sequence, if provided.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    S_prime: list of int
+        the pre-computed s_prime(S) sequence
+
+    Returns
+    -------
+    int
+        number of runs
+    """
+    if S_prime is None:
+        S_prime = s_prime(S)
+
+    return n_runs(S_prime)
+
+
+def _l_directional_runs(S: list[int], S_prime: list[int] | None = None) -> int:
+    """Measures the length of the longest run constructed using the relations between consecutive samples.
+
+    Accepts a pre-computed S_prime sequence, if provided.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    S_prime: list of int
+        the pre-computed s_prime(S) sequence
+
+    Returns
+    -------
+    int
+        length of the longest run of consecutive samples that are either strictly increasing or strictly decreasing
+    """
+    if S_prime is None:
+        S_prime = s_prime(S)
+
+    return l_runs(S_prime)
+
+
+def _n_increases_decreases(S: list[int], S_prime: list[int] | None = None) -> int:
+    """Measures the maximum number of increases or decreases between consecutive sample values.
+
+    Accepts a pre-computed S_prime sequence, if provided.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    S_prime: list of int
+        the pre-computed s_prime(S) sequence
+
+    Returns
+    -------
+    int
+        greater number between the total counts of increases and decreases among consecutive sample values
+    """
+    if S_prime is None:
+        S_prime = s_prime(S)
+
+    count = S_prime.count(1)
+
+    return max(count, len(S_prime) - count)
+
+
+def _n_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int:
+    """Measures the number of runs that are constructed with respect to the median of the sequence.
+
+    Accepts a pre-computed S_prime_median sequence, if provided.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    S_prime_median: list of int
+        the pre-computed s_prime_median(S) sequence
+
+    Returns
+    -------
+    int
+        number of runs
+    """
+    if S_prime_median is None:
+        S_prime_median = s_prime_median(S)
+
+    return n_runs(S_prime_median)
+
+
+def _l_median_runs(S: list[int], S_prime_median: list[int] | None = None) -> int:
+    """Measures the length of the longest run constructed with respect to the median of the sequence.
+
+    Accepts a pre-computed S_prime_median sequence, if provided.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+    S_prime_median: list of int
+        the pre-computed s_prime_median(S) sequence
 
     Returns
     -------
     int
         length of the longest run
     """
-    S_prime = s_prime_median(S)
+    if S_prime_median is None:
+        S_prime_median = s_prime_median(S)
 
-    T = 0
-    current_count = 1
-
-    for k in range(0, len(S_prime) - 1):
-        if S_prime[k] == S_prime[k + 1]:
-            current_count += 1
-        else:
-            if current_count > T:
-                T = current_count
-                current_count = 1
-
-    if current_count > T:
-        T = current_count
-
-    return T
+    return l_runs(S_prime_median)
 
 
-def _avg_collision(S: list[int]) -> float:
+def _avg_collision(S: list[int], C: list[int] | None = None) -> float:
     """Counts the number of successive sample values until a duplicate is found.
+
+    Accepts a pre-computed list of collisions C calculated on the sequence S, if provided.
 
     Parameters
     ----------
     S : list of int
         sequence of sample values
+    C: list of int
+        list of number of samples observed to find two occurrences of the same value in the input sequence
 
     Returns
     -------
     float
-        average length of subsequences with unique sample values before encountering a duplicate
+        average number of samples observed to find two occurrences of the same value in the input sequence
     """
-    seen = set()
-    C = []
-    last_split = 0
-    for i, x in enumerate(S):
-        if x in seen:
-            seen = set()
-            C.append(i - last_split)
-            last_split = i + 1
-        else:
-            seen.add(x)
-    return statistics.mean(C) + 1
+    if C is None:
+        C = compute_collisions(S)
+    return statistics.mean(C)
 
 
-def _max_collision(S: list[int]) -> int:
+def _max_collision(S: list[int], C: list[int] | None = None) -> int:
     """Counts the number of successive sample values until a duplicate is found.
+
+    Accepts a pre-computed list of collisions C calculated on the sequence S, if provided.
 
     Parameters
     ----------
     S : list of int
         sequence of sample values
+    C: list of int
+        list of number of samples observed to find two occurrences of the same value in the input sequence
 
     Returns
     -------
     int
-        length of the longest unique subsequence before encountering a duplicate value
+        maximum number of samples observed to find two occurrences of the same value in the input sequence
     """
-    seen = set()
-    C = []
-    last_split = 0
-    for i, x in enumerate(S):
-        if x in seen:
-            seen = set()
-            C.append(i + 1 - last_split)
-            last_split = i + 1
-        else:
-            seen.add(x)
-    return max(C) + 1
+    if C is None:
+        C = compute_collisions(S)
+    return max(C)
 
 
 def _periodicity(S: list[int], p: int) -> int:
@@ -349,7 +416,8 @@ def _compression(S: list[int]) -> int:
         length of the compressed string
     """
     S_string = " ".join(map(str, S))
-    t = bz2.compress(S_string.encode("utf-8"))
+    # Select compresslevel=5 to make results numerically identical to NIST implementation
+    t = bz2.compress(S_string.encode("utf-8"), compresslevel=5)
     return len(t)
 
 
@@ -404,14 +472,43 @@ def run_tests(S: list[int], p: list[int], test_list: list[int] = [i.id for i in 
         list of tests results
     """
     T = []
-    for test_index in test_list:
-        if test_index in [8, 9]:
-            for p_value in p:
-                result = tests[test_index].run(S, p_value)
-                T.append(result)
-        else:
-            result = tests[test_index].run(S)
-            T.append(result)
+
+    # Pre-compute common intermediate values
+    S_prime = None
+    if set((n_directional_runs.id, l_directional_runs.id, n_increases_decreases.id)).intersection(test_list):
+        S_prime = s_prime(S)
+    S_prime_median = None
+    if set((n_median_runs.id, l_median_runs.id)).intersection(test_list):
+        S_prime_median = s_prime_median(S)
+    collisions = None
+    if set((avg_collision.id, max_collision.id)).intersection(test_list):
+        collisions = compute_collisions(S)
+
+    if excursion.id in test_list:
+        T.append(excursion.run(S))
+    if n_directional_runs.id in test_list:
+        T.append(n_directional_runs.run(S, S_prime))
+    if l_directional_runs.id in test_list:
+        T.append(l_directional_runs.run(S, S_prime))
+    if n_increases_decreases.id in test_list:
+        T.append(n_increases_decreases.run(S, S_prime))
+    if n_median_runs.id in test_list:
+        T.append(n_median_runs.run(S, S_prime_median))
+    if l_median_runs.id in test_list:
+        T.append(l_median_runs.run(S, S_prime_median))
+    if avg_collision.id in test_list:
+        T.append(avg_collision.run(S, collisions))
+    if max_collision.id in test_list:
+        T.append(max_collision.run(S, collisions))
+    if periodicity.id in test_list:
+        for each_p in p:
+            T.append(periodicity.run(S, each_p))
+    if covariance.id in test_list:
+        for each_p in p:
+            T.append(covariance.run(S, each_p))
+    if compression.id in test_list:
+        T.append(compression.run(S))
+
     return T
 
 
