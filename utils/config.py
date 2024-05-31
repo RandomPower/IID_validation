@@ -12,6 +12,8 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 class Config:
     DEFAULT_CONFIG_FILE = "conf.toml"
+    DEFAULT_SYMBOL_LENGTH = 4
+    DEFAULT_ALPHABET_SIZE = 2**DEFAULT_SYMBOL_LENGTH
     DEFAULT_NIST_TEST = True
     DEFAULT_STATISTICAL_ANALYSIS = True
     DEFAULT_MINIMUM_ENTROPY = True
@@ -274,6 +276,15 @@ class Config:
                         "int",
                     )
 
+                if nist_n_symbols < self.DEFAULT_ALPHABET_SIZE:
+                    logger.error(
+                        "%s: %s: invalid configuration value %s (expected >= %s)",
+                        filename,
+                        "nist_test",
+                        "n_symbols",
+                        self.DEFAULT_ALPHABET_SIZE,
+                    )
+
                 self.nist._n_symbols = nist_n_symbols
 
             if "n_permutations" in conf["nist_test"]:
@@ -371,6 +382,15 @@ class Config:
                         "statistical_analysis",
                         "n_symbols",
                         "int",
+                    )
+
+                if stat_n_symbols < self.DEFAULT_ALPHABET_SIZE:
+                    logger.error(
+                        "%s: %s: invalid configuration value %s (expected >= %s)",
+                        filename,
+                        "statistical_analysis",
+                        "n_symbols",
+                        self.DEFAULT_ALPHABET_SIZE,
                     )
 
                 self.stat._n_symbols = stat_n_symbols
@@ -501,6 +521,11 @@ class Config:
         if (not self.nist._n_symbols) or (not isinstance(self.nist._n_symbols, int)):
             raise ValueError(f'Invalid configuration parameter: "nist_n_symbols" ({self.nist._n_symbols})')
 
+        if self.nist._n_symbols < self.DEFAULT_ALPHABET_SIZE:
+            raise ValueError(
+                f'Invalid value for "nist_n_symbols" (must be >= {self.DEFAULT_ALPHABET_SIZE}): {self.nist._n_symbols}'
+            )
+
         if (not self.nist._n_permutations) or (not isinstance(self.nist._n_permutations, int)):
             raise ValueError(f'Invalid configuration parameter: "nist_n_permutations" ({self.nist._n_permutations})')
 
@@ -538,6 +563,11 @@ class Config:
 
         if (not self.stat._n_symbols) or (not isinstance(self.stat._n_symbols, int)):
             raise ValueError(f'Invalid configuration parameter: "stat_n_symbols" ({self.stat._n_symbols})')
+
+        if self.stat._n_symbols < self.DEFAULT_ALPHABET_SIZE:
+            raise ValueError(
+                f'Invalid value for "stat_n_symbols" (must be >= {self.DEFAULT_ALPHABET_SIZE}): {self.stat._n_symbols}'
+            )
 
         if (not self.stat._n_iterations) or (not isinstance(self.stat._n_iterations, int)):
             raise ValueError(f'Invalid configuration parameter: "n_iterations" ({self.stat._n_iterations})')
