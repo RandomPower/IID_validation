@@ -198,6 +198,12 @@ def main() -> None:
         action=argparse.BooleanOptionalAction,
         help=f"Run the program in parallel mode [Default: {utils.config.Config.DEFAULT_PARALLEL}].",
     )
+    global_args.add_argument(
+        "-d",
+        "--debug",
+        action=argparse.BooleanOptionalAction,
+        help=f"Show debug messages [Default: {utils.config.Config.DEFAULT_DEBUG}].",
+    )
 
     # Nist test
     nist_args = parser.add_argument_group("[nist_test]", "NIST IID test suite configuration")
@@ -313,8 +319,10 @@ def main() -> None:
         s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
         logger.addHandler(s_handler)
 
-        # Set application-specific logger level from DEBUG up
-        logger.setLevel(logging.DEBUG)
+        if conf.debug:
+            s_handler.setLevel(logging.DEBUG)
+        else:
+            s_handler.setLevel(logging.INFO)
 
         np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
