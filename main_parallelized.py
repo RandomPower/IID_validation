@@ -405,14 +405,15 @@ def main() -> None:
 
         # Write the application-specific logger to stderr, from INFO up
         s_handler = logging.StreamHandler()
-        s_handler.setLevel(logging.INFO)
-        s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
-        logger.addHandler(s_handler)
-
         if conf.debug:
             s_handler.setLevel(logging.DEBUG)
         else:
             s_handler.setLevel(logging.INFO)
+        s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
+        logger.addHandler(s_handler)
+
+        # Set application-specific logger level from DEBUG up
+        logger.setLevel(logging.DEBUG)
 
         np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
