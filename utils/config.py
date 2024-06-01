@@ -15,11 +15,13 @@ class Config:
     DEFAULT_NIST_TEST = True
     DEFAULT_STATISTICAL_ANALYSIS = True
     DEFAULT_PARALLEL = True
+    DEFAULT_DEBUG = False
 
     _input_file: str
     _nist_test: bool
     _statistical_analysis: bool
     _parallel: bool
+    _debug: bool
 
     class NISTConfig:
         DEFAULT_SELECTED_TESTS = [i.id for i in permutation_tests.tests]
@@ -146,6 +148,7 @@ class Config:
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
         self._parallel = self.DEFAULT_PARALLEL
+        self._debug = self.DEFAULT_DEBUG
 
     def _read_conf(self, filename: str) -> None:
         """Read configuration file and set the parameters.
@@ -214,6 +217,19 @@ class Config:
                     )
 
                 self._parallel = parallel
+
+            if "debug" in conf["global"]:
+                debug = conf["global"]["debug"]
+                if not isinstance(debug, bool):
+                    logger.error(
+                        "%s: %s: invalid configuration parameter %s (expected %s)",
+                        filename,
+                        "global",
+                        "debug",
+                        "bool",
+                    )
+
+                self._debug = debug
 
         # nist_test section
         if "nist_test" in conf:
@@ -395,6 +411,8 @@ class Config:
             self._statistical_analysis = args.stat_analysis
         if args.parallel is not None:
             self._parallel = args.parallel
+        if args.debug is not None:
+            self._debug = args.debug
         # NIST IID tests
         if args.nist_selected_tests:
             self.nist._selected_tests = args.nist_selected_tests
@@ -443,6 +461,9 @@ class Config:
 
         if not isinstance(self._parallel, bool):
             raise ValueError(f'Invalid configuration parameter: "parallel" ({self._parallel})')
+
+        if not isinstance(self._debug, bool):
+            raise ValueError(f'Invalid configuration parameter: "debug" ({self._debug})')
 
         # NIST IID tests
         if (
@@ -530,6 +551,10 @@ class Config:
     @property
     def parallel(self) -> bool:
         return self._parallel
+
+    @property
+    def debug(self) -> bool:
+        return self._debug
 
 
 def parse_config_file(file_path: str) -> dict:
