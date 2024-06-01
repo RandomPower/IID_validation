@@ -4,6 +4,7 @@
 input_file = "getbits_20230401_195315_RAW_BITS.BIN"
 nist_test = true
 stat_analysis = false
+min_entropy = true
 
 [nist_test]
 # Select which tests to test IID assumption

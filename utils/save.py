@@ -92,6 +92,46 @@ def save_counters(
     _save_data_helper(f, header, [d])
 
 
+def save_entropy(
+    file: str, symbols_occurrences: dict, n_symbols: int, H_min: float, H_min_sigma: float, H_min_NIST: float
+):
+    """Saves the min-entropy for the input file
+
+    Parameters
+    ----------
+    file : string
+        input file
+    symbols_occurrences : dict
+        occurrences of symbols
+    n_symbols: int
+        total number of symbols
+    H_min: float
+        min-entropy for symbols
+    H_min_sigma: float
+        min-entropy for symbols
+    H_min_NIST: float
+        min-entropy for symbols as per NIST documentation
+    """
+    header = [
+        "file",
+        "symbols_occurrences",
+        "n_symbols" "H_min_symbol",
+        "H_min_symbol_sigma",
+        "H_min_NIST_symbol",
+        "date",
+    ]
+    d = [
+        file,
+        symbols_occurrences,
+        n_symbols,
+        H_min,
+        H_min_sigma,
+        H_min_NIST,
+        str(datetime.now()),
+    ]
+    _save_data_helper("min_entropy_values.csv", header, [d])
+
+
 class TestResults:
     """A helper class to interact with test results."""
 
