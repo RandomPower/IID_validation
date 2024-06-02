@@ -149,7 +149,7 @@ def statistical_analysis_function(conf: utils.config.Config) -> None:
             C1_TjNorm,
             IID_assumption_TjNorm,
             t3 - t2 + t1 - t0,
-            "countersTjNorm_distribution",
+            "countersTj_distribution",
         )
 
         counters_C0_Tx[i] = C0_Tx
@@ -159,17 +159,19 @@ def statistical_analysis_function(conf: utils.config.Config) -> None:
 
     # Plot the distributions of the counters
     for t in range(len(conf.stat.selected_tests)):
-        utils.plot.counters_distribution_Tx(
+        utils.plot.counters_distribution(
             [i[t] for i in counters_C0_Tx],
             conf.stat.n_permutations,
             conf.stat.n_iterations,
             conf.stat.selected_tests[t],
+            "Tx",
         )
-        utils.plot.counters_distribution_Tj(
+        utils.plot.counters_distribution(
             [i[t] for i in counters_C0_TjNorm],
             conf.stat.n_permutations,
             conf.stat.n_iterations,
             conf.stat.selected_tests[t],
+            "Tj",
         )
 
     logger.debug("Statistical analysis completed")

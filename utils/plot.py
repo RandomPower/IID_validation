@@ -88,7 +88,7 @@ def binomial_function(n: int, v: int, p: float) -> float:
     return f
 
 
-def counters_distribution_Tx(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
+def counters_distribution(c: list[int], n_seq: int, n_iter: int, test: int, method: str) -> None:
     """Plots a histogram of the distribution of the counter C0 for a given test with the measured mean and
     standard deviation.
 
@@ -102,9 +102,20 @@ def counters_distribution_Tx(c: list[int], n_seq: int, n_iter: int, test: int) -
         number of iterations
     test : int
         index of the executed permutation test
+    method : str
+        method of computation of the counter
     """
     # Calculate the parameters of the distribution
-    p = sum(c) / (n_seq * n_iter)
+    # if the counters are computed with the Tj method, the sequences are considered in pairs and discarded if they give
+    # the same result under the test considered. In this case the probability of updating the counter is 50% and the
+    # number of effective sequences is halved
+    if method == "Tj":
+        p = 0.5
+        n_seq = int(n_seq / 2)
+    # else, i.e. with the Tx method, the probability of updating a counter depends on the reference value Tx and is
+    # therefore computed empirically as the fraction of the Ti which are smaller than Tx
+    else:
+        p = sum(c) / (n_seq * n_iter)
 
     # Histogram of results to extract binning
     n_bins = 10
@@ -151,102 +162,14 @@ $\chi^2/ndf={chi_square_red:.2f}$"""
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, Tx method", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, {method} method", size=14)
     plt.legend(loc="upper right")
 
     # Define and create the directory
-    directory_path = os.path.join("countersTx_distribution")
+    directory_path = os.path.join(f"counters{method}_distribution")
     os.makedirs(directory_path, exist_ok=True)
 
-    plot_filename = f"countersTx_{permutation_tests.tests[test].name}.pdf"
-    plot_path = os.path.join(directory_path, plot_filename)
-
-    plt.savefig(plot_path)
-    plt.close()
-
-
-def counters_distribution_Tj(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
-    """Plots a histogram of the distribution of the counter C0 for a given test adjusted for Tj normalized.
-
-    Parameters
-    ----------
-    c : list of int
-        counter values
-    n_seq : int
-        number of sequences
-    n_iter : int
-        number of iterations
-    test : int
-        index of the executed permutation test
-    """
-    # calculate the parameters of the distribution
-    p = 0.5
-    n_seq_norm = n_seq / 2
-
-    # create histo of results to extract binning
-    bin_width = math.ceil((- min(c) + 0.5 + max(c) + 1.5) / 10)
-    bin_edges = (np.arange(min(c) - 0.5, max(c) + 1.5, bin_width)).tolist()
-    if bin_edges[-1] < max(c):
-        bin_edges.append(bin_edges[-1] + bin_width)
-    bin_val, _, _ = plt.hist(c, bins=bin_edges, color="skyblue", edgecolor="black")
-    plt.close()
-
-    # Calculate and plot reference binomial distribution
-    x_exp = np.arange(bin_edges[0] + 0.5, bin_edges[-1] + 0.5, 1)
-    y_exp = [n_iter * binomial_function(int(n_seq_norm), int(i), p) if i <= n_seq else 0 for i in x_exp]
-    exp_val = [sum(y_exp[i : i + bin_width]) for i in range(0, len(y_exp), bin_width)]
-
-    # Replot with adjusted binning
-    fig, ax = plt.subplots()
-    ax.stairs(exp_val, bin_edges, color="red", label="Binomial fit")
-
-    # Adjust bin_center for error bars
-    bin_center = [(bin_edges[i] + bin_edges[i + 1]) / 2 for i in range(len(bin_edges) - 1)]
-
-    bin_err = [math.sqrt(n * (1 - (n / n_iter))) for n in bin_val]
-
-    ax.errorbar(
-        bin_center,
-        bin_val,
-        yerr=bin_err,
-        fmt="o",
-        color="blue",
-        capsize=3,
-        label="Data",
-    )
-
-    # calculate chi square
-    chi_square = 0
-    ndf = 0
-    for i in range(len(bin_val)):
-        if exp_val[i] == 0:
-            continue
-        else:
-            chi_square += (bin_val[i] - exp_val[i]) ** 2 / exp_val[i]
-            ndf += 1
-
-    chi_square_red = chi_square / ndf
-
-    # Box with parameters of the distribution
-    textstr = "\n".join(
-        (
-            f"$mean={statistics.mean(c):.2f}$",
-            f"$std={statistics.stdev(c):.2f}$",
-            f"p={p}",
-            rf"$\chi^2/ndf={chi_square_red:.2f}$",
-        )
-    )
-    props = dict(boxstyle="round", facecolor="w", alpha=0.5)
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
-
-    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, TjNorm method", size=14)
-    plt.legend()
-
-    # Define and create the directory
-    directory_path = os.path.join("countersTjNorm_distribution")
-    os.makedirs(directory_path, exist_ok=True)
-
-    plot_filename = f"countersTjNorm_{permutation_tests.tests[test].name}.pdf"
+    plot_filename = f"counters{method}_{permutation_tests.tests[test].name}.pdf"
     plot_path = os.path.join(directory_path, plot_filename)
 
     plt.savefig(plot_path)
