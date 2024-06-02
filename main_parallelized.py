@@ -36,8 +36,9 @@ def iid_plots(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]])
 
     Ti_transposed = np.transpose(Ti)
     test_names = utils.save.TestResults.test_labels(conf.nist.selected_tests, conf.nist.p)
+    test_types = utils.save.TestResults.test_isint(conf.nist.selected_tests, conf.nist.p)
     for t in range(len(Tx)):
-        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], histo_dir)
+        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], test_types[t], histo_dir)
 
 
 def iid_test_function(conf: utils.config.Config) -> None:
