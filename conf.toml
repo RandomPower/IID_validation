@@ -1,26 +1,11 @@
 [global]
-# The input file
-# If you don't specify a full path, it will be interpreted as relative to the executable program directory
 input_file = "getbits_20230401_195315_RAW_BITS.BIN"
-nist_test = true
-stat_analysis = false
-min_entropy = true
 
 [nist_test]
-# Select which tests to test IID assumption
-selected_tests = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-n_symbols = 1000
-n_permutations = 100000
-# if True: reference sequence read from beginning
-# if False: reference sequence from the end
-first_seq = true
-plot = false
-p = [2]
+n_symbols = 1000000
+n_permutations = 10000
 
 [statistical_analysis]
-selected_tests = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-n_permutations = 20
-n_symbols = 100
-n_iterations = 50
-# User sets preferred value
-p = 2
+n_permutations = 1000
+n_symbols = 1000
+n_iterations = 500
