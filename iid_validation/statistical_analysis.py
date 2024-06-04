@@ -35,7 +35,15 @@ def calculate_counters_TjNorm(conf: config.Config, S: list[int], Ti: list[list[f
 
     for u in range(len(conf.stat.selected_tests)):
         for z in range(0, len(Ti) - 1, 2):
+            n_tries = 0
+            # If a pair of consecutive results is identical, we cannot use it for the Tj method.
+            # Discard and recalculate them both. Only do this up to a maximum n_permutations number of times for sanity
+            # (if we have to regenerate more results for this pair than we generated in total, something is wrong).
             while Ti[z][u] == Ti[z + 1][u]:
+                n_tries += 1
+                if n_tries > conf.stat.n_permutations:
+                    logger.error("TjNorm method exceeded maximum number of tries %s", conf.stat.n_permutations)
+                    raise RuntimeError("TjNorm method failed")
                 Ti[z][u] = permutation_tests.run_tests_shuffle(S, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
                 Ti[z + 1][u] = permutation_tests.run_tests_shuffle(S, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
 
