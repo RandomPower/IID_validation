@@ -41,7 +41,8 @@ def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, test_isint: bool
     # Plotting histogram for Ti
     ax.hist(Ti, bins=bin_edges, color="skyblue", edgecolor="black")
     # Adding a vertical line for Tx
-    ax.axvline(x=Tx, color="red", label=f"Reference Value: {Tx}")
+    reference_label = "Reference Value: " + (f"{Tx}" if test_isint else f"{Tx:.2f}")
+    ax.axvline(x=Tx, color="red", label=reference_label)
 
     # Preparing text string for mean and std
     textstr = rf"""$\mu={statistics.mean(Ti):.2f}$
