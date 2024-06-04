@@ -55,10 +55,10 @@ $\sigma={statistics.stdev(Ti):.2f}$"""
     # Setting title and axis labels
     ax.set_title(f"Distribution of the Results T for {test_label} test", size=12)
     ax.set_xlabel("T Values", fontsize=12)
-    ax.set_ylabel("Frequency", fontsize=12)
+    ax.set_ylabel("Occurrencies", fontsize=12)
 
     # Displaying the legend
-    ax.legend()
+    ax.legend(loc="upper right")
 
     plot_filename = f"{test_label}.pdf"
     plot_path = os.path.join(plot_dir_h, plot_filename)
