@@ -36,8 +36,9 @@ def iid_plots(conf: utils.config.Config, Tx: list[float], Ti: list[list[float]])
 
     Ti_transposed = np.transpose(Ti)
     test_names = utils.save.TestResults.test_labels(conf.nist.selected_tests, conf.nist.p)
+    test_types = utils.save.TestResults.test_isint(conf.nist.selected_tests, conf.nist.p)
     for t in range(len(Tx)):
-        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], histo_dir)
+        utils.plot.histogram_TxTi(Tx[t], Ti_transposed[t], test_names[t], test_types[t], histo_dir)
 
 
 def iid_test_function(conf: utils.config.Config) -> None:
@@ -148,7 +149,7 @@ def statistical_analysis_function(conf: utils.config.Config) -> None:
             C1_TjNorm,
             IID_assumption_TjNorm,
             t3 - t2 + t1 - t0,
-            "countersTjNorm_distribution",
+            "countersTj_distribution",
         )
 
         counters_C0_Tx[i] = C0_Tx
@@ -158,17 +159,19 @@ def statistical_analysis_function(conf: utils.config.Config) -> None:
 
     # Plot the distributions of the counters
     for t in range(len(conf.stat.selected_tests)):
-        utils.plot.counters_distribution_Tx(
+        utils.plot.counters_distribution(
             [i[t] for i in counters_C0_Tx],
             conf.stat.n_permutations,
             conf.stat.n_iterations,
             conf.stat.selected_tests[t],
+            "Tx",
         )
-        utils.plot.counters_distribution_Tj(
+        utils.plot.counters_distribution(
             [i[t] for i in counters_C0_TjNorm],
             conf.stat.n_permutations,
             conf.stat.n_iterations,
             conf.stat.selected_tests[t],
+            "Tj",
         )
 
     logger.debug("Statistical analysis completed")

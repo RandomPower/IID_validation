@@ -8,7 +8,7 @@ import numpy as np
 import permutation_tests
 
 
-def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, plot_dir_h: str) -> None:
+def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, test_isint: bool, plot_dir_h: str) -> None:
     """Plots tests values in an histogram (with binning made such that bins are centered on an integer)
     with the red vertical line as the reference value Tx.
 
@@ -20,20 +20,34 @@ def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, plot_dir_h: str)
         Ti test values calculated on the shuffled sequences
     test_label : str
         test executed
+    test_isint: bool
+        True if the test executed returns an int
     plot_dir_h : str
         directory where to save the plot
     """
     fig, ax = plt.subplots()
 
     # Creating bins for histogram
-    bin_edges = np.arange(min(Ti) - 0.5, max(Ti) + 1.5, 3)
+    n_bins = 30
+    bin_width = (-min(Ti) + 0.5 + max(Ti) + 1.5) / n_bins
+    # if the data is int, consider an integer number of values for each bin to avoid binning artifacts
+    if test_isint:
+        bin_width = math.ceil(bin_width)
+    bin_edges = list(np.arange(min(Ti) - 0.5, max(Ti) + 1.5, bin_width))
+    # as np.arange considers an half open interval [start, stop), check if the last bin edge covers the maximum of Ti
+    # and add another bin edge to the right if necessary
+    if bin_edges[-1] < max(Ti):
+        bin_edges.append(bin_edges[-1] + bin_width)
     # Plotting histogram for Ti
     ax.hist(Ti, bins=bin_edges, color="skyblue", edgecolor="black")
     # Adding a vertical line for Tx
-    ax.axvline(x=Tx, color="red", label=f"Target Value: {Tx}")
+    reference_label = "Reference Value: " + (f"{Tx}" if test_isint else f"{Tx:.2f}")
+    ax.axvline(x=Tx, color="red", label=reference_label)
 
     # Preparing text string for mean and std
-    textstr = "\n".join((r"$\mu=%.2f$" % (np.mean(Ti),), r"$\sigma=%.2f$" % (np.std(Ti),)))
+    textstr = rf"""$\mu={statistics.mean(Ti):.2f}$
+$\sigma={statistics.stdev(Ti):.2f}$"""
+
     # Text box properties
     props = dict(boxstyle="round", facecolor="wheat", alpha=0.5)
     # Placing text box on the plot
@@ -42,10 +56,10 @@ def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, plot_dir_h: str)
     # Setting title and axis labels
     ax.set_title(f"Distribution of the Results T for {test_label} test", size=12)
     ax.set_xlabel("T Values", fontsize=12)
-    ax.set_ylabel("Frequency", fontsize=12)
+    ax.set_ylabel("Occurrencies", fontsize=12)
 
     # Displaying the legend
-    ax.legend()
+    ax.legend(loc="upper right")
 
     plot_filename = f"{test_label}.pdf"
     plot_path = os.path.join(plot_dir_h, plot_filename)
@@ -75,7 +89,7 @@ def binomial_function(n: int, v: int, p: float) -> float:
     return f
 
 
-def counters_distribution_Tx(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
+def counters_distribution(c: list[int], n_seq: int, n_iter: int, test: int, method: str) -> None:
     """Plots a histogram of the distribution of the counter C0 for a given test with the measured mean and
     standard deviation.
 
@@ -89,148 +103,74 @@ def counters_distribution_Tx(c: list[int], n_seq: int, n_iter: int, test: int) -
         number of iterations
     test : int
         index of the executed permutation test
+    method : str
+        method of computation of the counter
     """
     # Calculate the parameters of the distribution
-    p = sum(c) / (n_seq * n_iter)
+    # if the counters are computed with the Tj method, the sequences are considered in pairs and discarded if they give
+    # the same result under the test considered. In this case the probability of updating the counter is 50% and the
+    # number of effective sequences is halved
+    if method == "Tj":
+        p = 0.5
+        n_seq = int(n_seq / 2)
+    # else, i.e. with the Tx method, the probability of updating a counter depends on the reference value Tx and is
+    # therefore computed empirically as the fraction of the Ti which are smaller than Tx
+    else:
+        p = sum(c) / (n_seq * n_iter)
 
     # Histogram of results to extract binning
-    bin_edges = np.arange(min(c) - 0.5, max(c) + 2.5, 3)
-    _, bin_edges = np.histogram(c, bins=bin_edges)
+    n_bins = 10
+    bin_width = math.ceil((-min(c) + 0.5 + max(c) + 1.5) / n_bins)
+    bin_edges = list(np.arange(min(c) - 0.5, max(c) + 1.5, bin_width))
+    # as np.arange considers an half open interval [start, stop), check if the last bin edge covers the maximum of Ti
+    # and add another bin edge to the right if necessary
+    if bin_edges[-1] < max(c):
+        bin_edges.append(bin_edges[-1] + bin_width)
     bin_val, _, _ = plt.hist(c, bins=bin_edges, color="skyblue", edgecolor="black")
+
     plt.close()
 
     # Calculate reference binomial distribution
-    x_exp = np.arange(min(c), max(c) + 1, 1)
-    y_exp = [n_iter * binomial_function(n_seq, i, p) for i in x_exp]
-    exp_val = [sum(y_exp[i : i + 3]) for i in range(0, len(y_exp), 3)]
+    x_exp = np.arange(bin_edges[0] + 0.5, bin_edges[-1] + 0.5, 1)
 
-    # Prepare adjusted edges for ax.stairs
-    adjusted_edges = np.linspace(min(c) - 0.5, max(c) + 1.5, len(exp_val) + 1)
+    y_exp = [n_iter * binomial_function(n_seq, int(i), p) if i <= n_seq else 0 for i in x_exp]
+    exp_val = [sum(y_exp[i : i + bin_width]) for i in range(0, len(y_exp), bin_width)]
 
     fig, ax = plt.subplots()
-    ax.stairs(exp_val, adjusted_edges, color="red", label="Binomial fit")
+    ax.stairs(exp_val, bin_edges, color="red", label="Binomial fit")
 
     # compute chi square
     chi_square = 0
     ndf = 0
     for i in range(len(bin_val)):
-        if exp_val[i] < 0:
-            continue
-        else:
+        if exp_val[i] != 0:
             chi_square += (bin_val[i] - exp_val[i]) ** 2 / exp_val[i]
             ndf += 1
     chi_square_red = chi_square / ndf
 
     # Plot results with error bars
-    bin_center = (adjusted_edges[:-1] + adjusted_edges[1:]) / 2
-    bin_err = [np.sqrt(n * (1 - (n / n_iter))) for n in bin_val]
-    ax.errorbar(bin_center[: len(bin_val)], bin_val, yerr=bin_err, fmt="o", color="blue", capsize=3, label="Data")
+    bin_center = [(bin_edges[i] + bin_edges[i + 1]) / 2 for i in range(len(bin_edges) - 1)]
+    bin_err = [math.sqrt(n * (1 - (n / n_iter))) for n in bin_val]
+    ax.errorbar(bin_center, bin_val, yerr=bin_err, fmt="o", color="blue", capsize=3, label="Data")
 
     # Text box for mean, std on the left
-    textstr = "\n".join(
-        (f"$mean={np.mean(c):.2f}$", f"$std={np.std(c):.2f}$", f"p={p:.3f}", rf"$\chi^2/ndf={chi_square_red:.2f}$")
-    )
+    textstr = rf"""$mean={statistics.mean(c):.2f}$
+$std={statistics.stdev(c):.2f}$
+p={p:.3f}
+$\chi^2/ndf={chi_square_red:.2f}$"""
+
     props = dict(boxstyle="round", facecolor="w", alpha=0.5)
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10, verticalalignment="top", bbox=props)
 
     # Setting title and positioning the legend
-    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, Tx method", size=14)
+    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, {method} method", size=14)
     plt.legend(loc="upper right")
 
     # Define and create the directory
-    directory_path = os.path.join("countersTx_distribution")
+    directory_path = os.path.join(f"counters{method}_distribution")
     os.makedirs(directory_path, exist_ok=True)
 
-    plot_filename = f"countersTx_{permutation_tests.tests[test].name}.pdf"
-    plot_path = os.path.join(directory_path, plot_filename)
-
-    plt.savefig(plot_path)
-    plt.close()
-
-
-def counters_distribution_Tj(c: list[int], n_seq: int, n_iter: int, test: int) -> None:
-    """Plots a histogram of the distribution of the counter C0 for a given test adjusted for Tj normalized.
-
-    Parameters
-    ----------
-    c : list of int
-        counter values
-    n_seq : int
-        number of sequences
-    n_iter : int
-        number of iterations
-    test : int
-        index of the executed permutation test
-    """
-    # calculate the parameters of the distribution
-    p = 0.5
-    n_seq_norm = n_seq / 2
-
-    # create histo of results to extract binning
-    fig, ax = plt.subplots()
-    bin_edges = np.arange(min(c) - 0.5, max(c) + 2.5, 3)
-    bin_val, bin_edges, patches = ax.hist(c, bins=bin_edges, color="skyblue", edgecolor="black")
-    plt.close(fig)
-
-    # Calculate and plot reference binomial distribution
-    x_exp = np.arange(min(c), max(c) + 1, 1)
-    y_exp = [n_iter * binomial_function(int(n_seq_norm), i, p) for i in x_exp]
-    exp_val = [sum(y_exp[i : i + 3]) for i in range(0, len(y_exp), 3)]
-
-    # Prepare the edges for the aggregated exp_val
-    new_edges = np.linspace(min(c) - 0.5, max(c) + 1.5, len(exp_val) + 1)
-
-    # Replot with adjusted binning
-    fig, ax = plt.subplots()
-    ax.stairs(exp_val, new_edges, color="red", label="Binomial fit")
-
-    # Adjust bin_center for error bars
-    bin_center = (new_edges[:-1] + new_edges[1:]) / 2
-
-    bin_err = [np.sqrt(n * (1 - (n / n_iter))) for n in bin_val]
-
-    ax.errorbar(
-        bin_center[: len(bin_val)],
-        bin_val,
-        yerr=bin_err[: len(bin_val)],
-        fmt="o",
-        color="blue",
-        capsize=3,
-        label="Data",
-    )
-
-    # calculate chi square
-    chi_square = 0
-    ndf = 0
-    for i in range(len(bin_val)):
-        if exp_val[i] < 0:
-            continue
-        else:
-            chi_square += (bin_val[i] - exp_val[i]) ** 2 / exp_val[i]
-            ndf += 1
-
-    chi_square_red = chi_square / ndf
-
-    # Box with parameters of the distribution
-    textstr = "\n".join(
-        (
-            f"$mean={statistics.mean(c):.2f}$",
-            f"$std={statistics.stdev(c):.2f}$",
-            f"p={p}",
-            rf"$\chi^2/ndf={chi_square_red:.2f}$",
-        )
-    )
-    props = dict(boxstyle="round", facecolor="w", alpha=0.5)
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
-
-    ax.set_title(f"Distribution of C0 for test {permutation_tests.tests[test].name}, TjNorm method", size=14)
-    plt.legend()
-
-    # Define and create the directory
-    directory_path = os.path.join("countersTjNorm_distribution")
-    os.makedirs(directory_path, exist_ok=True)
-
-    plot_filename = f"countersTjNorm_{permutation_tests.tests[test].name}.pdf"
+    plot_filename = f"counters{method}_{permutation_tests.tests[test].name}.pdf"
     plot_path = os.path.join(directory_path, plot_filename)
 
     plt.savefig(plot_path)
@@ -272,16 +212,10 @@ def min_entropy(
     fig, ax = plt.subplots()
     ax.errorbar(symbols_occ.keys(), frequencies, err_y, fmt="o", capsize=3)
     ax.axhline(1 / 16, 0, 1, label="uniform distribution", color="red", linestyle="dashed")
-    ax.set_title("Min-Entropy evaluation")
+    plt.suptitle("Min-Entropy and Symbol Distribution")
+    textstr = rf"""$H_{{min}}={H_min:.4f}\pm{H_min_sigma:.4f}$, $H_{{min}}$ NIST={H_min_NIST:.4f}"""
+    plt.title(textstr, fontsize=10)
     plt.xticks([i for i in range(16)], size=12)
-    textstr = "\n".join(
-        (
-            r"$min-H=%.4f\pm%.4f$" % (H_min, H_min_sigma),
-            r"$min-H_{NIST}=%.4f$" % (H_min_NIST,),
-        )
-    )
-    props = dict(boxstyle="round", facecolor="white", alpha=1)
-    ax.text(0.40, 0.75, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
     ax.set_xlabel("Symbols")
     ax.set_ylabel("Frequency of the symbols")

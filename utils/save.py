@@ -444,6 +444,58 @@ class TestResults:
         return labels
 
     @staticmethod
+    def test_isint(selected_tests: list[int], p: list[int]) -> list[bool]:
+        """Generate booleans stating whether the selected tests and p variants return an int
+
+        Parameters
+        ----------
+        selected_tests : list[int]
+            A list of selected tests
+        p : list[int]
+            A list of parameters p
+
+        Returns
+        -------
+        list[bool]
+            One for each test with optional p variants, true if the test returns an int
+        """
+        isint = []
+        if permutation_tests.excursion.id in selected_tests:
+            return_type = permutation_tests.excursion.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.n_directional_runs.id in selected_tests:
+            return_type = permutation_tests.n_directional_runs.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.l_directional_runs.id in selected_tests:
+            return_type = permutation_tests.l_directional_runs.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.n_increases_decreases.id in selected_tests:
+            return_type = permutation_tests.n_increases_decreases.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.n_median_runs.id in selected_tests:
+            return_type = permutation_tests.n_median_runs.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.l_median_runs.id in selected_tests:
+            return_type = permutation_tests.l_median_runs.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.avg_collision.id in selected_tests:
+            return_type = permutation_tests.avg_collision.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.max_collision.id in selected_tests:
+            return_type = permutation_tests.max_collision.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        if permutation_tests.periodicity.id in selected_tests:
+            return_type = permutation_tests.periodicity.run.__annotations__.get("return", None)
+            isint.extend([return_type is int for n in p])
+        if permutation_tests.covariance.id in selected_tests:
+            return_type = permutation_tests.covariance.run.__annotations__.get("return", None)
+            isint.extend([return_type is int for n in p])
+        if permutation_tests.compression.id in selected_tests:
+            return_type = permutation_tests.compression.run.__annotations__.get("return", None)
+            isint.append(return_type is int)
+        return isint
+
+    @staticmethod
     def to_json(selected_tests: list[int], Tx: list[float], Ti: list[list[float]], p: list[int]) -> str:
         """Dump test results to JSON.
 
