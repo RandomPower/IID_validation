@@ -212,13 +212,10 @@ def min_entropy(
     fig, ax = plt.subplots()
     ax.errorbar(symbols_occ.keys(), frequencies, err_y, fmt="o", capsize=3)
     ax.axhline(1 / 16, 0, 1, label="uniform distribution", color="red", linestyle="dashed")
-    ax.set_title("Min-Entropy evaluation")
+    plt.suptitle("Min-Entropy and Symbol Distribution")
+    textstr = rf"""$H_{{min}}={H_min:.4f}\pm{H_min_sigma:.4f}$, $H_{{min}}$ NIST={H_min_NIST:.4f}"""
+    plt.title(textstr, fontsize=10)
     plt.xticks([i for i in range(16)], size=12)
-    textstr = rf"""$min-H={H_min:.4f}\pm{H_min_sigma:.4f}$
-$min-H_{{NIST}}={H_min_NIST:.4f}$"""
-
-    props = dict(boxstyle="round", facecolor="white", alpha=1)
-    ax.text(0.40, 0.75, textstr, transform=ax.transAxes, fontsize=14, verticalalignment="top", bbox=props)
 
     ax.set_xlabel("Symbols")
     ax.set_ylabel("Frequency of the symbols")
