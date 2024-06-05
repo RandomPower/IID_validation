@@ -36,10 +36,8 @@ def calculate_counters_TjNorm(conf: config.Config, S: list[int], Ti: list[list[f
     for u in range(len(conf.stat.selected_tests)):
         for z in range(0, len(Ti) - 1, 2):
             while Ti[z][u] == Ti[z + 1][u]:
-                s_shuffled = permutation_tests.FY_shuffle(S.copy())
-                Ti[z][u] = permutation_tests.run_tests(s_shuffled, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
-                s_shuffled = permutation_tests.FY_shuffle(S.copy())
-                Ti[z + 1][u] = permutation_tests.run_tests(s_shuffled, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
+                Ti[z][u] = permutation_tests.run_tests_shuffle(S, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
+                Ti[z + 1][u] = permutation_tests.run_tests_shuffle(S, [conf.stat.p], [conf.stat.selected_tests[u]])[0]
 
             if Ti[z][u] > Ti[z + 1][u]:
                 C0[u] += 1
