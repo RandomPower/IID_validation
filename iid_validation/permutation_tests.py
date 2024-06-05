@@ -2,7 +2,6 @@ import bz2
 import concurrent.futures
 import random
 import statistics
-import sys
 import typing
 
 from tqdm import tqdm
@@ -571,7 +570,12 @@ def iid_result(C0: list[int], C1: list[int], n_permutations: int) -> bool:
 
 
 def run_tests_permutations(
-    S: list[int], n_permutations: int, selected_tests: list[int], p: list[int], parallel: bool = True
+    S: list[int],
+    n_permutations: int,
+    selected_tests: list[int],
+    p: list[int],
+    parallel: bool = True,
+    standalone_progress: bool = True,
 ) -> list[list[float]]:
     """Executes the NIST test suite on n_permutations shuffled sequences.
 
@@ -591,6 +595,8 @@ def run_tests_permutations(
         parameter p
     parallel: bool
         Test sequences in parallel or not
+    standalone_progress: bool
+        Display a standalone progress bar or a nested one
 
     Returns
     -------
@@ -612,16 +618,16 @@ def run_tests_permutations(
                 )
                 futures.append(future)
 
-            completed = 0
-            total_futures = len(futures)
-            for future in concurrent.futures.as_completed(futures):
+            for future in tqdm(
+                concurrent.futures.as_completed(futures),
+                total=len(futures),
+                desc="Running test suite runs in parallel",
+                position=0 if standalone_progress else 1,
+                leave=standalone_progress,
+            ):
                 Ti.append(future.result())
-                completed += 1
-                percentage_complete = (completed / total_futures) * 100
-                sys.stdout.write(f"\rProgress: {percentage_complete:.2f}%")
-                sys.stdout.flush()
     else:
-        for _ in tqdm(range(n_permutations)):
+        for _ in tqdm(range(n_permutations), desc="Running test suite runs"):
             s_shuffled = FY_shuffle(S.copy())
             result = run_tests(s_shuffled, p, selected_tests)
             Ti.append(result)
