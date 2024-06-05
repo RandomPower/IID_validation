@@ -7,7 +7,7 @@ import pathlib
 import struct
 from datetime import datetime
 
-import permutation_tests
+from . import permutation_tests
 
 # Configure per-module logger
 logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")

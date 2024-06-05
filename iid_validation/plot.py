@@ -5,7 +5,7 @@ import statistics
 import matplotlib.pyplot as plt
 import numpy as np
 
-import permutation_tests
+from . import permutation_tests
 
 
 def histogram_TxTi(Tx: float, Ti: list[float], test_label: str, test_isint: bool, plot_dir_h: str) -> None:

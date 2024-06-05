@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["iid_validation"]
+
+[project]
+name = "iid-validation"
+description = "The RaP entropy validation test suite"
+authors = [
+    { name = "Valeria Rossi", email = "vrossi6@uninsubria.it" },
+    { name = "Matteo Huang", email = "zyhuang@studenti.uninsubria.it" },
+    { name = "Olivia Riccomi", email = "oliviariccomi98@gmail.com" },
+    { name = "Filippo Bonazzi", email = "filippo.bonazzi@arcobaleno.group" },
+]
+readme = "README.md"
+
+dynamic = ["version"]
+dependencies = ["matplotlib", "numpy", "tqdm"]
+requires-python = ">= 3.10"
+
+# Prevent project from being uploaded to PyPI
+classifiers = ["Private :: Do Not Upload"]
+
+[project.urls]
+Repository = "https://github.com/RandomPower/IID_validation.git"
+Issues = "https://github.com/RandomPower/IID_validation/issues"
+
+[project.scripts]
+iid_validation = "iid_validation.__main__:main"
