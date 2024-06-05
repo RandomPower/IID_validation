@@ -1,6 +1,7 @@
 import argparse
 import contextlib
 import datetime
+import importlib.metadata
 import logging
 import os
 
@@ -11,6 +12,7 @@ from . import config, iid_test, min_entropy, statistical_analysis
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--version", action="version", version=importlib.metadata.version(__spec__.parent))
 
     # Global
     global_args = parser.add_argument_group("[global]", "Global settings")
