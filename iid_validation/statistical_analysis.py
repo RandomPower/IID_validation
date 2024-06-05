@@ -69,11 +69,16 @@ def statistical_analysis_function(conf: config.Config) -> None:
     logger.debug("Building the counter's population")
     counters_C0_Tx = [[]] * conf.stat.n_iterations
     counters_C0_TjNorm = [[]] * conf.stat.n_iterations
-    for i in tqdm(range(conf.stat.n_iterations)):
+    for i in tqdm(range(conf.stat.n_iterations), desc="Running statistical analysis", position=0):
         # Calculate counters for Tx and TjNorm methods
         t0 = time.process_time()
         Ti = permutation_tests.run_tests_permutations(
-            S, conf.stat.n_permutations, conf.stat.selected_tests, [conf.stat.p], conf.parallel
+            S,
+            conf.stat.n_permutations,
+            conf.stat.selected_tests,
+            [conf.stat.p],
+            conf.parallel,
+            standalone_progress=False,
         )
         t1 = time.process_time()
         C0_Tx, C1_Tx = permutation_tests.calculate_counters(Tx, Ti)
