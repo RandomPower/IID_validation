@@ -154,7 +154,7 @@ def main() -> None:
         # Write all loggers to file, each with their own level, from DEBUG up
         f_handler = logging.FileHandler(f"{current_run_date}.log", mode="w")
         f_handler.setLevel(logging.DEBUG)
-        f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s"))
+        f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-28s %(levelname)-8s %(message)s"))
         logging.getLogger().addHandler(f_handler)
 
         # Write the application-specific logger to stderr, from INFO up
@@ -163,7 +163,7 @@ def main() -> None:
             s_handler.setLevel(logging.DEBUG)
         else:
             s_handler.setLevel(logging.INFO)
-        s_handler.setFormatter(logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s"))
+        s_handler.setFormatter(logging.Formatter("[%(relativeCreated)d] %(name)s: %(levelname)s: %(message)s"))
         logger.addHandler(s_handler)
 
         # Set application-specific logger level from DEBUG up
