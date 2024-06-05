@@ -511,6 +511,31 @@ def run_tests(S: list[int], p: list[int], test_list: list[int] = [i.id for i in 
     return T
 
 
+def run_tests_shuffle(S: list[int], p: list[int], test_list: list[int] = [i.id for i in tests]) -> list[float]:
+    """Shuffles a given sequence using the Fisher-Yates method, then runs a list of tests on the shuffled sequence,
+    using a specified p value.
+    By default, all tests are run.
+
+    Parameters
+    ----------
+    S : list of int
+        sequence of sample values
+
+    p : list of int
+        list of p values
+
+    test_list : list of int
+        list of test indexes to run
+
+    Returns
+    -------
+    list of float
+        list of tests results
+    """
+    s_shuffled = FY_shuffle(S.copy())
+    return run_tests(s_shuffled, p, test_list)
+
+
 def calculate_counters(Tx: list[float], Ti: list[list[float]]) -> tuple[list[int], list[int]]:
     """Computes the counters C0 and C1 for the selected tests.
 
@@ -609,10 +634,9 @@ def run_tests_permutations(
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = []
             for _ in range(n_permutations):
-                s_shuffled = FY_shuffle(S.copy())
                 future = executor.submit(
-                    run_tests,
-                    s_shuffled,
+                    run_tests_shuffle,
+                    S,
                     p,
                     selected_tests,
                 )
@@ -628,7 +652,6 @@ def run_tests_permutations(
                 Ti.append(future.result())
     else:
         for _ in tqdm(range(n_permutations), desc="Running test suite runs"):
-            s_shuffled = FY_shuffle(S.copy())
-            result = run_tests(s_shuffled, p, selected_tests)
+            result = run_tests_shuffle(S, p, selected_tests)
             Ti.append(result)
     return Ti
