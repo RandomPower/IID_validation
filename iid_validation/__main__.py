@@ -1,16 +1,24 @@
 import argparse
 import contextlib
 import datetime
+import enum
 import importlib.metadata
 import logging
 import os
+import sys
 
 import numpy as np
 
 from . import config, iid_test, min_entropy, statistical_analysis
 
 
-def main() -> None:
+class ReturnValue(enum.IntEnum):
+    OK = 0
+    BAD_CONFIG = 1
+    FAILED_ANALYSIS = 2
+
+
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", action="version", version=importlib.metadata.version(__spec__.parent))
 
@@ -145,8 +153,13 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    conf = config.Config(args)
+    try:
+        conf = config.Config(args)
+    except ValueError as e:
+        logger.error(e)
+        return ReturnValue.BAD_CONFIG
 
+    rv = ReturnValue.OK
     # Create results folder and move into it
     current_run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     results_dir = os.path.join("results", current_run_date)
@@ -179,22 +192,32 @@ def main() -> None:
         if conf.nist_test:
             os.makedirs("IID_validation", exist_ok=True)
             with contextlib.chdir("IID_validation"):
-                iid_test.iid_test_function(conf)
+                try:
+                    iid_test.iid_test_function(conf)
+                except Exception as e:
+                    logger.error("NIST TEST failed: %s", e)
+                    rv = ReturnValue.FAILED_ANALYSIS
         if conf.statistical_analysis:
             os.makedirs("statistical_analysis", exist_ok=True)
             with contextlib.chdir("statistical_analysis"):
                 try:
                     statistical_analysis.statistical_analysis_function(conf)
-                except RuntimeError as e:
+                except Exception as e:
                     logger.error("Statistical analysis failed: %s", e)
+                    rv = ReturnValue.FAILED_ANALYSIS
         if conf.min_entropy:
             os.makedirs("min_entropy", exist_ok=True)
             with contextlib.chdir("min_entropy"):
-                min_entropy.min_entropy_function(conf)
+                try:
+                    min_entropy.min_entropy_function(conf)
+                except Exception as e:
+                    logger.error("Min-entropy failed: %s", e)
+                    rv = ReturnValue.FAILED_ANALYSIS
+    return rv
 
 
 # Configure application logger
 logger = logging.getLogger("IID_validation")
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
