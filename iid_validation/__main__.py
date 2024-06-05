@@ -183,7 +183,10 @@ def main() -> None:
         if conf.statistical_analysis:
             os.makedirs("statistical_analysis", exist_ok=True)
             with contextlib.chdir("statistical_analysis"):
-                statistical_analysis.statistical_analysis_function(conf)
+                try:
+                    statistical_analysis.statistical_analysis_function(conf)
+                except RuntimeError as e:
+                    logger.error("Statistical analysis failed: %s", e)
         if conf.min_entropy:
             os.makedirs("min_entropy", exist_ok=True)
             with contextlib.chdir("min_entropy"):
