@@ -656,8 +656,6 @@ def file_info(conf: Config) -> None:
     logger.debug("FILE INFO")
     logger.debug("Input file: %s", conf.input_file)
     logger.debug("Size of file is: %s bytes", size)
-    logger.debug("Number of symbols per sequence for counters analysis: %s", conf.stat.n_symbols)
-    logger.debug("Number of sequences wanted for counters analysis: %s", conf.stat.n_permutations)
 
 
 def config_info(conf: Config) -> None:
