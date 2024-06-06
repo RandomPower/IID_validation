@@ -650,12 +650,9 @@ def file_info(conf: Config) -> None:
     conf : Config
         the conf object containing configuration values
     """
-    f = open(conf.input_file, "rb")
-    f.seek(0, 2)
-    size = f.tell()
     logger.debug("FILE INFO")
     logger.debug("Input file: %s", conf.input_file)
-    logger.debug("Size of file is: %s bytes", size)
+    logger.debug("File size: %s B", os.path.getsize(conf.input_file))
 
 
 def config_info(conf: Config) -> None:
