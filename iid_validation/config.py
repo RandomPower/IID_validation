@@ -664,54 +664,48 @@ class Config:
     def debug(self) -> bool:
         return self._debug
 
+    def dump(self) -> str:
+        """Prints configuration in a user-readable format.
 
-def file_info(conf: Config) -> None:
-    """Logs file info:
-            input file,
-            size of input file in bytes,
-            number of symbols per sequence for counter analysis
-            number of sequences for counter analysis
+        Returns
+        -------
+        str
+            user-readable configuration dump
+        """
+        if self.nist_test:
+            selected_tests = ", ".join([permutation_tests.tests[i].name for i in self.nist.selected_tests])
+            selected_tests_all = "all" if len(self.nist.selected_tests) == len(permutation_tests.tests) else "subset"
+            nist_str = f"""n_symbols: {self.nist.n_symbols}
+n_permutations: {self.nist.n_permutations}
+selected tests ({selected_tests_all}): {selected_tests}
+reference sequence read from {"beginning" if self.nist.first_seq else "end"} of the file
+p parameter ({"NIST" if self.nist.p == self.nist.DEFAULT_P else "custom"}): {self.nist.p}"""
+        else:
+            nist_str = "NIST test disabled"
 
-    Parameters
-    ----------
-    conf : Config
-        the conf object containing configuration values
-    """
-    logger.debug("FILE INFO")
-    logger.debug("Input file: %s", conf.input_file)
-    logger.debug("File size: %s B", os.path.getsize(conf.input_file))
+        if self.statistical_analysis:
+            selected_tests = ", ".join([permutation_tests.tests[i].name for i in self.stat.selected_tests])
+            selected_tests_all = "all" if len(self.stat.selected_tests) == len(permutation_tests.tests) else "subset"
+            stat_str = f"""n_symbols: {self.stat.n_symbols}
+n_permutations: {self.stat.n_permutations}
+n_iterations: {self.stat.n_iterations}
+selected tests ({selected_tests_all}): {selected_tests}
+p parameter ({"default" if self.stat.p == self.stat.DEFAULT_P else "custom"}): {self.stat.p}"""
+        else:
+            stat_str = "Statistical analysis disabled"
 
+        mine_str = f"Min-entropy calculation {'enabled' if self.min_entropy else 'disabled'}"
 
-def config_info(conf: Config) -> None:
-    """Log configuration info for both nist_test and statistical_analysis
+        return f"""Configuration info
+Config file{" (invalid)" if self.config_file and not self.config_file_read else ""}: {self.config_file}
+Input file ({os.path.getsize(self.input_file)}B): {self.input_file}
 
-    Parameters
-    ----------
-    conf : Config
-        the conf object containing configuration values
-    """
-    logger.debug("CONFIG INFO - NIST")
-    if conf.nist_test:
-        logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
-        logger.debug("Number of permutations = %s", conf.nist.n_permutations)
-        ts = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
-        logger.debug("Tests selected for IID validation: %s", ts)
-        logger.debug("Reference sequence read from the %s of the file", "beginning" if conf.nist.first_seq else "end")
-        logger.debug(
-            "p parameter used: %s %s\n", "NIST" if conf.nist.p == conf.nist.DEFAULT_P else "custom", conf.nist.p
-        )
-    else:
-        logger.debug("Nist test disabled\n")
+NIST test parameters:
+{nist_str}
 
-    logger.debug("CONFIG INFO - STATISTICAL ANALYSIS")
-    if conf.statistical_analysis:
-        logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
-        logger.debug("Number of shuffled sequences = %s", conf.stat.n_permutations)
-        logger.debug("Number of iterations: %s", conf.stat.n_iterations)
-        stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
-        logger.debug("Tests selected for statistical analysis: %s", stat_tests)
-        logger.debug(
-            "p parameter used: %s %s\n", "default" if conf.stat.p == conf.stat.DEFAULT_P else "custom", conf.stat.p
-        )
-    else:
-        logger.debug("Statistical analysis disabled\n")
+Statistical analysis parameters:
+{stat_str}
+
+Min-entropy parameters:
+{mine_str}
+"""

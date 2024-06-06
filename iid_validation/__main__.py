@@ -186,8 +186,7 @@ def main() -> int:
 
         np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
-        config.file_info(conf)
-        config.config_info(conf)
+        logger.debug(conf.dump())
 
         if conf.nist_test:
             os.makedirs("IID_validation", exist_ok=True)
