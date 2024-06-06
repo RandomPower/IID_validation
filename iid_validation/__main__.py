@@ -170,7 +170,7 @@ def main() -> int:
         f_handler = logging.FileHandler(f"{current_run_date}.log", mode="w")
         f_handler.setLevel(logging.DEBUG)
         f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-28s %(levelname)-8s %(message)s"))
-        logging.getLogger().addHandler(f_handler)
+        logger.addHandler(f_handler)
 
         # Write the application-specific logger to stderr, from INFO up
         s_handler = logging.StreamHandler()
@@ -186,8 +186,7 @@ def main() -> int:
 
         np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
-        config.file_info(conf)
-        config.config_info(conf)
+        logger.debug(conf.dump())
 
         if conf.nist_test:
             os.makedirs("IID_validation", exist_ok=True)

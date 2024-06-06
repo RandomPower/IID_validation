@@ -3,6 +3,7 @@ import logging
 import os
 import pathlib
 import tomllib
+import typing
 
 from . import permutation_tests
 
@@ -21,6 +22,8 @@ class Config:
     DEFAULT_DEBUG = False
 
     _input_file: str
+    _config_file: str
+    _config_file_read: bool
     _nist_test: bool
     _statistical_analysis: bool
     _min_entropy: bool
@@ -136,34 +139,73 @@ class Config:
         self._nist = Config.NISTConfig()
         self._stat = Config.StatConfig()
 
-        # Read a user-provided configuration file, if specified
-        if args.config:
-            self._read_conf(args.config)
-        else:
-            self._read_conf(self.DEFAULT_CONFIG_FILE)
+        self._apply_conf(args.config)
 
-        self._parse_args(args)
+        self._apply_args(args)
 
         self._validate()
 
     def _set_defaults(self) -> None:
         """Initialise member variables to default values."""
         self._input_file = ""
+        self._config_file = ""
+        self._config_file_read = False
         self._nist_test = self.DEFAULT_NIST_TEST
         self._statistical_analysis = self.DEFAULT_STATISTICAL_ANALYSIS
         self._min_entropy = self.DEFAULT_MINIMUM_ENTROPY
         self._parallel = self.DEFAULT_PARALLEL
         self._debug = self.DEFAULT_DEBUG
 
-    def _read_conf(self, filename: str) -> None:
-        """Read configuration file and set the parameters.
+    def _read_conf(self, file: str | None) -> dict[str, typing.Any]:
+        """Read a TOML configuration file into a dictionary.
+
+        If no file is provided, read the default configuration file if it exists.
+        If the default configuration file does not exist, return an empty dictionary.
+
+        If the selected configuration file (provided or default) cannot be read, log an error and return and empty
+        dictionary.
 
         Parameters
         ----------
-        filename : str
+        file : str | None
+            the configuration file
+
+        Returns
+        -------
+        dict[str, typing.Any]
+            the dictionary of configuration values read from file
+        """
+        if file is None:
+            if os.path.isfile(self.DEFAULT_CONFIG_FILE):
+                file = self.DEFAULT_CONFIG_FILE
+            else:
+                return {}
+        file = os.path.abspath(file)
+        self._config_file = file
+
+        d = {}
+        try:
+            with open(file, "rb") as f:
+                d = tomllib.load(f)
+            self._config_file_read = True
+        except IOError as e:
+            logger.error("Unable to open or read config file: %s", e)
+        except Exception as e:
+            logger.error("Unable to parse config file: %s", e)
+        return d
+
+    def _apply_conf(self, file: str | None) -> None:
+        """Update the Config object with values from a configuration file.
+
+        Parameters
+        ----------
+        file : str | None
             the configuration file
         """
-        conf = parse_config_file(filename)
+        conf = self._read_conf(file)
+        # Short-circuit if no config values to apply
+        if not conf:
+            return
 
         # Global section
         if "global" in conf:
@@ -172,7 +214,7 @@ class Config:
                 if (not isinstance(input_file, str)) or (not input_file.endswith((".bin", ".BIN", ".dat", ".DAT"))):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "input_file",
                         "binary file",
@@ -180,7 +222,7 @@ class Config:
 
                 input_file = os.path.abspath(os.path.expanduser(input_file))
                 if not os.path.isfile(input_file):
-                    logger.error("%s: %s is not a valid file: %s", filename, "input_file", input_file)
+                    logger.error("%s: %s is not a valid file: %s", self._config_file, "input_file", input_file)
 
                 self._input_file = input_file
 
@@ -189,7 +231,7 @@ class Config:
                 if not isinstance(nist_test, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "nist_test",
                         "bool",
@@ -202,7 +244,7 @@ class Config:
                 if not isinstance(statistical_analysis, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "stat_analysis",
                         "bool",
@@ -215,7 +257,7 @@ class Config:
                 if not isinstance(min_entropy, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "min_entropy",
                         "bool",
@@ -227,7 +269,7 @@ class Config:
                 if not isinstance(parallel, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "parallel",
                         "bool",
@@ -240,7 +282,7 @@ class Config:
                 if not isinstance(debug, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "global",
                         "debug",
                         "bool",
@@ -257,7 +299,7 @@ class Config:
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "selected_tests",
                         "list of integers",
@@ -270,7 +312,7 @@ class Config:
                 if not isinstance(nist_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "n_symbols",
                         "int",
@@ -279,7 +321,7 @@ class Config:
                 if nist_n_symbols < self.DEFAULT_ALPHABET_SIZE:
                     logger.error(
                         "%s: %s: invalid configuration value %s (expected >= %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "n_symbols",
                         self.DEFAULT_ALPHABET_SIZE,
@@ -292,7 +334,7 @@ class Config:
                 if not isinstance(nist_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "n_permutations",
                         "int",
@@ -305,7 +347,7 @@ class Config:
                 if not isinstance(nist_first_seq, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "first_seq",
                         "bool",
@@ -318,7 +360,7 @@ class Config:
                 if not isinstance(nist_plot, bool):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "plot",
                         "bool",
@@ -331,14 +373,18 @@ class Config:
                 if (not isinstance(nist_p, list)) or (not all(isinstance(i, int) for i in nist_p)):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "nist_test",
                         "p",
                         "list of integers",
                     )
                 elif (any(i <= 0 for i in nist_p)) or (any(i >= self.nist.n_symbols for i in nist_p)):
                     logger.error(
-                        "%s: %s: parameter %s out of range (0 < %s < n_symbols)", filename, "nist_test", "p", "p"
+                        "%s: %s: parameter %s out of range (0 < %s < n_symbols)",
+                        self._config_file,
+                        "nist_test",
+                        "p",
+                        "p",
                     )
 
                 self.nist._p = nist_p
@@ -352,7 +398,7 @@ class Config:
                 ):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "selected_tests",
                         "list of integers",
@@ -365,7 +411,7 @@ class Config:
                 if not isinstance(stat_n_permutations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "n_permutations",
                         "int",
@@ -378,7 +424,7 @@ class Config:
                 if not isinstance(stat_n_symbols, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "n_symbols",
                         "int",
@@ -387,7 +433,7 @@ class Config:
                 if stat_n_symbols < self.DEFAULT_ALPHABET_SIZE:
                     logger.error(
                         "%s: %s: invalid configuration value %s (expected >= %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "n_symbols",
                         self.DEFAULT_ALPHABET_SIZE,
@@ -400,7 +446,7 @@ class Config:
                 if not isinstance(stat_n_iterations, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "n_iterations",
                         "int",
@@ -413,7 +459,7 @@ class Config:
                 if not isinstance(stat_p, int):
                     logger.error(
                         "%s: %s: invalid configuration parameter %s (expected %s)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "p",
                         "int",
@@ -421,7 +467,7 @@ class Config:
                 elif (stat_p <= 0) or (stat_p >= self.stat.n_symbols):
                     logger.error(
                         "%s: %s: parameter %s out of range (0 < %s < n_symbols)",
-                        filename,
+                        self._config_file,
                         "statistical_analysis",
                         "p",
                         "p",
@@ -429,8 +475,8 @@ class Config:
 
                 self.stat._p = stat_p
 
-    def _parse_args(self, args: argparse.Namespace) -> None:
-        """Parse the command-line arguments.
+    def _apply_args(self, args: argparse.Namespace) -> None:
+        """Update the Config object with the supplied command-line arguments.
 
         Parameters
         ----------
@@ -591,6 +637,14 @@ class Config:
         return self._input_file
 
     @property
+    def config_file(self) -> str:
+        return self._config_file
+
+    @property
+    def config_file_read(self) -> bool:
+        return self._config_file_read
+
+    @property
     def nist_test(self) -> bool:
         return self._nist_test
 
@@ -610,81 +664,48 @@ class Config:
     def debug(self) -> bool:
         return self._debug
 
+    def dump(self) -> str:
+        """Prints configuration in a user-readable format.
 
-def parse_config_file(file_path: str) -> dict:
-    """Parse the specified file into a Python dictionary
+        Returns
+        -------
+        str
+            user-readable configuration dump
+        """
+        if self.nist_test:
+            selected_tests = ", ".join([permutation_tests.tests[i].name for i in self.nist.selected_tests])
+            selected_tests_all = "all" if len(self.nist.selected_tests) == len(permutation_tests.tests) else "subset"
+            nist_str = f"""n_symbols: {self.nist.n_symbols}
+n_permutations: {self.nist.n_permutations}
+selected tests ({selected_tests_all}): {selected_tests}
+reference sequence read from {"beginning" if self.nist.first_seq else "end"} of the file
+p parameter ({"NIST" if self.nist.p == self.nist.DEFAULT_P else "custom"}): {self.nist.p}"""
+        else:
+            nist_str = "NIST test disabled"
 
-    Parameters
-    ----------
-    file_path : str
-        the path of the configuration file
+        if self.statistical_analysis:
+            selected_tests = ", ".join([permutation_tests.tests[i].name for i in self.stat.selected_tests])
+            selected_tests_all = "all" if len(self.stat.selected_tests) == len(permutation_tests.tests) else "subset"
+            stat_str = f"""n_symbols: {self.stat.n_symbols}
+n_permutations: {self.stat.n_permutations}
+n_iterations: {self.stat.n_iterations}
+selected tests ({selected_tests_all}): {selected_tests}
+p parameter ({"default" if self.stat.p == self.stat.DEFAULT_P else "custom"}): {self.stat.p}"""
+        else:
+            stat_str = "Statistical analysis disabled"
 
-    Returns
-    -------
-    dict
-        a dictionary containing all the configuration values,
-        or an empty dictionary if the configuration file cannot
-        be parsed
-    """
-    try:
-        with open(file_path, "rb") as f:
-            config_data: dict = tomllib.load(f)
-        return config_data
-    except IOError as e:
-        logger.error("Unable to open or read config file: %s", e)
-        return {}
-    except Exception as e:
-        logger.error("Unable to parse config file: %s", e)
-        return {}
+        mine_str = f"Min-entropy calculation {'enabled' if self.min_entropy else 'disabled'}"
 
+        return f"""Configuration info
+Config file{" (invalid)" if self.config_file and not self.config_file_read else ""}: {self.config_file}
+Input file ({os.path.getsize(self.input_file)}B): {self.input_file}
 
-def file_info(conf: Config) -> None:
-    """Logs file info:
-            input file,
-            size of input file in bytes,
-            number of symbols per sequence for counter analysis
-            number of sequences for counter analysis
+NIST test parameters:
+{nist_str}
 
-    Parameters
-    ----------
-    conf : Config
-        the conf object containing configuration values
-    """
-    logger.debug("FILE INFO")
-    logger.debug("Input file: %s", conf.input_file)
-    logger.debug("File size: %s B", os.path.getsize(conf.input_file))
+Statistical analysis parameters:
+{stat_str}
 
-
-def config_info(conf: Config) -> None:
-    """Log configuration info for both nist_test and statistical_analysis
-
-    Parameters
-    ----------
-    conf : Config
-        the conf object containing configuration values
-    """
-    logger.debug("CONFIG INFO - NIST")
-    if conf.nist_test:
-        logger.debug("Number of symbols per sequence = %s", conf.nist.n_symbols)
-        logger.debug("Number of permutations = %s", conf.nist.n_permutations)
-        ts = [permutation_tests.tests[i].name for i in conf.nist.selected_tests]
-        logger.debug("Tests selected for IID validation: %s", ts)
-        logger.debug("Reference sequence read from the %s of the file", "beginning" if conf.nist.first_seq else "end")
-        logger.debug(
-            "p parameter used: %s %s\n", "NIST" if conf.nist.p == conf.nist.DEFAULT_P else "custom", conf.nist.p
-        )
-    else:
-        logger.debug("Nist test disabled\n")
-
-    logger.debug("CONFIG INFO - STATISTICAL ANALYSIS")
-    if conf.statistical_analysis:
-        logger.debug("Number of symbols per sequence = %s", conf.stat.n_symbols)
-        logger.debug("Number of shuffled sequences = %s", conf.stat.n_permutations)
-        logger.debug("Number of iterations: %s", conf.stat.n_iterations)
-        stat_tests = [permutation_tests.tests[i].name for i in conf.stat.selected_tests]
-        logger.debug("Tests selected for statistical analysis: %s", stat_tests)
-        logger.debug(
-            "p parameter used: %s %s\n", "default" if conf.stat.p == conf.stat.DEFAULT_P else "custom", conf.stat.p
-        )
-    else:
-        logger.debug("Statistical analysis disabled\n")
+Min-entropy parameters:
+{mine_str}
+"""
