@@ -137,9 +137,10 @@ class Config:
         self._stat = Config.StatConfig()
 
         # Read a user-provided configuration file, if specified
+        # Otherwise, read the default config file if it exists
         if args.config:
             self._read_conf(args.config)
-        else:
+        elif os.path.isfile(self.DEFAULT_CONFIG_FILE):
             self._read_conf(self.DEFAULT_CONFIG_FILE)
 
         self._parse_args(args)
@@ -629,6 +630,7 @@ def parse_config_file(file_path: str) -> dict:
     try:
         with open(file_path, "rb") as f:
             config_data: dict = tomllib.load(f)
+        logging.debug("Config file: %s", file_path)
         return config_data
     except IOError as e:
         logger.error("Unable to open or read config file: %s", e)
