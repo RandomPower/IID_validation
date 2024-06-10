@@ -102,8 +102,8 @@ def main() -> int:
         "--plot",
         action=argparse.BooleanOptionalAction,
         help=(
-            "Generate a histogram plot for each of the executed tests. "
-            f"[Default: {config.Config.NISTConfig.DEFAULT_PLOT}]"
+            "Generate a histogram plot for each of the executed tests "
+            f"[Default: {config.Config.NISTConfig.DEFAULT_PLOT}]."
         ),
     )
     nist_args.add_argument(
@@ -127,14 +127,14 @@ def main() -> int:
         help="Indexes of the tests to execute. See README.md for the full list [Default: all].",
     )
     stat_args.add_argument(
-        "--stat_n_permutations",
-        type=int,
-        help=f"Number of sequences [Default: {config.Config.StatConfig.DEFAULT_N_PERMUTATIONS}].",
-    )
-    stat_args.add_argument(
         "--stat_n_symbols",
         type=int,
         help=f"Number of symbols in a sequence [Default: {config.Config.StatConfig.DEFAULT_N_SYMBOLS}].",
+    )
+    stat_args.add_argument(
+        "--stat_n_permutations",
+        type=int,
+        help=f"Number of permutations [Default: {config.Config.StatConfig.DEFAULT_N_PERMUTATIONS}].",
     )
     stat_args.add_argument(
         "--stat_n_iterations",
