@@ -4,95 +4,157 @@
 ![flake8|main](https://github.com/RandomPower/IID_validation/actions/workflows/flake8.yml/badge.svg?branch=main)
 ![isort|main](https://github.com/RandomPower/IID_validation/actions/workflows/isort.yml/badge.svg?branch=main)
 
-This project aims to provide a third entropy validation test suite, beyond the NIST randomness test suite [SP 800-22r1a](https://csrc.nist.gov/projects/random-bit-generation/documentation-and-software) and the [TestU01](https://simul.iro.umontreal.ca/testu01/tu01.html) suite.
+This project aims to provide a third randomness test suite, beyond the NIST randomness test suite [SP 800-22r1a](https://csrc.nist.gov/projects/random-bit-generation/documentation-and-software) and the [TestU01](https://simul.iro.umontreal.ca/testu01/tu01.html) suite.
 
-This test suite, called IID_Validation (temporary name) implements three statistical measures to be computed over random bit sequences:
+#### Table of contents
 
-1. Testing of the IID Assumption (NIST [SP 800-90B](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf))
-2. A RandomPower-specific statistical analysis suite (TODO: fill in)
-3. Calculation of the [Min-Entropy](https://en.wikipedia.org/wiki/Min-entropy)
-
-The IID Assumption is evaluated according to the Permutation Testing section of chapter 5 in NIST [SP 800-90B](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf). The procedure checks whether the input sequence has an internal structure that would skew the results of the IID test suite. To do so it compares the outcomes of the selected tests for the input sequence, here called Tx, with those obtained using n_permutations shuffled versions of the latter, which are named Ti. For each selected test, an histogram of the obtained Ti is produced, with the Tx reference value shown as a red line. Fig1 shows an exemplary plot for the excursion test with n_symbols = 1000 and n_permutations = 10000. If the symbols that make up the input sequence are IID, Tx shouldn't be an extreme value of the Ti distribution and should instead fall within the central 99.5% of the sample. A counter C0 is updated every time that a result Ti is smaller than the reference values Tx and a counter C1 is increased when they are equal.
-<img src="assets/excursion.png" alt="Histogram of the Ti results">
-    <figcaption>Fig1: Histogram of the results Ti for the excursion test with parameters n_symbols=1000 and n_permutations=10000.</figcaption>
-</figure>
-The statistical analysis suite performs a statistical analysis on the counters C0, which are expected to be binomially distributed for each of the given tests. The sample is plotted against the theoretical binomial distribution in an histogram. The box reports the mean and standard deviation of the sample, the parameter p of the binomial distribution (i.e. the probability for the counter to update at the next Ti) and the reduced chi square for the data in the null hypotesis of binomial distribution. Fig2 shows an exemplary plot for the excursion test for n_symbols = 1000, n_permutations = 200 and n_iterations = 500.
-<figure>
-    <img src="assets/countersTx_excursion.png" alt="Binomial distribution of counters, Tx method">
-    <figcaption>Fig2: Distribution of the counters C0 computed keeping as reference the Tx result for the excursion test with parameters n_symbols = 1000, n_permutations = 200, n_iterations = 500.</figcaption>
-</figure>
-The statistical analysis on the counter C0 is also carried out with the "Tj method", that is by considering consecutive pairs of Ti and increasing C0 whenever the first one is greater than the second one. If the Ti are equal the couple is discarded in order to recover a binomial parameter of p = 0.5. The results are plotted as previously. Fig3 shows an exemplary plot for the excursion test with the same parameters used above. Please note that despite the probability for the counter to increase being p = 0.5, the mean of the distribution is approximately equal to the number of Ti / 4 (aka n_permutations / 4) because this method effectively halves the number of occasions for the C0 to update, compared to the previous "Tx method".
-<figure>
-    <img src="assets/countersTj_excursion.png" alt="Binomial distribution of counters, Tj method">
-    <figcaption>Fig3: Distribution of the counters C0 computed confronting pairs of Ti results for the excursion test with parameters n_symbols = 1000, n_permutations = 200, n_iterations = 500.</figcaption>
-</figure>
-The min-entropy is evaluated over the whole file as H<sub>min</sub> = -log<sub>2</sub> (p<sub>max</sub>), p<sub>max</sub> being the frequency of the symbols that is the most likely to occur, and given an error with the propagation of the binomial uncertainty on p<sub>max</sub>. The NIST definition of min-entropy, which considers a lower bound on p<sub>max</sub>, is calculated as well. The distribution of the symbols that make up the file under test is shown in a scatter plot with binomial error bars and compared with the uniform distribution. Fig4 shows the plot for an exemplary 250MB file.
-<figure>
-    <img src="assets/MinEntropy.png" alt="Frequencies of the symbols and min-entropy">
-    <figcaption>Fig4: Frequencies of the symbols in a 250MB file.
-</figure>
+- [The IID_Validation test suite](#the-iid_validation-test-suite)
+  - [NIST IID testing](#nist-iid-testing)
+  - [Statistical analysis](#statistical-analysis)
+  - [Min-entropy calculation](#min-entropy-calculation)
+- [Installing the software](#installing-the-software)
+  - [Setting up a local development environment](#setting-up-a-local-development-environment)
+- [Using the software](#using-the-software)
+- [Software configuration](#software-configuration)
+  - [Global options](#global-options)
+  - [NIST test options](#nist-test-options)
+  - [Statistical analysis options](#statistical-analysis-options)
+  - [NIST IID test suite indexes](#nist-iid-test-suite-indexes)
 
 ## The IID_validation test suite
 
-The suite is implemented in Python 3 as the `main_parallelized.y` Python program:
+This test suite, called `IID_Validation`, implements three statistical measurements to be computed over random bit sequences.
 
-```
-$ main_parallelized.py --help
-```
+### NIST IID testing
 
-TODO: fill this section
+The IID assumption is evaluated according to the Permutation Testing section of Chapter 5 of [NIST SP 800-90B](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf).
+The procedure checks whether the input sequence has an internal structure that would skew the results of the IID test suite.
+To do so, it compares the results of the selected tests for the input sequence, here called `Tx`, with the results obtained over `n_permutations` shuffled versions of the input sequence, here called `Ti`.
+Counter C0 is updated every time that a result Ti is smaller than the reference values `Tx`, and counter C1 is increased when they are equal.
+For each selected test, a histogram of the obtained `Ti` is produced, with the `Tx` reference value shown as a red line.
+
+[Fig. 1](#fig-histTxTi) shows an example plot for the excursion test with `n_symbols` = 1000 and `n_permutations` = 10000.
+If the symbols that make up the input sequence are IID, `Tx` shouldn't be an extreme value in the `Ti` distribution and should instead fall within the central 99.5% of the sample.
+
+<figure id=fig-histTxTi>
+<img src="assets/excursion.png" alt="Histogram of the Ti results">
+    <figcaption>Figure 1: Histogram of the results Ti for the excursion test with parameters n_symbols=1000 and n_permutations=10000.</figcaption>
+</figure>
+
+### Statistical analysis
+
+A statistical analysis is performed on the counters C0, which are expected to be binomially distributed for each of the given tests.
+
+#### Tx method
+
+The sample is plotted against the theoretical binomial distribution in a histogram.
+The box reports the mean and standard deviation of the sample, the parameter p of the binomial distribution (*i.e.* the probability for the counter to update at the next `Ti`) and the reduced chi square for the data in the null hypothesis of binomial distribution.
+[Fig. 2](#fig-countersTx) shows an example plot for the excursion test for `n_symbols` = 1000, `n_permutations` = 200 and `n_iterations` = 500.
+
+<figure id=fig-countersTx>
+    <img src="assets/countersTx_excursion.png" alt="Binomial distribution of counters, Tx method">
+    <figcaption>Figure 2: Distribution of the counters C0 computed keeping as reference the Tx result for the excursion test with parameters n_symbols = 1000, n_permutations = 200, n_iterations = 500.</figcaption>
+</figure>
+
+#### Tj method
+
+The statistical analysis on the counter C0 is also carried out with a so-called "Tj method", which considers consecutive pairs of `Ti` values and increases C0 whenever the first element of the pair is greater than the second.
+If the pair is comprised of two identical results, it is discarded and recomputed in order to reach a binomial parameter p = 0.5.
+
+[Fig. 3](#fig-countersTj) shows an example plot for the excursion test with the same parameters used for the "Tx method" above.
+Please note that despite the probability of increasing the counter equal to p = 0.5, the mean of the distribution is approximately equal to the number of `Ti` / 4 (*i.e.* `n_permutations` / 4), because this method effectively halves the number of occasions for the C0 to update, compared to the previous "Tx method".
+
+<figure id=fig-countersTj>
+    <img src="assets/countersTj_excursion.png" alt="Binomial distribution of counters, Tj method">
+    <figcaption>Figure 3: Distribution of the counters C0 computed confronting pairs of Ti results for the excursion test with parameters n_symbols = 1000, n_permutations = 200, n_iterations = 500.</figcaption>
+</figure>
+
+### Min-entropy calculation
+
+The min-entropy is calculated over the whole file as $H_{min} = -log_2(p_{max})$, with $p_{max}$ being the frequency of the symbol that is the most likely to occur, and given an error with the propagation of the binomial uncertainty on $p_{max}$.
+The min-entropy is also calculated according to the NIST definition, which considers a lower bound on $p_{max}$ without a separate error indication.
+The distribution of the symbols that make up the file under test is shown in a scatter plot with binomial error bars and compared with the uniform distribution.
+
+[Fig. 4](#fig-min-entropy) shows the plot for an example 250MB file.
+
+<figure id=fig-min-entropy>
+    <img src="assets/MinEntropy.png" alt="Frequencies of the symbols and min-entropy">
+    <figcaption>Figure 4: Frequencies of the symbols in a 250MB file.
+</figure>
 
 ## Installing the software
 
-The software is distributed with a list of requirements contained in `requirements.txt`. It is recommended to install the dependencies and run the software inside a Python virtual environment.
+The software is packaged using [setuptools](https://pypi.org/project/setuptools/) and can be installed as a regular Python package from this repository.
+It requires Python >= 3.10.
 
-For example, using `venv`:
+To access this repository on a deployment machine, use a [Deploy Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys).
+
+Once you can access this repository from the deployment server, you can install the software in a managed virtual environment by using [pipx](https://pypi.org/project/pipx/). Pipx will automatically take care of creating a managed virtual environment, installing the dependencies there, and adding a script to the `$PATH` that activates the virtual environment and runs the software transparently.
+
+For example, to install the latest released version of the software specifying Python version 3.11:
+
+```shell
+$ pip --user install pipx
+$ pipx install --python 3.11 git+ssh://git@github.com/RandomPower/IID_validation.git@latest
+$ pipx list
+...
+   package iid-validation 1.0.0, installed using Python 3.11.7
+    - iid_validation
+$ iid_validation --help
+```
+
+The dependencies of the software are `numpy`, `matplotlib` and the `tqdm` utility library.
+
+### Setting up a local development environment
+
+A local development environment for the software can be set up by cloning this repository, and preparing a self-managed virtual environment to handle dependencies.
+
+The software is distributed with a frozen list of requirements contained in `requirements.txt`, which you can use to set up your development virtual environment.
+
+For example, using the `venv` Python module:
 
 ```shell
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 (.venv) $ pip install -r requirements.txt
-(.venv) $ python main_parallelized.py --help
 ```
 
-The main dependencies of the IID_Validation test suite are `numpy`, `matplotlib` and the `tqdm` utility library.
+Once you have set up and activated the virtual environment, you can run the software under development, without installing it, by running the `iid_validation` Python module or the `main.py` helper script provided in the repo:
 
-## NIST IID test suite indexes
+```shell
+(.venv) $ python main.py --help
+(.venv) $ python -m iid_validation --help
+```
 
-Our implementation of the NIST IID test suite uses the following indexes to refer to the permutation tests:
+## Using the software
 
-| Index | NIST SP 800-90B reference                      |
-|:-----:|:-----------------------------------------------|
-|  0    | **5.1.1** - Excursion Test Statistic           |
-|  1    | **5.1.2** - Number of Directional Runs         |
-|  2    | **5.1.3** - Length of Directional Runs         |
-|  3    | **5.1.4** - Number of Increases and Decreases  |
-|  4    | **5.1.5** - Number of Runs Based on the Median |
-|  5    | **5.1.6** - Length of Runs Based on Median     |
-|  6    | **5.1.7** - Average Collision Test Statistic   |
-|  7    | **5.1.8** - Maximum Collision Test Statistic   |
-|  8    | **5.1.9** - Periodicity Test Statistic         |
-|  9    | **5.1.10** - Covariance Test Statistic         |
-| 10    | **5.1.11** - Compression Test Statistic        |
+The software is distributed as the `iid_validation` Python module.
 
-For more information on the individual tests, refer to [NIST SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final).
+It provides a set of libraries implementing the test suite components, and an executable script which the user can run on the command line.
+If you have [installed the software](#installing-the-software), this script is available on the `$PATH`:
 
-## Program configuration
+```
+$ iid_validation --help
+```
+
+## Software configuration
+
 Program options can be set in a TOML configuration file, or on the command line.
-The software contains default values for all parameters except the input file: values specified in the configuration file have precedence over the defaults, and values specified on the command line have precedence over any others.
+The software contains default values for all parameters except the input file to test: values specified in the configuration file have precedence over the defaults, and values specified on the command line have precedence over any others.
 
-A concise description of the options is available by running the program with the `--help` option, while a full description can be found in the following subsections.
+A concise description of the options is available by running the program with the `--help` option; a full description is found in the following subsections.
 
 Program options are divided into three groups: global, NIST test and Statistical analysis.
 
-### Global
+### Global options
+
 These options configure the overall operation of the software. They can be specified in the configuration file (see `-c, --config` option) in the `[global]` section.
 
 - `-c CONFIG`, `--config CONFIG` \
     The configuration file, in TOML format.
 
     It can be specified as an absolute or relative path. If relative, it will be interpreted as relative to the current directory.
-    If not specified, the program will look for a `conf.toml` in the current directory.
+    If not specified, the program will look for a file named `conf.toml` in the current directory.
 
     A configuration file can contain no, some, or all possible parameters.
     You can find a [reference configuration file](conf.toml) in the repo.
@@ -134,9 +196,9 @@ These options configure the overall operation of the software. They can be speci
 
     False by default.
 
-### NIST test
+### NIST test options
 
-These options configure the NIST permutation tests. They can be specified in the configuration file (see `-c, --config` option) in the `[nist_test]` section.
+These options configure the [NIST permutation tests](#nist-iid-testing). They can be specified in the configuration file (see `-c, --config` option) in the `[nist_test]` section.
 
 - `--nist_selected_tests INDEX [INDEX ...]` \
     The permutation tests to execute for the IID validation process. Supported values are described in [NIST IID test suite indexes](#nist-iid-test-suite-indexes).
@@ -180,9 +242,9 @@ These options configure the NIST permutation tests. They can be specified in the
 
     Set to the NIST SP-800-90B values [1, 2, 8, 16, 32] by default.
 
-### Statistical Analysis
+### Statistical Analysis options
 
-These options configure the Random Power statistical analysis part, described in section [TBD](#tbd).
+These options configure the Random Power [statistical analysis](#statistical-analysis).
 
 - `--stat_selected_tests INDEX [INDEX ...]` \
     The permutation tests to execute for the Random Power statistical analysis. Supported values are described in [NIST IID test suite indexes](#nist-iid-test-suite-indexes).
@@ -216,3 +278,23 @@ These options configure the Random Power statistical analysis part, described in
     The value has to be included in the open interval (0, nist_n_symbols).
 
     Set to 2 by default.
+
+### NIST IID test suite indexes
+
+Our implementation of the NIST IID test suite uses the following indexes to refer to the permutation tests:
+
+| Index | NIST SP 800-90B reference                      |
+|:-----:|:-----------------------------------------------|
+|  0    | **5.1.1** - Excursion Test Statistic           |
+|  1    | **5.1.2** - Number of Directional Runs         |
+|  2    | **5.1.3** - Length of Directional Runs         |
+|  3    | **5.1.4** - Number of Increases and Decreases  |
+|  4    | **5.1.5** - Number of Runs Based on the Median |
+|  5    | **5.1.6** - Length of Runs Based on Median     |
+|  6    | **5.1.7** - Average Collision Test Statistic   |
+|  7    | **5.1.8** - Maximum Collision Test Statistic   |
+|  8    | **5.1.9** - Periodicity Test Statistic         |
+|  9    | **5.1.10** - Covariance Test Statistic         |
+| 10    | **5.1.11** - Compression Test Statistic        |
+
+For more information on the individual tests, refer to [NIST SP 800-90B](https://csrc.nist.gov/pubs/sp/800/90/b/final).
