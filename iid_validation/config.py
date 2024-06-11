@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import logging
 import os
 import pathlib
@@ -12,6 +13,8 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
 class Config:
+    DEFAULT_HASH_ALGORITHM = "sha256"
+
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_SYMBOL_LENGTH = 4
     DEFAULT_ALPHABET_SIZE = 2**DEFAULT_SYMBOL_LENGTH
@@ -22,6 +25,7 @@ class Config:
     DEFAULT_DEBUG = False
 
     _input_file: str
+    _input_file_digest: str
     _config_file: str
     _config_file_read: bool
     _nist_test: bool
@@ -148,6 +152,7 @@ class Config:
     def _set_defaults(self) -> None:
         """Initialise member variables to default values."""
         self._input_file = ""
+        self._input_file_digest = ""
         self._config_file = ""
         self._config_file_read = False
         self._nist_test = self.DEFAULT_NIST_TEST
@@ -536,6 +541,10 @@ class Config:
         ):
             raise ValueError(f'Invalid or missing configuration parameter: "input_file" ({self._input_file})')
 
+        # Store the input file digest
+        with open(self._input_file, "rb") as f:
+            self._input_file_digest = hashlib.file_digest(f, self.DEFAULT_HASH_ALGORITHM).hexdigest()
+
         if not isinstance(self._nist_test, bool):
             raise ValueError(f'Invalid configuration parameter: "nist_test" ({self._nist_test})')
 
@@ -637,6 +646,10 @@ class Config:
         return self._input_file
 
     @property
+    def input_file_digest(self) -> str:
+        return self._input_file_digest
+
+    @property
     def config_file(self) -> str:
         return self._config_file
 
@@ -699,6 +712,7 @@ p parameter ({"default" if self.stat.p == self.stat.DEFAULT_P else "custom"}): {
         return f"""Configuration info
 Config file{" (invalid)" if self.config_file and not self.config_file_read else ""}: {self.config_file}
 Input file ({os.path.getsize(self.input_file)}B): {self.input_file}
+Input file digest ({Config.DEFAULT_HASH_ALGORITHM}): {self.input_file_digest}
 
 NIST test parameters:
 {nist_str}
