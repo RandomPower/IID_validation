@@ -1,5 +1,7 @@
 import argparse
+import collections
 import hashlib
+import json
 import logging
 import os
 import pathlib
@@ -676,6 +678,37 @@ class Config:
     @property
     def debug(self) -> bool:
         return self._debug
+
+    def to_json(self) -> str:
+        data = collections.OrderedDict()
+        data["input_file"] = self._input_file
+        data["input_file_digest"] = self._input_file_digest
+        if self.config_file_read:
+            data["config_file"] = self.config_file
+        data["nist_test"] = self.nist_test
+        data["statistical_analysis"] = self.statistical_analysis
+        data["min_entropy"] = self.min_entropy
+        data["parallel"] = self.parallel
+        if self.nist_test:
+            data["nist"] = collections.OrderedDict()
+            data["nist"]["selected_tests"] = self.nist.selected_tests
+            data["nist"]["n_symbols"] = self.nist.n_symbols
+            data["nist"]["n_permutations"] = self.nist.n_permutations
+            data["nist"]["first_seq"] = self.nist.first_seq
+            data["nist"]["plot"] = self.nist.plot
+            data["nist"]["p"] = self.nist.p
+        if self.statistical_analysis:
+            data["stat"] = collections.OrderedDict()
+            data["stat"]["selected_tests"] = self.stat.selected_tests
+            data["stat"]["n_symbols"] = self.stat.n_symbols
+            data["stat"]["n_permutations"] = self.stat.n_permutations
+            data["stat"]["n_iterations"] = self.stat.n_iterations
+            data["stat"]["p"] = self.stat.p
+        return json.dumps(data, ensure_ascii=False, indent=4)
+
+    def to_json_file(self, file) -> None:
+        with open(file, "w", encoding="utf-8") as f:
+            f.write(self.to_json())
 
     def dump(self) -> str:
         """Prints configuration in a user-readable format.

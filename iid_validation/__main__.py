@@ -186,6 +186,8 @@ def main() -> int:
 
         np.set_printoptions(suppress=True, threshold=np.inf, linewidth=np.inf, formatter={"float": "{:0.6f}".format})
 
+        # Save configuration parameters in the results folder
+        conf.to_json_file("configuration.json")
         logger.debug(conf.dump())
 
         if conf.nist_test:
