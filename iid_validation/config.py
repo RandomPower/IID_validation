@@ -1,4 +1,7 @@
 import argparse
+import collections
+import hashlib
+import json
 import logging
 import os
 import pathlib
@@ -12,6 +15,8 @@ logger = logging.getLogger(f"IID_validation.{pathlib.Path(__file__).stem}")
 
 
 class Config:
+    DEFAULT_HASH_ALGORITHM = "sha256"
+
     DEFAULT_CONFIG_FILE = "conf.toml"
     DEFAULT_SYMBOL_LENGTH = 4
     DEFAULT_ALPHABET_SIZE = 2**DEFAULT_SYMBOL_LENGTH
@@ -22,6 +27,7 @@ class Config:
     DEFAULT_DEBUG = False
 
     _input_file: str
+    _input_file_digest: str
     _config_file: str
     _config_file_read: bool
     _nist_test: bool
@@ -90,8 +96,8 @@ class Config:
         DEFAULT_P = 2
 
         _selected_tests: list[int]
-        _n_permutations: int
         _n_symbols: int
+        _n_permutations: int
         _n_iterations: int
         _p: int
 
@@ -101,8 +107,8 @@ class Config:
         def _set_defaults(self) -> None:
             """Initialise member variables to default values."""
             self._selected_tests = self.DEFAULT_SELECTED_TESTS
-            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._n_symbols = self.DEFAULT_N_SYMBOLS
+            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._n_iterations = self.DEFAULT_N_ITERATIONS
             self._p = self.DEFAULT_P
 
@@ -111,12 +117,12 @@ class Config:
             return self._selected_tests
 
         @property
-        def n_permutations(self) -> int:
-            return self._n_permutations
-
-        @property
         def n_symbols(self) -> int:
             return self._n_symbols
+
+        @property
+        def n_permutations(self) -> int:
+            return self._n_permutations
 
         @property
         def n_iterations(self) -> int:
@@ -148,6 +154,7 @@ class Config:
     def _set_defaults(self) -> None:
         """Initialise member variables to default values."""
         self._input_file = ""
+        self._input_file_digest = ""
         self._config_file = ""
         self._config_file_read = False
         self._nist_test = self.DEFAULT_NIST_TEST
@@ -536,6 +543,10 @@ class Config:
         ):
             raise ValueError(f'Invalid or missing configuration parameter: "input_file" ({self._input_file})')
 
+        # Store the input file digest
+        with open(self._input_file, "rb") as f:
+            self._input_file_digest = hashlib.file_digest(f, self.DEFAULT_HASH_ALGORITHM).hexdigest()
+
         if not isinstance(self._nist_test, bool):
             raise ValueError(f'Invalid configuration parameter: "nist_test" ({self._nist_test})')
 
@@ -637,6 +648,10 @@ class Config:
         return self._input_file
 
     @property
+    def input_file_digest(self) -> str:
+        return self._input_file_digest
+
+    @property
     def config_file(self) -> str:
         return self._config_file
 
@@ -663,6 +678,37 @@ class Config:
     @property
     def debug(self) -> bool:
         return self._debug
+
+    def to_json(self) -> str:
+        data = collections.OrderedDict()
+        data["input_file"] = self._input_file
+        data["input_file_digest"] = self._input_file_digest
+        if self.config_file_read:
+            data["config_file"] = self.config_file
+        data["nist_test"] = self.nist_test
+        data["statistical_analysis"] = self.statistical_analysis
+        data["min_entropy"] = self.min_entropy
+        data["parallel"] = self.parallel
+        if self.nist_test:
+            data["nist"] = collections.OrderedDict()
+            data["nist"]["selected_tests"] = self.nist.selected_tests
+            data["nist"]["n_symbols"] = self.nist.n_symbols
+            data["nist"]["n_permutations"] = self.nist.n_permutations
+            data["nist"]["first_seq"] = self.nist.first_seq
+            data["nist"]["plot"] = self.nist.plot
+            data["nist"]["p"] = self.nist.p
+        if self.statistical_analysis:
+            data["stat"] = collections.OrderedDict()
+            data["stat"]["selected_tests"] = self.stat.selected_tests
+            data["stat"]["n_symbols"] = self.stat.n_symbols
+            data["stat"]["n_permutations"] = self.stat.n_permutations
+            data["stat"]["n_iterations"] = self.stat.n_iterations
+            data["stat"]["p"] = self.stat.p
+        return json.dumps(data, ensure_ascii=False, indent=4)
+
+    def to_json_file(self, file) -> None:
+        with open(file, "w", encoding="utf-8") as f:
+            f.write(self.to_json())
 
     def dump(self) -> str:
         """Prints configuration in a user-readable format.
@@ -699,6 +745,7 @@ p parameter ({"default" if self.stat.p == self.stat.DEFAULT_P else "custom"}): {
         return f"""Configuration info
 Config file{" (invalid)" if self.config_file and not self.config_file_read else ""}: {self.config_file}
 Input file ({os.path.getsize(self.input_file)}B): {self.input_file}
+Input file digest ({Config.DEFAULT_HASH_ALGORITHM}): {self.input_file_digest}
 
 NIST test parameters:
 {nist_str}
