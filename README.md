@@ -27,24 +27,39 @@ This test suite, called `IID_Validation`, implements three statistical measureme
 
 ### NIST IID testing
 
-The IID validation procedure takes as input a sequence of length `n_symbols` and computes on it the eleven statistical tests detailed in the Permutation Testing section of chapter 5 of [NIST SP 800-90B](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf). The outcomes (in the following referred to as `Tx`) are taken as reference and used to compare the results of the aforementioned tests on a shuffled version of the input sequence: whenever the latter (here called `Ti`) are smaller than `Tx`, a counter `C0` is updated; if they are equal to `Tx`, a second counter `C1` is. Such counters are kept independent for each test and a number `n_permutations` of shuffled sequences is considered. The symbols are validated as IID if, for every test, the reference value `Tx` does not lie in the upper or lower 0.05% of the total population of `Ti` or, in other words if both C0 ≥ 0.0005 * `n_permutations` and C1+C0 ≤ 0.9995 * `n_permutations`.
-The default parameters are `n_symbols` = 1000000 (10^3) and `n_permutations` = 10000 (10^4), as specified by NIST.
-For a fixed test the population of the `Ti` is shown as an histogram, with the reference value `Tx` marked by a red line. [Fig. 1](#fig-histTxTi) shows an example plot for the excursion test with `n_symbols` = 1000 (10^3) and `n_permutations` = 10000 (10^4).
+The IID validation procedure performs the eleven statistical tests detailed in the Permutation Testing section of Chapter 5 of [NIST SP 800-90B](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf) over a reference sequence of `n_symbols` symbols taken from the file under test.
+The reference results (here called `Tx`) are compared to the results (here called `Ti`) of the same tests executed over `n_permutations` sequences obtained by shuffling the reference sequence.
+
+For each test, each element of `Ti` is compared to the reference `Tx`: if it is smaller, a counter `C0` is incremented; if it is equal, a counter `C1` is incremented.
+The symbols in the sequence are validated as IID if, for every test, the reference value `Tx` does not lie in the upper or lower 0.05% of the total population of `Ti` - in other words, if `C0` >= 0.0005 * `n_permutations` and `C1` + `C0` <= 0.9995 * `n_permutations`.
+
+To visualize the results, the population of `Ti` is shown as a histogram, with the reference value `Tx` marked by a red line.
+[Fig. 1](#fig-histTxTi) shows an example plot for the excursion test with `n_symbols` = 1000 (10^3) and `n_permutations` = 10000 (10^4).
 
 <figure id=fig-histTxTi>
 <img src="assets/excursion.png" alt="Histogram of the Ti results">
     <figcaption>Figure 1: Histogram of the results Ti for the excursion test with parameters n_symbols=1000 and n_permutations=10000.</figcaption>
 </figure>
 
+The parameter values specified by NIST are `n_symbols` = 1000000 (10^6) and `n_permutations` = 10000 (10^4).
+
 ### Statistical analysis
 
-The tests of the Permutation Testing procedure described by NIST, albeit concise and simple, cannot be easily evaluated in terms of a theoretical distribution of their outcomes. To perform a critical statistical study of the measurement described above, the distribution of a number `n_iterations` of counters C0 for each test is considered. Shuffling the input sequence to obtain a `Ti` is tantamaunt to picking a random value from the distribution shown in the histogram generated in the previous section (*e.g.* [Fig. 1](#fig-histTxTi)). The value of the counter `C0` can therefore be interpreted as the number of "successes" over `n_permutations` trials, a success being the updating of the counter, and is expected to be binomially distributed.
-The default parameters are `n_symbols` = 1000, chosen so that the space of the possible results Ti is wide enough, `n_permutations` = 200 and `n_iterations` = 500, high enough for the statistical interpretation to be meaningful.
+The tests of the Permutation Testing procedure described by NIST, albeit concise and simple, do not give us easily interpretable information about the theoretical distribution of their outcomes.
+
+Shuffling the input sequence to obtain a `Ti` is tantamount to picking a random value from the distribution shown in the histogram in [Fig. 1](#fig-histTxTi).
+The value of the counter `C0` can therefore be interpreted as the number of "successes" over `n_permutations` trials (with "success" defined as a property of the element of `Ti`, such as it being smaller than the reference value `Tx`), and is therefore expected to be binomially distributed.
+
+To perform a critical statistical analysis of this binomial characteristic, a sample of `n_iterations` counters C0 is computed for each test. The analysis is performed with two different methods, described below.
+
+The default parameters are `n_symbols` = 1000, chosen so that the space of the possible results `Ti` is wide enough, `n_permutations` = 200 and `n_iterations` = 500, high enough for the statistical interpretation to be meaningful.
 
 #### Tx method
 
-The counter `C0` is updated whenever `Ti` is bigger than the set reference `Tx`, so the parameter `p` of the theoretical binomial distribution for `C0` representing the probability of "success" is equal to the fraction of population to the left of the reference in the histogram of the `Ti`.
-A number `n_iterations` of counters `C0` is produced and their values are plotted with binomial error bars alongside the expected binomial distribution in red. [Fig. 2](#fig-countersTx) shows an example plot for the excursion test for `n_symbols` = 1000, `n_permutations` = 200 and `n_iterations` = 500. The box reports the mean and standard deviation of the sample, the parameter `p`, and the reduced chi square for the data in the null hypothesis of binomial distribution.
+The counter `C0` is updated whenever `Ti` is bigger than the reference `Tx`, so the parameter `p` of the theoretical binomial distribution for `C0` representing the probability of "success" is equal to the fraction of population to the left of the reference in the histogram of `Ti`.
+A number `n_iterations` of counters `C0` is produced and their values are plotted with binomial error bars alongside the expected binomial distribution in red.
+[Fig. 2](#fig-countersTx) shows an example plot for the excursion test for `n_symbols` = 1000, `n_permutations` = 200 and `n_iterations` = 500.
+The box reports the mean and standard deviation of the sample, the parameter `p`, and the reduced chi square for the data in the null hypothesis of binomial distribution.
 
 <figure id=fig-countersTx>
     <img src="assets/countersTx_excursion.png" alt="Binomial distribution of counters, Tx method">
@@ -53,8 +68,11 @@ A number `n_iterations` of counters `C0` is produced and their values are plotte
 
 #### Tj method
 
-In order to have a predictable and uniform value for `p` throughout the tests and the tested files, a second ratio for the increase of C0 is considered that does not depend on the random value `Tx`. Instead of having a fixed reference, the sequences are evaluated in disjointed consecutive pairs: given a statistical test, the counter C0 is increased whenever the result on the jth sequence is greater than the one on the jth+1 sequence. If such results turn out to be equal, the pair is discarded, so that the results are normalized and the probability for the counter `C0` to increase is `p` = 0.5 in each iteration. [Fig. 3](#fig-countersTj) shows an example plot for the excursion test with parameters `n_symbols` = 1000, `n_permutations` = 200 and `n_iterations` = 500.
-Please note that despite the probability of increasing the counter equal to p = 0.5, the mean of the distribution is approximately equal to  `n_permutations` / 4, because this method effectively halves the number of occasions for the `C0` to update, compared to the previous "Tx method".
+In order to have a predictable and uniform value for `p` throughout the tests and the tested files, a second criterion for the increase of C0 is considered that does not depend on the random value `Tx`.
+Instead of having a fixed reference, the `Ti` results for each test are considered in non-overlapping consecutive pairs: the counter C0 is increased whenever the first element in the pair is greater than the second.
+If the two elements are equal, the pair is discarded and re-computed, so that the results are normalized and the probability for the counter `C0` to increase is `p` = 0.5 in each iteration.
+[Fig. 3](#fig-countersTj) shows an example plot for the excursion test with parameters `n_symbols` = 1000, `n_permutations` = 200 and `n_iterations` = 500.
+Please note that despite the probability of increasing the counter equal to p = 0.5, the mean of the distribution is approximately equal to  `n_permutations` / 4, because this method effectively halves the number of occasions for `C0` to update, compared to the previous "Tx method".
 
 <figure id=fig-countersTj>
     <img src="assets/countersTj_excursion.png" alt="Binomial distribution of counters, Tj method">
