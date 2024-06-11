@@ -96,8 +96,8 @@ class Config:
         DEFAULT_P = 2
 
         _selected_tests: list[int]
-        _n_permutations: int
         _n_symbols: int
+        _n_permutations: int
         _n_iterations: int
         _p: int
 
@@ -107,8 +107,8 @@ class Config:
         def _set_defaults(self) -> None:
             """Initialise member variables to default values."""
             self._selected_tests = self.DEFAULT_SELECTED_TESTS
-            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._n_symbols = self.DEFAULT_N_SYMBOLS
+            self._n_permutations = self.DEFAULT_N_PERMUTATIONS
             self._n_iterations = self.DEFAULT_N_ITERATIONS
             self._p = self.DEFAULT_P
 
@@ -117,12 +117,12 @@ class Config:
             return self._selected_tests
 
         @property
-        def n_permutations(self) -> int:
-            return self._n_permutations
-
-        @property
         def n_symbols(self) -> int:
             return self._n_symbols
+
+        @property
+        def n_permutations(self) -> int:
+            return self._n_permutations
 
         @property
         def n_iterations(self) -> int:
