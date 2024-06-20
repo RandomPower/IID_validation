@@ -115,7 +115,8 @@ def save_entropy(
     header = [
         "file",
         "symbols_occurrences",
-        "n_symbols" "H_min_symbol",
+        "n_symbols",
+        "H_min_symbol",
         "H_min_symbol_sigma",
         "H_min_NIST_symbol",
         "date",
