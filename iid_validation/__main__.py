@@ -6,6 +6,7 @@ import importlib.metadata
 import logging
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 
@@ -162,12 +163,14 @@ def main() -> int:
     rv = ReturnValue.OK
     # Create results folder and move into it
     current_run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_dir = os.path.join("results", current_run_date)
+    file_name = Path(conf.input_file).stem  # Extracts the file name from the full path
+    dir_name = f"{file_name}@{current_run_date}"
+    results_dir = os.path.join("iid_results", dir_name)
     os.makedirs(results_dir, exist_ok=True)
     with contextlib.chdir(results_dir):
         # Configure logging
         # Write all loggers to file, each with their own level, from DEBUG up
-        f_handler = logging.FileHandler(f"{current_run_date}.log", mode="w")
+        f_handler = logging.FileHandler(f"{dir_name}.log", mode="w")
         f_handler.setLevel(logging.DEBUG)
         f_handler.setFormatter(logging.Formatter("%(asctime)s %(name)-28s %(levelname)-8s %(message)s"))
         logger.addHandler(f_handler)
