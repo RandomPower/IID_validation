@@ -95,7 +95,7 @@ The distribution of the symbols that make up the file under test is shown in a s
 ## Installing the software
 
 The software is packaged using [setuptools](https://pypi.org/project/setuptools/) and can be installed as a regular Python package from this repository.
-It requires Python >= 3.10.
+It requires Python >= 3.11.
 
 To access this repository on a deployment machine, use a [Deploy Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys).
 
@@ -104,8 +104,8 @@ Once you can access this repository from the deployment server, you can install 
 For example, to install the latest released version of the software specifying Python version 3.11:
 
 ```shell
-$ pip --user install pipx
-$ pipx install --python 3.11 git+ssh://git@github.com/RandomPower/IID_validation.git@latest
+$ pip install --user pipx
+$ pipx install --python python3.11 git+ssh://git@github.com/RandomPower/IID_validation.git@latest
 $ pipx list
 ...
    package iid-validation 1.0.0, installed using Python 3.11.7
@@ -127,6 +127,7 @@ For example, using the `venv` Python module:
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 (.venv) $ pip install -r requirements.txt
+(.venv) $ pip install .
 ```
 
 Once you have set up and activated the virtual environment, you can run the software under development, without installing it, by running the `iid_validation` Python module or the `main.py` helper script provided in the repo:
@@ -135,6 +136,8 @@ Once you have set up and activated the virtual environment, you can run the soft
 (.venv) $ python main.py --help
 (.venv) $ python -m iid_validation --help
 ```
+
+> **N.B.**: Make sure your Python interpreter points to a version >= 11. Otherwise, invoke it explicitly (e.g., `python3.11` instead of `python3` or `python`).
 
 ## Using the software
 
